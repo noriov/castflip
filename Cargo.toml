@@ -1,0 +1,6 @@
+[workspace]
+members = [
+    "castflip",
+    "castflip_derive",
+    "castflip_test",
+]
