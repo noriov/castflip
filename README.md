@@ -248,9 +248,4 @@ If successful, they return the number of resulting bytes.
 The endianness of resulting bytes is specified in the arguments of
 `decastf` and `decastvf`.
 
-## Types of return value
-
-* [`EncastMem`] and [`DecastMem`] return `std::option::Option`.
-* [`EncastIO`] and [`DecastIO`] return `std::io::Result`.
-
 For more information, please see <https://docs.rs/castflip/>.
