@@ -1,6 +1,6 @@
 [package]
 name = "castflip"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 description = "Library for encoding/decoding numeric variables, arrays and structures in little-endian and big-endian"
 categories = ["encoding", "parsing"]
@@ -10,4 +10,4 @@ readme = "crates-io.md"
 repository = "https://github.com/noriov/castflip"
 
 [dependencies]
-castflip_derive = { path = "../castflip_derive", version = "0.1.0" }
+castflip_derive = { path = "../castflip_derive", version = "0.1" }

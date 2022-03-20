@@ -1,6 +1,6 @@
 [package]
 name = "castflip_derive"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 description = "Derive macros of Cast, Flip and NopFlip"
 license = "MIT-0"
@@ -15,4 +15,4 @@ syn = "1.0"
 quote = "1.0"
 
 [dev-dependencies]
-castflip = { path = "../castflip" }
+castflip = { path = "../castflip", version = "0.1" }
