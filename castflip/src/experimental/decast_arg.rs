@@ -73,8 +73,9 @@ pub trait DecastArg: Cast {
     fn decast(bytes: &mut [u8], val_ptr: &Self) -> Option<usize>;
 
     /// Encodes the value pointed by `val_ptr` of type `T` to bytes
-    /// and stores them at the head of `bytes`.  The endianness of
-    /// resulting bytes is flipped if necessary as specified by `endian`.
+    /// and stores them at the head of `bytes`.  The endianness of the
+    /// resulting bytes is flipped if necessary.  The endianness of
+    /// the bytes is specified in `endian`.
     fn decastf(bytes: &mut [u8], val_ptr: &Self, endian: Endian)
 	       -> Option<usize>
     where
@@ -87,8 +88,9 @@ pub trait DecastArg: Cast {
 
     /// Encodes the slice of value(s) of type `T` pointed by `slice`
     /// to bytes and stores them at the head of `bytes`.  The
-    /// endianness of resulting bytes is flipped if necessary as
-    /// specified by `endian`.
+    /// endianness of the resulting bytes is flipped if necessary.
+    /// The endianness of the resulting bytes is specified in
+    /// `endian`.
     fn decastvf(bytes: &mut [u8], slice: &[Self], endian: Endian)
 		-> Option<usize>
     where

@@ -52,11 +52,12 @@ use crate::{Cast, Endian, Flip};
 /// # Description
 ///
 /// All methods in this trait `decast` one or more variables to a
-/// number of bytes on memory.  Because the generic type can be
-/// inferred from the argument, generic type parameter can be omitted.
-/// The endianness of resulting bytes is flipped when required and
-/// necessary.  Currently, only an implementation for `[u8]` is
-/// provided.
+/// number of bytes on memory.  The type of the value(s) can be
+/// explicitly specified as the generic type parameter of its method
+/// or simply omitted because the Rust compiler can infer from the
+/// argument.  The endianness of resulting bytes is flipped when
+/// required and necessary.  Currently, only an implementation for
+/// `[u8]` is provided.
 ///
 /// The size of `self` should be larger than or equal to the specified
 /// number of value(s) of type `T`.  If there is enough room, the
@@ -76,8 +77,9 @@ pub trait DecastMem {
 	T: Cast;
 
     /// Encodes the value pointed by `val_ptr` of type `T` to bytes
-    /// and stores them at the head of `self`.  The endianness of
-    /// resulting bytes is flipped if necessary as specified by `endian`.
+    /// and stores them at the head of `self`.  The endianness of the
+    /// resulting bytes is flipped if necessary.  The endianness of
+    /// the bytes is specified in `endian`.
     fn decastf<T>(&mut self, val_ptr: &T, endian: Endian) -> Option<usize>
     where
 	T: Cast + Flip;
@@ -91,8 +93,9 @@ pub trait DecastMem {
 
     /// Encodes the slice of value(s) of type `T` pointed by `slice`
     /// to bytes and stores them at the head of `self`.  The
-    /// endianness of resulting bytes is flipped if necessary as
-    /// specified by `endian`.
+    /// endianness of the resulting bytes is flipped if necessary.
+    /// The endianness of the resulting bytes is specified in
+    /// `endian`.
     fn decastvf<T>(&mut self, slice: &[T], endian: Endian) -> Option<usize>
     where
 	T: Cast + Flip;

@@ -57,11 +57,11 @@ use crate::experimental::AsBytes;
 ///
 /// All methods in this trait `encast` a number of bytes read from I/O
 /// to one or more values of the specified type.  The type of the
-/// value(s) can be explicitly specified as generic type parameter or
-/// implicitly specified so that the Rust compiler can infer.  The
-/// endianness of resulting value(s) is flipped when required and
-/// necessary.  Currently, only an implementation for trait `Read` is
-/// provided.
+/// value(s) can be explicitly specified as the generic type parameter
+/// of the methods or implicitly specified so that the Rust compiler
+/// can infer.  The endianness of resulting value(s) is flipped when
+/// required and necessary.  Currently, only an implementation for
+/// trait `Read` is provided.
 ///
 /// The input `self` should have enough bytes to decode to the
 /// specified number of value(s) of type `T`.  If there are enough
@@ -80,25 +80,26 @@ pub trait EncastIO {
     where
 	T: Cast;
 
-    /// Decodes the bytes read from input `self` to a value of type `T`,
-    /// then flips its endianness if necessary.
-    /// The endianness of the bytes is specified by `endian`.
+    /// Decodes the bytes read from input `self` to a value of type `T`.
+    /// The endianness of the resulting value is flipped if necessary.
+    /// The endianness of the bytes is specified in `endian`.
     fn encastf<T>(&mut self, endian: Endian) -> Result<T>
     where
 	T: Cast + Flip;
 
     /// Decodes the bytes read from input `self` to a vector of
-    /// value(s) of type `T`.  The endianness of the resulting value
-    /// is not flipped.  The number of elements in the resulting
-    /// vecotr is specified by `nelem`.
+    /// value(s) of type `T`.  The endianness of the resulting
+    /// value(s) is not flipped.  The number of elements in the
+    /// resulting vecotr is specified in `nelem`.
     fn encastv<T>(&mut self, nelem: usize) -> Result<Vec<T>>
     where
 	T: Cast;
 
-    /// Decodes the bytes read from input `self` to a vector of value(s)
-    /// of type `T`, then flips their endianness if necessary.  The
-    /// endianness of the bytes is specified by `endian`.  The number
-    /// of elements in the resulting vecotr is specified by `nelem`.
+    /// Decodes the bytes read from input `self` to a vector of
+    /// value(s) of type `T`.  The endianness of the resulting
+    /// value(s) is flipped if necessary.  The endianness of the bytes
+    /// is specified in `endian`.  The number of elements in the
+    /// resulting vecotr is specified in `nelem`.
     fn encastvf<T>(&mut self, nelem: usize, endian: Endian) -> Result<Vec<T>>
     where
 	T: Cast + Flip;

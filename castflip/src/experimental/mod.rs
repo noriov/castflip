@@ -1,5 +1,5 @@
 //!
-//! Defines experimental and historical traits.
+//! Defines experimental traits and historical traits.
 //!
 //! - [`AsBytes`] converts a reference to a variable or a slice into a
 //!   phantom reference to bytes without copying data.  Although it is
@@ -15,7 +15,7 @@
 //!
 //! - [`EncastArg`], [`DecastArg`] and [`FlipUnsized`] provides some
 //!   older versions of APIs of this crate.  If no good use case can
-//!   be found, they may be deleted in future.
+//!   be found, they may be removed in a future release.
 //!
 
 

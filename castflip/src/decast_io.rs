@@ -56,11 +56,12 @@ use crate::experimental::AsBytes;
 /// # Description
 ///
 /// All methods in this trait `decast` one or more variables to a
-/// number of bytes and writes to I/O.  Because the generic type can
-/// be inferred from the argument, generic type parameter can be
-/// omitted.  The endianness of resulting value(s) is flipped when
-/// required and necessary.  Currently, only an implementation for
-/// trait `Write` is provided.
+/// number of bytes and writes to I/O.  The type of the value(s) can
+/// be explicitly specified as the generic type parameter of its
+/// method or simply omitted because the Rust compiler can infer from
+/// the argument.  The endianness of resulting value(s) is flipped
+/// when required and necessary.  Currently, only an implementation
+/// for trait `Write` is provided.
 ///
 /// The output `self` should have enough room to encode to the
 /// specified number of value(s) of type `T`.  If there is enough
@@ -81,8 +82,9 @@ pub trait DecastIO {
 	T: Cast;
 
     /// Encodes the value pointed by `val_ptr` of type `T` to bytes
-    /// and writes them to output `self`.  The endianness of resulting
-    /// bytes is flipped if necessary as specified by `endian`.
+    /// and writes them to output `self`.  The endianness of the
+    /// resulting bytes is flipped if necessary.  The endianness of
+    /// the resulting bytes is specified in `endian`.
     fn decastf<T>(&mut self, val_ptr: &T, endian: Endian) -> Result<usize>
     where
 	T: Cast + Flip;
@@ -96,8 +98,8 @@ pub trait DecastIO {
 
     /// Encodes the slice of value(s) of type `T` pointed by `slice`
     /// to bytes and writes them to output `self`.  The endianness of
-    /// resulting bytes is flipped if necessary as specified by
-    /// `endian`.
+    /// the resulting bytes is flipped if necessary.  The endianness
+    /// of the resulting bytes is specified in `endian`.
     fn decastvf<T>(&mut self, slice: &[T], endian: Endian) -> Result<usize>
     where
 	T: Cast + Flip;

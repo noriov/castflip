@@ -8,7 +8,10 @@ one or more values, the term `decast` means encoding one or more
 variables to a number of bytes, and the term `endian-flip` means
 flipping the endianness of value(s).
 
-# Example
+Here we show an example below.  For more examples and documentation,
+please see <https://docs.rs/castflip/>.
+
+# Example 1
 
 In the example below, method `encastf` decodes bytes in `bytes1` in
 big-endian (`BE`) to variable `udp_hdr2` of type `UdpHdr`.  Then,
@@ -46,8 +49,8 @@ assert_eq!(bytes3_size, 8);
 assert_eq!(bytes3, bytes1);
 ```
 
-In the example above, #[derive(`Cast`)] makes the values of `UdpHdr`
-`encast`able / `decast`able, and #[derive(`Flip`)] makes the values
+In the example above, #[derive(`Cast`)] makes the value of `UdpHdr`
+`encast`able / `decast`able, and #[derive(`Flip`)] makes the value
 of `UdpHdr` `endian-flip`pable.
 
 Trait `EncastMem` provides methods to `encast` from memory, and

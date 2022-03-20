@@ -22,8 +22,6 @@ use crate::Endian;
 /// - it is a struct type whose all members are `Flip` and
 ///   implements `Flip` by declaring `#[derive(Flip)]`.
 ///
-/// Some methods of `Flip` is used internally in this crate.
-///
 /// # Example 1
 ///
 /// In the example below, #[derive(`Flip`)] makes the value of
@@ -77,8 +75,8 @@ use crate::Endian;
 ///
 /// # Example 2
 ///
-/// In the example below, two values and one variable are
-/// `endian-flip`ped by using methods defined in `Flip`.
+/// The example below shows how to use the methods defined in trait
+/// `Flip`.
 ///
 /// ```
 /// # fn main() { test(); }
@@ -102,9 +100,13 @@ use crate::Endian;
 /// # }
 /// ```
 ///
-/// In the example above, method `flip_val` returns the `endian-flip`ped
-/// value of `self` (e.g., `val1` and `0xABCD_u16`), and method `flip_var`
-/// flips the endianness of `self` (e.g., `val3`).
+/// Two types methods are defined in trait `Flip`.
+///
+/// * Method `flip_val` returns the `endian-flip`ped value of `self`.
+///   (e.g. `val1`, `0xABCD_u16`)
+/// * Method `flip_var` flips the endianness of `self`. (e.g. `val3`)
+///
+/// The former method is used internally in this crate.
 ///
 pub trait Flip: Sized {
     /// Returns the endian-flipped value of `self`.
@@ -193,16 +195,16 @@ impl<T: Flip, const N: usize> Flip for [T; N] {
 ///
 /// # Description
 ///
-/// A struct type may contain a union type.  A union type can be
-/// `encast`ed and `decast`ed but cannot be automatically
+/// A struct type may contain a union type as its member.  A union
+/// type can be `encast`ed and `decast`ed but cannot be automatically
 /// `endian-flip`ped.  In order to automatically flip the endianness
-/// of such struct type without `endian-flip`ping its internal union
-/// type, `NopFlip` is provided.
+/// of such container struct type without `endian-flip`ping its
+/// internal union type, trait `NopFlip` is defined.
 ///
 /// `NopFlip` is a subtrait of [`Flip`].  It has the same methods with
 /// [`Flip`] but all methods do nothing.  In the above example, if
-/// `NopFlip` is implemented for the union type, `Flip` can be
-/// implemented for the struct type.
+/// `NopFlip` is implemented for the internal union type, `Flip` can
+/// be implemented for the container struct type.
 ///
 /// In general, `NopFlip` can be implemented by declaring
 /// `#[derive(NopFlip)]` for a struct type or a union type whose all
@@ -212,11 +214,11 @@ impl<T: Flip, const N: usize> Flip for [T; N] {
 ///
 /// # Example
 ///
-/// In the example below, #[derive(`NopFlip`)] marks `UnionU` as
+/// In the example below, #[derive(`NopFlip`)] marks `UnionB` as
 /// `endian-flip`pable but the implemented methods do nothing (Nop,
 /// i.e., No operation) so that method `encastf` and method `decastf`
-/// do not flip its endianness even if in a case where it is a member
-/// of another struct type `TypeC` which implements `Flip`.
+/// can flip the endianness of the container struct `StructC` except
+/// its internal union `UnionB`.
 ///
 /// ```
 /// # use std::io::Result;
@@ -227,7 +229,7 @@ impl<T: Flip, const N: usize> Flip for [T; N] {
 ///
 /// #[repr(C)]
 /// #[derive(Cast, Flip)]
-/// struct TypeA {      // 8 bytes (total)
+/// struct StructA {    // 8 bytes (total)
 ///     x: [u8; 2],     // 2 bytes
 ///     y: u16,         // 2 bytes
 ///     z: u32,         // 4 bytes
@@ -243,8 +245,8 @@ impl<T: Flip, const N: usize> Flip for [T; N] {
 ///
 /// #[repr(C)]
 /// #[derive(Cast, Flip)]
-/// struct TypeC {      // 16 bytes (total)
-///     a: TypeA,       //  8 bytes
+/// struct StructC {    // 16 bytes (total)
+///     a: StructA,     //  8 bytes
 ///     b: UnionB,      //  4 bytes
 ///     f: f32,         //  4 bytes
 /// }
@@ -254,19 +256,19 @@ impl<T: Flip, const N: usize> Flip for [T; N] {
 ///                         0x18, 0x19, 0x1A, 0x1B, 0x00, 0x00, 0x48, 0x41];
 /// let mut input1 = Cursor::new(bytes1);
 ///
-/// // Decode input `input1` to variable `var2_c` of type `TypeC`.
-/// let var2_c: TypeC = input1.encastf(LE)?;  // LE = Little-Endian
+/// // Decode input `input1` to variable `var2_c` of type `StructC`.
+/// let var2_c: StructC = input1.encastf(LE)?;  // LE = Little-Endian
 ///
 /// // Encode variable `var2_c` to bytes and write them to `output3`.
 /// let mut output3 = Cursor::new(vec![0_u8; 16]);
 /// output3.decastf(&var2_c, LE)?;
 ///
-/// // Check the results (TypeA in TypeC)
+/// // Check the results (StructA in StructC)
 /// assert_eq!(var2_c.a.x, [0x10_u8, 0x11]);
 /// assert_eq!(var2_c.a.y, 0x1312);
 /// assert_eq!(var2_c.a.z, 0x17161514);
 ///
-/// // Check the results (UnionB in TypeC)
+/// // Check the results (UnionB in StructC)
 /// unsafe {
 ///     assert_eq!(var2_c.b.u, [0x18_u8, 0x19, 0x1A, 0x1B]);
 ///     if cfg!(target_endian = "little") {
@@ -278,7 +280,7 @@ impl<T: Flip, const N: usize> Flip for [T; N] {
 ///     }
 /// }
 ///
-/// // Check the result (f32 in TypeC)
+/// // Check the result (f32 in StructC)
 /// assert_eq!(var2_c.f, 12.5_f32);
 ///
 /// // Check the result (output3)
@@ -288,11 +290,11 @@ impl<T: Flip, const N: usize> Flip for [T; N] {
 /// ```
 ///
 /// In the example above, method `encastf` decodes bytes in `bytes1`
-/// in little-endian (`LE`) to variable `var2_c` of type `TypeC`.
+/// in little-endian (`LE`) to variable `var2_c` of type `StructC`.
 /// Then, method `decastf` encodes the resulting value in `var2_c` to
 /// bytes in little-endian (`LE`) and stores them in `bytes3`.
 ///
-/// As the results show, field `a` and `f` of `TypeC` are
+/// As the results show, field `a` and `f` of `StructC` are
 /// `endian-flip`ped, but field `b` is not `endian-flip`ped.
 /// The endianness of the value(s) in field `b` needs to be
 /// flipped manually, e.g., by using the methods of [`Flip`].

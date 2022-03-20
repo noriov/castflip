@@ -5,7 +5,8 @@ use crate::Cast;
 
 ///
 /// Defines methods to convert a reference to a slice of a type to a
-/// reference to a slice of the specified type without copying data.
+/// phantom reference to a slice of the specified type without copying
+/// data.
 ///
 /// # Example
 ///
@@ -87,23 +88,23 @@ use crate::Cast;
 /// with this trait.
 ///
 /// Because the Rust compiler would not recognize what is happening,
-/// it may reorder instructions unexpectedly.  When a reference is
-/// created by this trait, it would be better not to use the original
-/// reference until the newly created reference is dropped, expecially
-/// when the original reference is mutable.
+/// it may reorder instructions unexpectedly.  When a phantom
+/// reference is created by this trait, it would be better not to use
+/// the original reference until the phantom reference is dropped,
+/// expecially when the original reference is mutable.
 ///
-/// When creating a new reference with this trait, take care with the
-/// alignment issues.
+/// When creating a phantom reference with this trait, take care with
+/// the alignment issues.
 ///
 pub trait Reslice {
     /// Converts a reference to slice `self` of a type
-    /// into a reference to a slice of type `U`.
+    /// into a phantom reference to a slice of type `U`.
     unsafe fn reslice<'a, U>(&'a self) -> Option<&'a [U]>
     where
 	U: Cast;
 
     /// Converts a mutable reference to slice `self` of a type
-    /// into a mutable reference to a slice of type `U`.
+    /// into a mutable phantom reference to a slice of type `U`.
     unsafe fn reslice_mut<'a, U>(&'a mut self) -> Option<&'a mut [U]>
     where
 	U: Cast;

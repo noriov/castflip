@@ -11,11 +11,11 @@ pub fn proc_tokens(input: TokenStream) -> TokenStream {
 	Data::Struct(data_struct) =>
 	    match &data_struct.fields {
 		Fields::Named(fields_named) =>
-		    proc_named(&ast.ident, &fields_named),
+		    proc_named_struct(&ast.ident, &fields_named),
 		Fields::Unnamed(fields_unnamed) =>
-		    proc_unnamed(&ast.ident, &fields_unnamed),
+		    proc_unnamed_struct(&ast.ident, &fields_unnamed),
 		Fields::Unit =>
-		    proc_unit(&ast.ident),
+		    proc_unit_struct(&ast.ident),
 	    },
 	Data::Enum(_data_enum) =>
 	    panic!("Trait NopFlip cannot be implemented for enum."),
@@ -24,7 +24,8 @@ pub fn proc_tokens(input: TokenStream) -> TokenStream {
     }
 }
 
-fn proc_named(ident: &Ident, fields: &FieldsNamed) -> TokenStream {
+// e.g. struct Ident { field1: Type1, field2: Type2, ... }
+fn proc_named_struct(ident: &Ident, fields: &FieldsNamed) -> TokenStream {
     let field_type = fields.named.iter().map(|field| &field.ty);
 
     quote! {
@@ -43,7 +44,8 @@ fn proc_named(ident: &Ident, fields: &FieldsNamed) -> TokenStream {
     }.into()
 }
 
-fn proc_unnamed(ident: &Ident, fields: &FieldsUnnamed) -> TokenStream {
+// e.g. struct Ident ( Type1, Type2, ... );
+fn proc_unnamed_struct(ident: &Ident, fields: &FieldsUnnamed) -> TokenStream {
     let field_type = fields.unnamed.iter().map(|field| &field.ty);
 
     quote! {
@@ -62,7 +64,8 @@ fn proc_unnamed(ident: &Ident, fields: &FieldsUnnamed) -> TokenStream {
     }.into()
 }
 
-fn proc_unit(ident: &Ident) -> TokenStream {
+// e.g. struct Ident;
+fn proc_unit_struct(ident: &Ident) -> TokenStream {
     quote! {
 	impl castflip::Flip for #ident
 	{
@@ -75,6 +78,7 @@ fn proc_unit(ident: &Ident) -> TokenStream {
     }.into()
 }
 
+// e.g. union Ident { field1: Type1, field2: Type2, ... }
 fn proc_union(ident: &Ident, fields: &FieldsNamed) -> TokenStream {
     let field_type = fields.named.iter().map(|field| &field.ty);
 

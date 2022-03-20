@@ -6,7 +6,8 @@ use crate::experimental::Reslice;
 
 ///
 /// Defines methods to convert a reference to a variable into a
-/// reference to a slice of the specified type without copying data.
+/// phantom reference to a slice of the specified type without copying
+/// data.
 ///
 /// The antonym of [`Enslice`] is [`Deslice`].
 ///
@@ -75,20 +76,20 @@ use crate::experimental::Reslice;
 /// with this trait.
 ///
 /// Because the Rust compiler would not recognize what is happening,
-/// it may reorder instructions unexpectedly.  When a reference is
-/// created by this trait, it would be better not to use the original
-/// reference until the newly created reference is dropped, expecially
-/// when the original reference is mutable.
+/// it may reorder instructions unexpectedly.  When a phantom
+/// reference is created by this trait, it would be better not to use
+/// the original reference until the phantom reference is dropped,
+/// expecially when the original reference is mutable.
 ///
 pub trait Enslice {
     /// Converts a reference to `self` of a type
-    /// into a reference to a slice of type `U`.
+    /// into a phantom reference to a slice of type `U`.
     unsafe fn enslice<'a, U>(&'a self) -> Option<&'a [U]>
     where
 	U: Cast;
 
     /// Converts a mutable reference to `self` of a type
-    /// into a mutable reference to a slice of type `U`.
+    /// into a mutable phantom reference to a slice of type `U`.
     unsafe fn enslice_mut<'a, U>(&'a mut self) -> Option<&'a mut [U]>
     where
 	U: Cast;

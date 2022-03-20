@@ -5,9 +5,9 @@ use crate::Cast;
 
 ///
 /// Defines methods to convert a reference to a variable or a slice
-/// into a new reference to bytes without copying data.
+/// into a phantom reference to bytes without copying data.
 ///
-/// Some methods of `AsBytes` is used internally in this crate.
+/// Trait `AsBytes` is used internally in this crate.
 ///
 /// # Example 1
 ///
@@ -74,9 +74,9 @@ use crate::Cast;
 ///
 /// #[repr(C)]
 /// #[derive(Cast)]
-/// struct Pair (u16, u16);
+/// struct Pair (u16, u16); // 4 bytes
 ///
-/// // Input data.
+/// // Input data (16 bytes)
 /// let pairs1 = [Pair(0x3031, 0x3233), Pair(0x3435, 0x3637),
 ///               Pair(0x3839, 0x3A3B), Pair(0x3C3D, 0x3E3F)];
 ///
@@ -105,13 +105,20 @@ use crate::Cast;
 /// with this trait.
 ///
 /// Because the Rust compiler would not recognize what is happening,
-/// it may reorder instructions unexpectedly.  When a reference is
-/// created by this trait, it would be better not to use the original
-/// reference until the newly created reference is dropped, expecially
-/// when the original reference is mutable.
+/// it may reorder instructions unexpectedly.  When a phantom
+/// reference is created by this trait, it would be better not to use
+/// the original reference until the phantom reference is dropped,
+/// expecially when the original reference is mutable.
 ///
 pub trait AsBytes {
+    /// Converts a reference to `self` into a phantom reference to a
+    /// slice of u8 without copying data.  `self` can be a variable or
+    /// a slice.
     unsafe fn as_bytes_ref(&self) -> &[u8];
+
+    /// Converts a mutable reference to `self` into a mutable phantom
+    /// reference to a slice of u8 without copying data.  `self` can
+    /// be a variable or a slice.
     unsafe fn as_bytes_mut(&mut self) -> &mut [u8];
 }
 
