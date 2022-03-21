@@ -18,13 +18,15 @@
 ///   and implements `Cast` by declaring `#[derive(Cast)]`.
 ///   (Note: `#[repr(C)]` must also be declared)
 ///
-/// As you may have noticed, all types implementing `Cast` can be
-/// duplicated simply by copying bits.  But `Cast` is not a subtrait
-/// of `Copy`.  The reasons why `Cast` is defined independently from
-/// `Copy` are (1) to exclude pointers and (2) to avoid unexpected
-/// copying to enjoy the merit of Rust's ownership mechanism.  Hence,
-/// if a type need to be `Copy`, #[derive(Clone, Copy)] should also be
-/// declared.
+/// As you may have noticed, all types implementing trait `Cast` can
+/// be duplicated simply by copying bits.  But trait `Cast` is not a
+/// subtrait of trait `Copy`.  The reasons why trait `Cast` is defined
+/// independently from trait `Copy` are (1) to exclude pointers and
+/// (2) to avoid unexpected copying to enjoy the merit of Rust's
+/// ownership system.  Hence, if a type need to be `Copy`,
+/// #[derive(Clone, Copy)] should also be declared.
+///
+/// `Cast` has no method.
 ///
 /// # Example
 ///
@@ -78,7 +80,6 @@
 /// variable `id_hdr` of type `ElfIdHdr`, and method `decast` encodes
 /// the resulting value in `id_hdr` to bytes and stores them in
 /// `bytes3`.  Their endiannesses are not flipped.
-/// `Cast` has no method.
 ///
 /// Note: [ELF] is a common standard file format for executable files.
 /// ELF Identification is the first 16 bytes of the ELF header.

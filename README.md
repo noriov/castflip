@@ -60,12 +60,12 @@ In the example above, #[derive(`Cast`)] makes the value of `UdpHdr`
 of `UdpHdr` `endian-flip`pable.
 
 Trait `EncastMem` provides methods to `encast` from memory, and
-trait `DecastMem` provides methods to `decast` to memory.  The type
-of the value(s) can be explicitly specified as the generic type parameter
-of their methods or implicitly specified so that the Rust compiler can
-infer.  Their methods whose names end with 'f' flip the endianness of
-the results.  The endianness of bytes is specified in their argument.
-`BE` is an alias of `Endian::Big`, which means Big-Endian.
+trait `DecastMem` provides methods to `decast` to memory.  The
+generic type parameters of their methods can be omitted where the Rust
+compiler can infer them.  Their methods whose names end with 'f' flip
+the endianness of the results.  The endianness of bytes is specified
+in their argument.  `BE` is an alias of `Endian::Big`, which means
+Big-Endian.
 
 Note: [UDP] is one of the fundamental protocols in the internet
 protocol suite.

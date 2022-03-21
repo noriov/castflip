@@ -1,6 +1,7 @@
 use core::ptr;
 
 use crate::Endian;
+#[allow(unused_imports)] use crate::Cast; // used in document comment.
 
 
 ///
@@ -21,6 +22,19 @@ use crate::Endian;
 /// - it is an array type whose element is `Flip`, or
 /// - it is a struct type whose all members are `Flip` and
 ///   implements `Flip` by declaring `#[derive(Flip)]`.
+///
+/// The types that trait `Flip` can be implemented for is similar to
+/// the types that trait [`Cast`] can be implemented for.  The only
+/// difference is that trait `Flip` cannot be implemented for a union
+/// type by declaring `#[derive(Flip)]`, while trait [`Cast`] can be
+/// implemented for a union type by declaring `#[derive(Cast)]`.  The
+/// reason is that there is no general way to flip the endianness of a
+/// union type.
+///
+/// `#[derive([`NopFlip`])]` enables to implement trait `Flip` for a
+/// union type.  But the implemented methods do nothing (Nop = No
+/// operation).  See the description of trait [`NopFlip`] for more
+/// information.
 ///
 /// # Example 1
 ///
@@ -201,24 +215,24 @@ impl<T: Flip, const N: usize> Flip for [T; N] {
 /// of such container struct type without `endian-flip`ping its
 /// internal union type, trait `NopFlip` is defined.
 ///
-/// `NopFlip` is a subtrait of [`Flip`].  It has the same methods with
-/// [`Flip`] but all methods do nothing.  In the above example, if
-/// `NopFlip` is implemented for the internal union type, `Flip` can
-/// be implemented for the container struct type.
+/// It can be implemented by declaring `#[derive(NopFlip)]` for a
+/// struct type or a union type whose all members implement [`Flip`].
+/// It implements trait `NopFlip` as well as trait [`Flip`] whose
+/// methods do nothing (Nop = No operation).
 ///
-/// In general, `NopFlip` can be implemented by declaring
-/// `#[derive(NopFlip)]` for a struct type or a union type whose all
-/// members implement `Flip`.  Types implementing `NopFlip` can be
-/// used as a member of a struct type or a union type implementing
-/// `Flip`.
+/// Therefore, in the above example, if `NopFlip` is implemented for
+/// the internal union type, [`Flip`] can be implemented for the
+/// container struct type.
+///
+/// `NopFlip` has no method.
 ///
 /// # Example
 ///
 /// In the example below, #[derive(`NopFlip`)] marks `UnionB` as
-/// `endian-flip`pable but the implemented methods do nothing (Nop,
-/// i.e., No operation) so that method `encastf` and method `decastf`
-/// can flip the endianness of the container struct `StructC` except
-/// its internal union `UnionB`.
+/// `endian-flip`pable but the implemented methods do nothing (Nop =
+/// No operation) so that method `encastf` and method `decastf` can
+/// flip the endianness of the container struct `StructC` except its
+/// internal union `UnionB`.
 ///
 /// ```
 /// # use std::io::Result;
