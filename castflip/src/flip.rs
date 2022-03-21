@@ -1,3 +1,4 @@
+use core::mem::MaybeUninit;
 use core::ptr;
 
 use crate::Endian;
@@ -186,6 +187,21 @@ impl_flip_for_float!(f32, f64);
 impl<T: Flip, const N: usize> Flip for [T; N] {
     fn flip_val_swapped(&self) -> Self
     {
+	unsafe {
+	    let mut array: [MaybeUninit<T>; N] =
+		MaybeUninit::uninit().assume_init();
+	    for i in 0 .. N {
+		array[i] = MaybeUninit::new(self[i].flip_val_swapped());
+	    }
+	    return ptr::read(array.as_ptr() as *const [T; N]);
+	}
+
+	// The code fragment below is replaced by the code fragment above
+	// on 2022-03-21 (UTC), effective since castflip v0.1.2.
+	// The code fragment below and this comment will be removed
+	// when the code fragment above is tested enough.
+
+/*
 	let mut vec = Vec::new();
 	for i in 0 .. N {
 	    vec.push(self[i].flip_val_swapped());
@@ -195,6 +211,8 @@ impl<T: Flip, const N: usize> Flip for [T; N] {
 	    Ok(array) => array,
 	    Err(_e) => panic!(),
 	}
+ */
+
     }
 }
 

@@ -80,22 +80,20 @@ impl Endian {
     /// ```
     ///
     pub fn relative(&self) -> Endian {
-	if cfg!(target_endian = "little") {
-	    match self {
-		Self::Native	=> Self::Native,
-		Self::Swapped	=> Self::Swapped,
-		Self::Little	=> Self::Native,
-		Self::Big	=> Self::Swapped,
-	    }
-	} else if cfg!(target_endian = "big") {
-	    match self {
-		Self::Native	=> Self::Native,
-		Self::Swapped	=> Self::Swapped,
-		Self::Little	=> Self::Swapped,
-		Self::Big	=> Self::Native,
-	    }
-	} else {
-	    panic!("Unknown target_endian");
+	#[cfg(target_endian = "little")]
+	match self {
+	    Self::Native  => Self::Native,
+	    Self::Swapped => Self::Swapped,
+	    Self::Little  => Self::Native,
+	    Self::Big     => Self::Swapped,
+	}
+
+	#[cfg(target_endian = "big")]
+	match self {
+	    Self::Native  => Self::Native,
+	    Self::Swapped => Self::Swapped,
+	    Self::Little  => Self::Swapped,
+	    Self::Big     => Self::Native,
 	}
     }
 
@@ -121,22 +119,20 @@ impl Endian {
     /// ```
     ///
     pub fn absolute(&self) -> Endian {
-	if cfg!(target_endian = "little") {
-	    match self {
-		Self::Native	=> Self::Little,
-		Self::Swapped	=> Self::Big,
-		Self::Little	=> Self::Little,
-		Self::Big	=> Self::Big,
-	    }
-	} else if cfg!(target_endian = "big") {
-	    match self {
-		Self::Native	=> Self::Big,
-		Self::Swapped	=> Self::Little,
-		Self::Little	=> Self::Little,
-		Self::Big	=> Self::Big,
-	    }
-	} else {
-	    panic!("Unknown target_endian");
+	#[cfg(target_endian = "little")]
+	match self {
+	    Self::Native  => Self::Little,
+	    Self::Swapped => Self::Big,
+	    Self::Little  => Self::Little,
+	    Self::Big     => Self::Big,
+	}
+
+	#[cfg(target_endian = "big")]
+	match self {
+	    Self::Native  => Self::Big,
+	    Self::Swapped => Self::Little,
+	    Self::Little  => Self::Little,
+	    Self::Big     => Self::Big,
 	}
     }
 
@@ -163,13 +159,11 @@ impl Endian {
     /// ```
     ///
     pub fn need_swap(self) -> bool {
-	if cfg!(target_endian = "little") {
-	    self == Self::Swapped || self == Self::Big
-	} else if cfg!(target_endian = "big") {
-	    self == Self::Swapped || self == Self::Little
-	} else {
-	    panic!();
-	}
+	#[cfg(target_endian = "little")]
+	return self == Self::Swapped || self == Self::Big;
+
+	#[cfg(target_endian = "big")]
+	return self == Self::Swapped || self == Self::Little;
     }
 
     /// Returns the name of the endianness (self).
