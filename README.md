@@ -207,6 +207,9 @@ assert_eq! requires them.  This crate works without them.
 This crate provides methods for encoding and decoding numeric
 variables, arrays and structures in little-endian and big-endian.
 
+Two types of endianness is defined in enum [`Endian`]: relative endian
+(Native vs. Swapped) and absolute endian (Little vs. Big).
+
 ## List of traits to mark characteristics of types
 
 * `Cast` marks types as `encast`able / `decast`able
@@ -247,5 +250,9 @@ the methods defined in trait [`DecastIO`] returns `io::Result`.
 If successful, they return the number of resulting bytes.
 The endianness of resulting bytes is specified in the arguments of
 `decastf` and `decastvf`.
+
+Because this crate is very small, you can easily find a way to create
+your own traits to `encast` / `decast` on your system if the current
+API does not match your requirements.
 
 For more information, please see <https://docs.rs/castflip/>.
