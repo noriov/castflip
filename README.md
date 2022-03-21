@@ -207,7 +207,7 @@ assert_eq! requires them.  This crate works without them.
 This crate provides methods for encoding and decoding numeric
 variables, arrays and structures in little-endian and big-endian.
 
-Two types of endianness is defined in enum [`Endian`]: relative endian
+Two types of endianness is defined in enum `Endian`: relative endian
 (Native vs. Swapped) and absolute endian (Little vs. Big).
 
 ## List of traits to mark characteristics of types
@@ -230,8 +230,8 @@ required conditions are met.
 * `encastvf` decodes a required number of bytes to a vector of value(s)
   with `endian-flip`ping.
 
-The methods defined in trait [`EncastMem`] returns `Option` and
-the methods defined in trait [`EncastIO`] returns `io::Result`.
+The methods defined in trait `EncastMem` returns `Option` and
+the methods defined in trait `EncastIO` returns `io::Result`.
 If successful, they return the resulting value(s).
 The endianness of the bytes in `self` is specified in the arguments of
 `encastf` and `encastvf`.  The number of elements in the resulting
@@ -245,8 +245,8 @@ vector is specified in the arguments of `encastv` and `encastvf`.
 * `decastvf` encodes a slice of variable(s) to a number of bytes
   with `endian-flip`ping.
 
-The methods defined in trait [`DecastMem`] returns `Option` and
-the methods defined in trait [`DecastIO`] returns `io::Result`.
+The methods defined in trait `DecastMem` returns `Option` and
+the methods defined in trait `DecastIO` returns `io::Result`.
 If successful, they return the number of resulting bytes.
 The endianness of resulting bytes is specified in the arguments of
 `decastf` and `decastvf`.
