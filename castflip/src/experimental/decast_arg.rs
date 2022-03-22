@@ -1,4 +1,5 @@
 use crate::{Cast, DecastMem, Endian, Flip};
+#[allow(unused_imports)] use crate::BE; // used in document comment.
 
 
 ///
@@ -12,7 +13,7 @@ use crate::{Cast, DecastMem, Endian, Flip};
 /// # Example
 ///
 /// In the example below, method `decastf` encodes the value in
-/// `udp_hdr1` of type `UdpHdr` to bytes in Big-Endian (`BE`) and
+/// `udp_hdr1` of type `UdpHdr` to bytes in Big-Endian ([`BE`]) and
 /// stores them in `bytes2`.
 ///
 /// ```
@@ -32,17 +33,19 @@ use crate::{Cast, DecastMem, Endian, Flip};
 ///
 /// // Input data: UDP header (8 bytes)
 /// let udp_hdr1 = UdpHdr { sport: 50121, dport: 53, len: 50, sum: 0x823F };
-/// let bytes1: [u8; 8] = [0xC3, 0xC9, 0x00, 0x35, 0x00, 0x32, 0x82, 0x3F];
 ///
-/// // Encode UDP header `udp_hdr2` to a numer of bytes in `byte2`.
+/// // Encode UDP header `udp_hdr1` to bytes in `bytes2`.
 /// // Because the UDP header is 8 bytes as defined above,
 /// // only the first 8 bytes of `bytes2` are filled with data.
 /// let mut bytes2 = [0_u8; 16];
 /// let bytes2_size = UdpHdr::decastf(&mut bytes2, &udp_hdr1, BE)?;
 ///
+/// // `udp_hdr1` should be encoded as following (8 bytes)
+/// let bytes3: [u8; 8] = [0xC3, 0xC9, 0x00, 0x35, 0x00, 0x32, 0x82, 0x3F];
+///
 /// // Check the results.
 /// assert_eq!(bytes2_size, 8);
-/// assert_eq!(&bytes2[0..8], &bytes1[0..8]);
+/// assert_eq!(&bytes2[0..8], &bytes3[0..8]);
 /// assert_eq!(&bytes2[8..16], &[0_u8; 8]);
 /// # Some(())
 /// # }
@@ -50,19 +53,20 @@ use crate::{Cast, DecastMem, Endian, Flip};
 ///
 /// # Description
 ///
-/// All functions in this trait `decast` one or more variables to a
-/// number of bytes on memory.  The endianness of resulting value(s)
-/// is flipped when required and necessary.  Currently, only an
-/// implementation for `[u8]` is provided.
+/// All functions in trait `DecastArg` `decast` one or more variables
+/// to a number of bytes on memory.  The endianness of resulting
+/// value(s) is flipped when required and necessary.  Currently, only
+/// an implementation for `[u8]` is provided.
 ///
-/// The size of `bytes` should be larger than or equal to the specified
-/// number of value(s) of type `T`.  If there is enough room, the
-/// specified variable(s) is/are encoded to bytes and stored at the
-/// head of `bytes`.  Then, the size of sotred bytes are returned in
-/// `Some`().  If there are not enough room, `None` is returned.
+/// The size of argument `bytes` should be larger than or equal to the
+/// specified number of value(s) of the specified type `T`.  If there
+/// is enough room, the specified variable(s) is/are encoded to bytes
+/// and stored at the head of `bytes`.  Then, the size of sotred bytes
+/// are returned in `Some`().  If there are not enough room, `None` is
+/// returned.
 ///
-/// When `endian` is specified, the endianness of resulting bytes is
-/// flipped if necessary.
+/// When argument `endian` is specified, the endianness of resulting
+/// bytes is flipped if necessary.
 ///
 /// The API of this trait is an older form of [`DecastMem`].
 ///

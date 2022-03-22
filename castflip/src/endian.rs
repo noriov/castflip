@@ -1,10 +1,17 @@
 ///
 /// Defines variants of endianness.
 ///
+/// Note: In this crate, the term `encast` means decoding a number of
+/// bytes to one or more values, the term `decast` means encoding one
+/// or more variables to a number of bytes, and the term `endian-flip`
+/// means flipping the endianness of value(s).
+///
+/// # Description
+///
 /// It defines the following two types of endianness.
 ///
-/// - Relative endian ([`Native`] and  [`Swapped`])
-/// - Absolute endian ([`Little`] and  [`Big`])
+/// - Relative endian ([`Native`] or  [`Swapped`])
+/// - Absolute endian ([`Little`] or  [`Big`])
 ///
 /// Relative endinan is useful when encoding or decoding binaries
 /// whose endiannesses are specified by some magic numbers indicating
@@ -14,7 +21,32 @@
 /// specification as little-endian or big-endian (e.g., [ELF], [TCP/IP]).
 ///
 /// For convenience, their short aliases are exported as
-/// [`NE`] and [`SE`], [`LE`] and [`BE`], respectively.
+/// [`NE`], [`SE`], [`LE`] and [`BE`], respectively.
+///
+/// The purpose of enum `Endian` is to specify the endianness of input
+/// / output bytes of the methods to `encast` or `decast` data with
+/// `endian-flip`ping.
+///
+/// # Example
+///
+/// Enum `Endian` has four methods.  Here are examples of two of them.
+///
+/// ```
+/// use castflip::Endian;
+///
+/// let endian = Endian::Native.absolute();
+/// let endian_name = endian.name();
+///
+/// if cfg!(target_endian = "little") {
+///     assert_eq!(endian, Endian::Little);
+///     assert_eq!(endian_name, "Little");
+/// } else if cfg!(target_endian = "big") {
+///     assert_eq!(endian, Endian::Big);
+///     assert_eq!(endian_name, "Big");
+/// # } else {
+/// #   panic!();
+/// }
+/// ```
 ///
 /// [`Native`]: #variant.Native
 /// [`Swapped`]: #variant.Swapped

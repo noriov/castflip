@@ -1,4 +1,5 @@
 use crate::{Cast, EncastMem, Endian, Flip};
+#[allow(unused_imports)] use crate::BE; // used in document comment.
 
 
 ///
@@ -12,7 +13,7 @@ use crate::{Cast, EncastMem, Endian, Flip};
 /// # Example
 ///
 /// In the example below, function `encastf` decodes bytes in `bytes1`
-/// in Big-Endian (`BE`) to variable `udp_hdr2` of type `UdpHdr`.
+/// in Big-Endian ([`BE`]) to variable `udp_hdr2` of type `UdpHdr`.
 ///
 /// ```
 /// # fn main() { test(); }
@@ -35,7 +36,7 @@ use crate::{Cast, EncastMem, Endian, Flip};
 ///
 /// // Decode input `bytes1` to variable `udp_hdr2`.
 /// // Because the UDP header is 8 bytes as defined above, only
-/// // the first 8 bytes are converted, remaining 8 bytes are ignored.
+/// // the first 8 bytes are decoded, remaining 8 bytes are ignored.
 /// let udp_hdr2 = UdpHdr::encastf(&bytes1, BE)?;  // BE = Big-Endian
 ///
 /// // Check the results.
@@ -49,21 +50,21 @@ use crate::{Cast, EncastMem, Endian, Flip};
 ///
 /// # Description
 ///
-/// All functions in this trait `encast` a number of bytes on the
-/// memory to one or more values of the specified type.  The
+/// All functions in trait `EncastArg` `encast` a number of bytes on
+/// the memory to one or more values of the specified type.  The
 /// endianness of resulting value(s) is flipped when required and
 /// necessary.  Currently, only an implementation for `[u8]` is
 /// provided.
 ///
-/// The bytes in `bytes` should be larger than or equal to the
-/// specified number of value(s) of type `T`.  If there are enough
-/// bytes, the required number of bytes at the head of `bytes` are
-/// decoded to the specified type of value(s), which is/are returned
-/// in `Some`().  The remaining bytes are ignored.  If there are not
-/// enough bytes, `None` is returned.
+/// The bytes in argument `bytes` should be larger than or equal to
+/// the specified number of value(s) of the specified type `T`.  If
+/// there are enough bytes, the required number of bytes at the head
+/// of `bytes` are decoded to the specified type of value(s), which
+/// is/are returned in `Some`().  The remaining bytes are ignored.  If
+/// there are not enough bytes, `None` is returned.
 ///
-/// When `endian` is specified, the endianness of value(s) is flipped
-/// if necessary.
+/// When argument `endian` is specified, the endianness of value(s) is
+/// flipped if necessary.
 ///
 /// The API of this trait is an older form of [`EncastMem`].
 ///

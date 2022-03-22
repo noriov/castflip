@@ -11,9 +11,9 @@ flipping the endianness of value(s).
 # Example 1
 
 In the example below, method `encastf` decodes bytes in `bytes1` in
-big-endian (`BE`) to variable `udp_hdr2` of type `UdpHdr`.  Then,
+big-endian ([`BE`]) to variable `udp_hdr2` of type `UdpHdr`.  Then,
 method `decastf` encodes the resulting value in `udp_hdr2` to bytes in
-big-endian (`BE`) and stores them in `bytes3`.
+big-endian ([`BE`]) and stores them in `bytes3`.
 
 ```
 # fn main() { test(); }
@@ -50,9 +50,9 @@ assert_eq!(bytes3, bytes1);
 # }
 ```
 
-In the example above, #[derive([`Cast`])] makes the value of `UdpHdr`
-`encast`able / `decast`able, and #[derive([`Flip`])] makes the value
-of `UdpHdr` `endian-flip`pable.
+In the example above, `#[derive(`[`Cast`]`)]` makes the value of
+`UdpHdr` `encast`able / `decast`able, and `#[derive(`[`Flip`]`)]`
+makes the value of `UdpHdr` `endian-flip`pable.
 
 Trait [`EncastMem`] provides methods to `encast` from memory, and
 trait [`DecastMem`] provides methods to `decast` to memory.  The
@@ -140,11 +140,11 @@ assert_eq!(&output3.into_inner(), &bytes1[..]);
 # }
 ```
 
-In the example above, #[derive([`Cast`])] makes all types
-`encast`able / `decast`able, #[derive([`Flip`])] makes `StructA`
-and `StructC` `endian-flip`pable, and #[derive([`NopFlip`]) marks
-`UnionB` as `endian-flip`pable but the implemented operation is
-Nop (No operation).
+In the example above, `#[derive(`[`Cast`]`)]` makes all types
+`encast`able / `decast`able, `#[derive(`[`Flip`]`)]` makes `StructA`
+and `StructC` `endian-flip`pable, and `#[derive(`[`NopFlip`]`)]` marks
+`UnionB` as `endian-flip`pable but the implemented operation is Nop
+(No operation).
 
 Trait [`EncastIO`] provides methods to `encast` from I/O, and trait
 [`DecastIO`] provides methods to `decast` to I/O.  The type of the
@@ -188,9 +188,9 @@ assert_eq!(bytes3, bytes1);
 # }
 ```
 
-In the example above, #[derive([`Cast`])] makes the values of `Pair`
-`encast`able / `decast`able, and #[derive([`Flip`])] makes the values
-of `Pair` `endian-flip`pable.
+In the example above, `#[derive(`[`Cast`]`)]` makes the values of
+`Pair` `encast`able / `decast`able, and `#[derive(`[`Flip`]`)]` makes
+the values of `Pair` `endian-flip`pable.
 
 Trait [`EncastMem`] provides methods to `encast` from memory, and
 trait [`DecastMem`] provides methods to `decast` to memory.  The type
@@ -203,7 +203,7 @@ specified in the argument of method `encastvf`.  The endianness of
 bytes is specified in their argument.  [`BE`] is an alias of
 [`Endian`]`::Big`, which means Big-Endian.
 
-Note: The reason why #[derive(PartialEq, Debug)] is declared is that
+Note: The reason why `#[derive(PartialEq, Debug)]` is declared is that
 assert_eq! requires them.  This crate works without them.
 
 # Summary
@@ -212,7 +212,7 @@ This crate provides methods for encoding and decoding numeric
 variables, arrays and structures in little-endian and big-endian.
 
 Two types of endianness is defined in enum [`Endian`]: relative endian
-(Native vs. Swapped) and absolute endian (Little vs. Big).
+(Native or Swapped) and absolute endian (Little or Big).
 
 ## List of traits to mark characteristics of types
 
@@ -221,8 +221,8 @@ Two types of endianness is defined in enum [`Endian`]: relative endian
 * [`NopFlip`] marks types as `endian-flip`pable but the implemented
   operation is Nop (No operation)
 
-They can be implemented by declaring #[derive([`Cast`])],
-#[derive([`Flip`])] and #[derive([`NopFlip`])] respectively if
+They can be implemented by declaring `#[derive(`[`Cast`]`)]`,
+`#[derive(`[`Flip`]`)]` and `#[derive(`[`NopFlip`]`)]` respectively if
 required conditions are met.
 
 ## List of methods defined in trait [`EncastMem`] and trait [`EncastIO`]
@@ -255,9 +255,9 @@ If successful, they return the number of resulting bytes.
 The endianness of resulting bytes is specified in the arguments of
 `decastf` and `decastvf`.
 
-Because this crate is very small, you can easily find a way to create
-your own traits to `encast` / `decast` on your system if the current
-API does not match your requirements.
+Because this crate is very small, you can easily write your own traits
+to `encast` / `decast` on your system if the current API does not
+match your requirements.
 
 For more information, please see the description of each trait and enum.
 

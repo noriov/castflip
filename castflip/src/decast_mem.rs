@@ -1,6 +1,7 @@
 use core::{mem, ptr};
 
 use crate::{Cast, Endian, Flip};
+#[allow(unused_imports)] use crate::BE; // used in document comment.
 
 
 ///
@@ -14,7 +15,7 @@ use crate::{Cast, Endian, Flip};
 /// # Example
 ///
 /// In the example below, method `decastf` encodes the value in
-/// `udp_hdr1` of type `UdpHdr` to bytes in Big-Endian (`BE`) and
+/// `udp_hdr1` of type `UdpHdr` to bytes in Big-Endian ([`BE`]) and
 /// stores them in `bytes2`.
 ///
 /// ```
@@ -33,17 +34,19 @@ use crate::{Cast, Endian, Flip};
 ///
 /// // Input data: UDP header (8 bytes)
 /// let udp_hdr1 = UdpHdr { sport: 50121, dport: 53, len: 50, sum: 0x823F };
-/// let bytes1: [u8; 8] = [0xC3, 0xC9, 0x00, 0x35, 0x00, 0x32, 0x82, 0x3F];
 ///
-/// // Encode UDP header `udp_hdr2` to bytes in `byte2`.
+/// // Encode UDP header `udp_hdr1` to bytes in `bytes2`.
 /// // Because the UDP header is 8 bytes as defined above,
 /// // only the first 8 bytes of `bytes2` are filled with data.
 /// let mut bytes2 = [0_u8; 16];
-/// let bytes2_size = bytes2.decastf(&udp_hdr1, BE)?;
+/// let bytes2_size = bytes2.decastf(&udp_hdr1, BE)?;  // BE = Big-Endian
+///
+/// // `udp_hdr1` should be encoded as following (8 bytes)
+/// let bytes3: [u8; 8] = [0xC3, 0xC9, 0x00, 0x35, 0x00, 0x32, 0x82, 0x3F];
 ///
 /// // Check the results.
 /// assert_eq!(bytes2_size, 8);
-/// assert_eq!(&bytes2[0..8], &bytes1[0..8]);
+/// assert_eq!(&bytes2[0..8], &bytes3[0..8]);
 /// assert_eq!(&bytes2[8..16], &[0_u8; 8]);
 /// # Some(())
 /// # }
@@ -51,22 +54,23 @@ use crate::{Cast, Endian, Flip};
 ///
 /// # Description
 ///
-/// All methods in this trait `decast` one or more variables to a
-/// number of bytes on memory.  The type of the value(s) can be
-/// explicitly specified as the generic type parameter of its method
-/// or simply omitted because the Rust compiler can infer from the
+/// All methods in trait `DecastMem` `decast` one or more variables to
+/// a number of bytes on memory.  The type of the value(s) may be
+/// explicitly specified as the generic type parameter of its methods
+/// or simply omitted because the Rust compiler can infer it from the
 /// argument.  The endianness of resulting bytes is flipped when
 /// required and necessary.  Currently, only an implementation for
 /// `[u8]` is provided.
 ///
 /// The size of `self` should be larger than or equal to the specified
-/// number of value(s) of type `T`.  If there is enough room, the
-/// specified variable(s) is/are encoded to bytes and stored at the
-/// head of `self`.  Then, the size of stored bytes are returned in
-/// `Some`().  If there are not enough room, `None` is returned.
+/// number of value(s) of the specified type `T`.  If there is enough
+/// room, the specified variable(s) is/are encoded to bytes and stored
+/// at the head of `self`.  Then, the size of stored bytes are
+/// returned in `Some`().  If there are not enough room, `None` is
+/// returned.
 ///
-/// When `endian` is specified, the endianness of resulting bytes is
-/// flipped if necessary.
+/// When argument `endian` is specified, the endianness of resulting
+/// bytes is flipped if necessary.
 ///
 pub trait DecastMem {
     /// Encodes the value pointed by `val_ptr` of type `T` to bytes

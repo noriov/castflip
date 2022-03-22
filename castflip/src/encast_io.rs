@@ -3,6 +3,7 @@ use std::io::{Read, Result};
 
 use crate::{Cast, Endian, Flip};
 use crate::experimental::AsBytes;
+#[allow(unused_imports)] use crate::BE; // used in document comment.
 
 
 ///
@@ -16,7 +17,7 @@ use crate::experimental::AsBytes;
 /// # Example
 ///
 /// In the example below, method `encastf` decodes bytes from `input1`
-/// in Big-Endian (`BE`) to variable `udp_hdr2` of type `UdpHdr`.
+/// in Big-Endian ([`BE`]) to variable `udp_hdr2` of type `UdpHdr`.
 ///
 /// ```
 /// # use std::io::Result;
@@ -55,23 +56,24 @@ use crate::experimental::AsBytes;
 ///
 /// # Description
 ///
-/// All methods in this trait `encast` a number of bytes read from I/O
-/// to one or more values of the specified type.  The type of the
-/// value(s) can be explicitly specified as the generic type parameter
-/// of the methods or implicitly specified so that the Rust compiler
-/// can infer.  The endianness of resulting value(s) is flipped when
-/// required and necessary.  Currently, only an implementation for
-/// trait `Read` is provided.
+/// All methods in trait `EncastIO` `encast` a number of bytes read
+/// from I/O to one or more values of the specified type.  The type of
+/// the value(s) can be explicitly specified as the generic type
+/// parameter of the methods or implicitly specified so that the Rust
+/// compiler can infer.  The endianness of resulting value(s) is
+/// flipped when required and necessary.  Currently, only an
+/// implementation for trait `Read` is provided.
 ///
 /// The input `self` should have enough bytes to decode to the
-/// specified number of value(s) of type `T`.  If there are enough
-/// bytes, the required number of bytes are read from I/O and
-/// decoded to the specified type of value(s), which is/are returned
-/// in `Ok`().  The remaining bytes in input `self` are untouched.
-/// If I/O error is detected, `Err`(std::io::Error) is returned.
+/// specified number of value(s) of the specified type `T`.  If there
+/// are enough bytes, the required number of bytes are read from I/O
+/// and decoded to the specified type of value(s), which is/are
+/// returned in `Ok`().  The remaining bytes in input `self` are
+/// untouched.  If I/O error is detected, `Err`(std::io::Error) is
+/// returned.
 ///
-/// When `endian` is specified, the endianness of value(s) is flipped
-/// if necessary.
+/// When argument `endian` is specified, the endianness of value(s) is
+/// flipped if necessary.
 ///
 pub trait EncastIO {
     /// Decodes the bytes read from input `self` to a value of type `T`.

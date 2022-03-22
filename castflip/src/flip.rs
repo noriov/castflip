@@ -28,18 +28,18 @@ use crate::Endian;
 /// the types that trait [`Cast`] can be implemented for.  The only
 /// difference is that trait `Flip` cannot be implemented for a union
 /// type by declaring `#[derive(Flip)]`, while trait [`Cast`] can be
-/// implemented for a union type by declaring `#[derive(Cast)]`.  The
-/// reason is that there is no general way to flip the endianness of a
-/// union type.
+/// implemented for a union type by declaring `#[derive(`[`Cast`]`)]`.
+/// The reason is that there is no general way to flip the endianness
+/// of a union type.
 ///
-/// `#[derive([`NopFlip`])]` enables to implement trait `Flip` for a
-/// union type.  But the implemented methods do nothing (Nop = No
+/// `#[derive([`[`NopFlip`]`)]` enables to implement trait `Flip` for
+/// a union type.  But the implemented methods do nothing (Nop = No
 /// operation).  See the description of trait [`NopFlip`] for more
 /// information.
 ///
 /// # Example 1
 ///
-/// In the example below, #[derive(`Flip`)] makes the value of
+/// In the example below, `#[derive(Flip)]` makes the value of
 /// `UdpHdr` `endian-flip`pable so that method `encastf` and method
 /// `decastf` can flip the endianness of their results.
 ///
@@ -188,6 +188,8 @@ impl<T: Flip, const N: usize> Flip for [T; N] {
     fn flip_val_swapped(&self) -> Self
     {
 	unsafe {
+	    debug_assert_eq!(core::mem::size_of::<MaybeUninit<T>>(),
+			     core::mem::size_of::<T>());
 	    let mut array: [MaybeUninit<T>; N] =
 		MaybeUninit::uninit().assume_init();
 	    for i in 0 .. N {
@@ -200,6 +202,7 @@ impl<T: Flip, const N: usize> Flip for [T; N] {
 	// on 2022-03-21 (UTC), effective since castflip v0.1.2.
 	// The code fragment below and this comment will be removed
 	// when the code fragment above is tested enough.
+	// debug_assert_eq! above will also be removed.
 
 /*
 	let mut vec = Vec::new();
@@ -246,7 +249,7 @@ impl<T: Flip, const N: usize> Flip for [T; N] {
 ///
 /// # Example
 ///
-/// In the example below, #[derive(`NopFlip`)] marks `UnionB` as
+/// In the example below, `#[derive(NopFlip)]` marks `UnionB` as
 /// `endian-flip`pable but the implemented methods do nothing (Nop =
 /// No operation) so that method `encastf` and method `decastf` can
 /// flip the endianness of the container struct `StructC` except its

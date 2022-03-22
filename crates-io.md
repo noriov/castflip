@@ -14,9 +14,9 @@ please see <https://docs.rs/castflip/>.
 # Example 1
 
 In the example below, method `encastf` decodes bytes in `bytes1` in
-big-endian (`BE`) to variable `udp_hdr2` of type `UdpHdr`.  Then,
+big-endian ([`BE`]) to variable `udp_hdr2` of type `UdpHdr`.  Then,
 method `decastf` encodes the resulting value in `udp_hdr2` to bytes in
-big-endian (`BE`) and stores them in `bytes3`.
+big-endian ([`BE`]) and stores them in `bytes3`.
 
 ```rust
 use castflip::{Cast, Flip, EncastMem, DecastMem, BE};
@@ -49,23 +49,39 @@ assert_eq!(bytes3_size, 8);
 assert_eq!(bytes3, bytes1);
 ```
 
-In the example above, #[derive(`Cast`)] makes the value of `UdpHdr`
-`encast`able / `decast`able, and #[derive(`Flip`)] makes the value
-of `UdpHdr` `endian-flip`pable.
+In the example above, `#[derive(`[`Cast`]`)]` makes the value of
+`UdpHdr` `encast`able / `decast`able, and `#[derive(`[`Flip`]`)]`
+makes the value of `UdpHdr` `endian-flip`pable.
 
-Trait `EncastMem` provides methods to `encast` from memory, and
-trait `DecastMem` provides methods to `decast` to memory.  The
+Trait [`EncastMem`] provides methods to `encast` from memory, and
+trait [`DecastMem`] provides methods to `decast` to memory.  The
 generic type parameters of their methods can be omitted where the Rust
 compiler can infer them.  Their methods whose names end with 'f' flip
 the endianness of the results.  The endianness of bytes is specified
-by their argument.  `BE` is an alias of `Endian::Big`, which
+in their argument.  [`BE`] is an alias of [`Endian`]`::Big`, which
 means Big-Endian.
 
-In addition to these traits, this crate has trait `EncastIO` providing
-methods to `encast` from I/O, and trait `DecastIO` providing methods
-to `decast` to I/O.
+In addition to these traits, this crate has trait [`EncastIO`]
+providing methods to `encast` from I/O, and trait [`DecastIO`]
+providing methods to `decast` to I/O.
 
 Note: [UDP] is one of the fundamental protocols in the internet
 protocol suite.
 
 [UDP]: https://en.wikipedia.org/wiki/User_Datagram_Protocol
+
+
+[`Endian`]: https://docs.rs/castflip/latest/castflip/enum.Endian.html
+[`NE`]: https://docs.rs/castflip/latest/castflip/constant.NE.html
+[`SE`]: https://docs.rs/castflip/latest/castflip/constant.SE.html
+[`BE`]: https://docs.rs/castflip/latest/castflip/constant.BE.html
+[`LE`]: https://docs.rs/castflip/latest/castflip/constant.LE.html
+
+[`Cast`]: https://docs.rs/castflip/latest/castflip/trait.Cast.html
+[`Flip`]: https://docs.rs/castflip/latest/castflip/trait.Flip.html
+[`NopFlip`]: https://docs.rs/castflip/latest/castflip/trait.NopFlip.html
+
+[`EncastMem`]: https://docs.rs/castflip/latest/castflip/trait.EncastMem.html
+[`DecastMem`]: https://docs.rs/castflip/latest/castflip/trait.DecastMem.html
+[`EncastIO`]: https://docs.rs/castflip/latest/castflip/trait.EncastIO.html
+[`DecastIO`]: https://docs.rs/castflip/latest/castflip/trait.DecastIO.html

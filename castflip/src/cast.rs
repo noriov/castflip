@@ -23,14 +23,14 @@
 /// subtrait of trait `Copy`.  The reasons why trait `Cast` is defined
 /// independently from trait `Copy` are (1) to exclude pointers and
 /// (2) to avoid unexpected copying to enjoy the merit of Rust's
-/// ownership system.  Hence, if a type need to be `Copy`,
-/// #[derive(Clone, Copy)] should also be declared.
+/// ownership system.  Hence, if a struct type or a union type need to
+/// be `Copy`, `#[derive(Clone, Copy)]` should also be declared.
 ///
 /// `Cast` has no method.
 ///
 /// # Example
 ///
-/// In the example below, #[derive(`Cast`)] makes the values of
+/// In the example below, `#[derive(Cast)]` makes the values of
 /// `ElfIdHdr` `encast`able / `decast`able so that methods `encast`
 /// and method `decast` can work.
 ///

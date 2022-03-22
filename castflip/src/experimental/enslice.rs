@@ -39,7 +39,7 @@ use crate::experimental::Reslice;
 ///
 /// // Input data: ELF Identification (16 bytes)
 /// let hdr1 = ElfIdHdr {
-///     magic:    *b"\x7FELF",
+///     magic:    *b"\x7FELF",  // 7F 45 4C 46
 ///     class:    2,
 ///     encoding: 1,
 ///     version:  1,
@@ -48,10 +48,6 @@ use crate::experimental::Reslice;
 ///     pad:      [0_u8; 7],
 /// };
 ///
-/// // The binary of `hdr1` is the same with the following `bytes1`.
-/// let bytes1: [u8; 16] = [0x7F, 0x45, 0x4C, 0x46, 0x02, 0x01, 0x01, 0x00,
-///                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00];
-///
 /// unsafe {
 ///     // Convert the original reference to `hdr1` into `bytes2`.
 ///     // Both &`hdr1` and `bytes2` point to the same entity.
@@ -59,7 +55,8 @@ use crate::experimental::Reslice;
 ///     let bytes2: &[u8] = hdr1.enslice()?;
 ///
 ///     // Check the result.
-///     assert_eq!(bytes2, &bytes1);
+///     assert_eq!(bytes2, &[0x7F, 0x45, 0x4C, 0x46, 0x02, 0x01, 0x01, 0x00,
+///                          0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]);
 /// }
 /// # Some(())
 /// # }

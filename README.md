@@ -20,9 +20,9 @@ castflip = { version = "0.1" }
 # Example 1
 
 In the example below, method `encastf` decodes bytes in `bytes1` in
-big-endian (`BE`) to variable `udp_hdr2` of type `UdpHdr`.  Then,
+big-endian ([`BE`]) to variable `udp_hdr2` of type `UdpHdr`.  Then,
 method `decastf` encodes the resulting value in `udp_hdr2` to bytes in
-big-endian (`BE`) and stores them in `bytes3`.
+big-endian ([`BE`]) and stores them in `bytes3`.
 
 ```rust
 use castflip::{Cast, Flip, EncastMem, DecastMem, BE};
@@ -55,17 +55,17 @@ assert_eq!(bytes3_size, 8);
 assert_eq!(bytes3, bytes1);
 ```
 
-In the example above, #[derive(`Cast`)] makes the value of `UdpHdr`
-`encast`able / `decast`able, and #[derive(`Flip`)] makes the value
-of `UdpHdr` `endian-flip`pable.
+In the example above, `#[derive(`[`Cast`]`)]` makes the value of
+`UdpHdr` `encast`able / `decast`able, and `#[derive(`[`Flip`]`)]`
+makes the value of `UdpHdr` `endian-flip`pable.
 
-Trait `EncastMem` provides methods to `encast` from memory, and
-trait `DecastMem` provides methods to `decast` to memory.  The
+Trait [`EncastMem`] provides methods to `encast` from memory, and
+trait [`DecastMem`] provides methods to `decast` to memory.  The
 generic type parameters of their methods can be omitted where the Rust
 compiler can infer them.  Their methods whose names end with 'f' flip
 the endianness of the results.  The endianness of bytes is specified
-in their argument.  `BE` is an alias of `Endian::Big`, which means
-Big-Endian.
+in their argument.  [`BE`] is an alias of [`Endian`]`::Big`, which
+means Big-Endian.
 
 Note: [UDP] is one of the fundamental protocols in the internet
 protocol suite.
@@ -140,19 +140,19 @@ assert_eq!(var2_c.f, 12.5_f32);  // f: f32,
 assert_eq!(&output3.into_inner(), &bytes1[..]);
 ```
 
-In the example above, #[derive(`Cast`)] makes all types
-`encast`able / `decast`able, #[derive(`Flip`)] makes `StructA`
-and `StructC` `endian-flip`pable, and #[derive(`NopFlip`) marks
-`UnionB` as `endian-flip`pable but the implemented operation is
-Nop (No operation).
+In the example above, `#[derive(`[`Cast`]`)]` makes all types
+`encast`able / `decast`able, `#[derive(`[`Flip`]`)]` makes `StructA`
+and `StructC` `endian-flip`pable, and `#[derive(`[`NopFlip`]`)]` marks
+`UnionB` as `endian-flip`pable but the implemented operation is Nop
+(No operation).
 
-Trait `EncastIO` provides methods to `encast` from I/O, and trait
-`DecastIO` provides methods to `decast` to I/O.  The type of the
+Trait [`EncastIO`] provides methods to `encast` from I/O, and trait
+[`DecastIO`] provides methods to `decast` to I/O.  The type of the
 value(s) can be explicitly specified as the generic type parameter of
 their methods or implicitly specified so that the Rust compiler can
 infer.  Their methods whose names end with 'f' flip the endianness of
 the results.  The endianness of bytes is specified in their argument.
-`LE` is an alias of `Endian::Little`, which means Little-Endian.
+[`LE`] is an alias of [`Endian`]`::Little`, which means Little-Endian.
 
 # Example 3
 
@@ -184,22 +184,22 @@ assert_eq!(bytes3_size, 12);
 assert_eq!(bytes3, bytes1);
 ```
 
-In the example above, #[derive(`Cast`)] makes the values of `Pair`
-`encast`able / `decast`able, and #[derive(`Flip`)] makes the values
-of `Pair` `endian-flip`pable.
+In the example above, `#[derive(`[`Cast`]`)]` makes the values of
+`Pair` `encast`able / `decast`able, and `#[derive(`[`Flip`]`)]` makes
+the values of `Pair` `endian-flip`pable.
 
-Trait `EncastMem` provides methods to `encast` from memory, and
-trait `DecastMem` provides methods to `decast` to memory.  The type
+Trait [`EncastMem`] provides methods to `encast` from memory, and
+trait [`DecastMem`] provides methods to `decast` to memory.  The type
 of the value(s) can be explicitly specified as the generic type parameter
 of their methods or implicitly specified so that the Rust compiler can
 infer.  The methods whose name contain 'v' (= vector) process a series
 of structured binary data, and the methods whose names end with 'f'
 flip the endianness of the results.  The number of elements is
 specified in the argument of method `encastvf`.  The endianness of
-bytes is specified in their argument.  `BE` is an alias of
-`Endian::Big`, which means Big-Endian.
+bytes is specified in their argument.  [`BE`] is an alias of
+[`Endian`]`::Big`, which means Big-Endian.
 
-Note: The reason why #[derive(PartialEq, Debug)] is declared is that
+Note: The reason why `#[derive(PartialEq, Debug)]` is declared is that
 assert_eq! requires them.  This crate works without them.
 
 # Summary
@@ -207,21 +207,21 @@ assert_eq! requires them.  This crate works without them.
 This crate provides methods for encoding and decoding numeric
 variables, arrays and structures in little-endian and big-endian.
 
-Two types of endianness is defined in enum `Endian`: relative endian
-(Native vs. Swapped) and absolute endian (Little vs. Big).
+Two types of endianness is defined in enum [`Endian`]: relative endian
+(Native or Swapped) and absolute endian (Little or Big).
 
 ## List of traits to mark characteristics of types
 
-* `Cast` marks types as `encast`able / `decast`able
-* `Flip` marks types as `endian-flip`pable
-* `NopFlip` marks types as `endian-flip`pable but the implemented
+* [`Cast`] marks types as `encast`able / `decast`able
+* [`Flip`] marks types as `endian-flip`pable
+* [`NopFlip`] marks types as `endian-flip`pable but the implemented
   operation is Nop (No operation)
 
-They can be implemented by declaring #[derive(`Cast`)],
-#[derive(`Flip`)] and #[derive(`NopFlip`)] respectively if
+They can be implemented by declaring `#[derive(`[`Cast`]`)]`,
+`#[derive(`[`Flip`]`)]` and `#[derive(`[`NopFlip`]`)]` respectively if
 required conditions are met.
 
-## List of methods defined in trait `EncastMem` and trait `EncastIO`
+## List of methods defined in trait [`EncastMem`] and trait [`EncastIO`]
 
 * `encast` decodes a required number of bytes to a value.
 * `encastf` decodes a required number of bytes to a value with
@@ -230,14 +230,14 @@ required conditions are met.
 * `encastvf` decodes a required number of bytes to a vector of value(s)
   with `endian-flip`ping.
 
-The methods defined in trait `EncastMem` returns `Option` and
-the methods defined in trait `EncastIO` returns `io::Result`.
+The methods defined in trait [`EncastMem`] returns `Option` and
+the methods defined in trait [`EncastIO`] returns `io::Result`.
 If successful, they return the resulting value(s).
 The endianness of the bytes in `self` is specified in the arguments of
 `encastf` and `encastvf`.  The number of elements in the resulting
 vector is specified in the arguments of `encastv` and `encastvf`.
 
-## List of methods defined in trait `DecastMem` and trait `DecastIO`
+## List of methods defined in trait [`DecastMem`] and trait [`DecastIO`]
 
 * `decast` encodes a variable to a number of bytes.
 * `decastf` encodes a variable to a number of bytes with `endian-flip`ping.
@@ -245,14 +245,30 @@ vector is specified in the arguments of `encastv` and `encastvf`.
 * `decastvf` encodes a slice of variable(s) to a number of bytes
   with `endian-flip`ping.
 
-The methods defined in trait `DecastMem` returns `Option` and
-the methods defined in trait `DecastIO` returns `io::Result`.
+The methods defined in trait [`DecastMem`] returns `Option` and
+the methods defined in trait [`DecastIO`] returns `io::Result`.
 If successful, they return the number of resulting bytes.
 The endianness of resulting bytes is specified in the arguments of
 `decastf` and `decastvf`.
 
-Because this crate is very small, you can easily find a way to create
-your own traits to `encast` / `decast` on your system if the current
-API does not match your requirements.
+Because this crate is very small, you can easily write your own traits
+to `encast` / `decast` on your system if the current API does not
+match your requirements.
 
 For more information, please see <https://docs.rs/castflip/>.
+
+
+[`Endian`]: https://docs.rs/castflip/latest/castflip/enum.Endian.html
+[`NE`]: https://docs.rs/castflip/latest/castflip/constant.NE.html
+[`SE`]: https://docs.rs/castflip/latest/castflip/constant.SE.html
+[`BE`]: https://docs.rs/castflip/latest/castflip/constant.BE.html
+[`LE`]: https://docs.rs/castflip/latest/castflip/constant.LE.html
+
+[`Cast`]: https://docs.rs/castflip/latest/castflip/trait.Cast.html
+[`Flip`]: https://docs.rs/castflip/latest/castflip/trait.Flip.html
+[`NopFlip`]: https://docs.rs/castflip/latest/castflip/trait.NopFlip.html
+
+[`EncastMem`]: https://docs.rs/castflip/latest/castflip/trait.EncastMem.html
+[`DecastMem`]: https://docs.rs/castflip/latest/castflip/trait.DecastMem.html
+[`EncastIO`]: https://docs.rs/castflip/latest/castflip/trait.EncastIO.html
+[`DecastIO`]: https://docs.rs/castflip/latest/castflip/trait.DecastIO.html
