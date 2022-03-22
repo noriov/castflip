@@ -1,8 +1,8 @@
 [package]
 name = "castflip_derive"
-version = "0.1.1"
+version = "0.1.3"
 edition = "2021"
-description = "Derive macros of Cast, Flip and NopFlip"
+description = "Derive macros for castflip"
 license = "MIT-0"
 readme = "crates-io.md"
 repository = "https://github.com/noriov/castflip"
