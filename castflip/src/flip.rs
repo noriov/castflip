@@ -2,7 +2,7 @@ use core::mem::MaybeUninit;
 use core::ptr;
 
 use crate::Endian;
-#[allow(unused_imports)] use crate::Cast; // used in document comment.
+#[cfg(doc)] use crate::{Cast, NopFlip, LE, BE};
 
 
 ///
@@ -25,17 +25,23 @@ use crate::Endian;
 ///   implements `Flip` by declaring `#[derive(Flip)]`.
 ///
 /// The types that trait `Flip` can be implemented for is similar to
-/// the types that trait [`Cast`] can be implemented for.  The only
+/// the types that trait [`Cast`] can be implemented for.  The
 /// difference is that trait `Flip` cannot be implemented for a union
 /// type by declaring `#[derive(Flip)]`, while trait [`Cast`] can be
 /// implemented for a union type by declaring `#[derive(`[`Cast`]`)]`.
-/// The reason is that there is no general way to flip the endianness
-/// of a union type.
+/// Because there is no automatic way to flip the endianness of a
+/// union type, `#[derive(Flip)]` does not support a union type.  This
+/// is the reason why trait `Flip` is defined independently from trait
+/// `Cast`.
 ///
-/// `#[derive([`[`NopFlip`]`)]` enables to implement trait `Flip` for
-/// a union type.  But the implemented methods do nothing (Nop = No
-/// operation).  See the description of trait [`NopFlip`] for more
-/// information.
+/// FYI: There would be a need to flip the endianness of a struct type
+/// containing a union type.  In such case, those members whose types
+/// are not union types should be automatically `endian-flip`ped,
+/// while those members whose types are union types must be manually
+/// `endian-flip`ped.  In that case, `#[derive([`[`NopFlip`]`)]` would
+/// be a help.  It nominally implements trait `Flip` whose methods do
+/// nothing (Nop = No operation).  See the description of trait
+/// [`NopFlip`] for more information.
 ///
 /// # Example 1
 ///
@@ -79,9 +85,9 @@ use crate::Endian;
 /// ```
 ///
 /// In the example above, method `encastf` decodes bytes in `bytes1`
-/// in big-endian (`BE`) to variable `udp_hdr2` of type `UdpHdr`.
+/// in big-endian ([`BE`]) to variable `udp_hdr2` of type `UdpHdr`.
 /// Then, method `decastf` encodes the resulting value in `udp_hdr2`
-/// to bytes in big-endian (`BE`) and stores them in `bytes3`.
+/// to bytes in big-endian ([`BE`]) and stores them in `bytes3`.
 ///
 /// Note: [UDP] is one of the fundamental protocols in the internet
 /// protocol suite.
@@ -90,38 +96,54 @@ use crate::Endian;
 ///
 /// # Example 2
 ///
-/// The example below shows how to use the methods defined in trait
-/// `Flip`.
+/// Trait `Flip` has two types of methods.  In most cases, they are
+/// called automatically inside this crate.  However, users may need
+/// to call them explicitly in certain situations, e.g. to flip the
+/// endianness of union types.  The example below shows how to use the
+/// methods of trait `Flip`.
 ///
 /// ```
 /// # fn main() { test(); }
 /// # fn test() -> Option<()> {
-/// use castflip::{Flip, SE};
+/// use castflip::{Flip, LE, BE};
 ///
 /// // Get the endian-flipped value of `val1`.
 /// let val1 = 0x1234_u16;
-/// let val2 = val1.flip_val(SE);  // SE = Swapped-Endian
-/// assert_eq!(val2, 0x3412);
-///
-/// // Flip the endianness of variable `var3`.
-/// let mut var3 = 0x5678_u16;
-/// var3.flip_var(SE);
-/// assert_eq!(var3, 0x7856);
+/// let val2 = val1.flip_val(LE);  // LE = Little-Endian
 ///
 /// // Get the endian-flipped value of an integer.
-/// let val4 = 0xABCD_u16.flip_val(SE);
-/// assert_eq!(val4, 0xCDAB);
+/// let val3 = 0x5678_u16.flip_val(BE);  // BE = Big-Endian
+///
+/// // Flip the endianness of variable `var4`.
+/// let mut var4 = 0xABCD_u16;
+/// var4.flip_var(LE);  // LE = Little-Endian
+///
+/// if cfg!(target_endian = "little") {
+///     assert_eq!(val2, 0x1234);
+///     assert_eq!(val3, 0x7856);
+///     assert_eq!(var4, 0xABCD);
+/// } else if cfg!(target_endian = "big") {
+///     assert_eq!(val2, 0x3412);
+///     assert_eq!(val3, 0x5678);
+///     assert_eq!(var4, 0xCDAB);
+/// # } else {
+/// #   panic!();
+/// }
 /// # Some(())
 /// # }
 /// ```
 ///
-/// Two types methods are defined in trait `Flip`.
+/// In the example above, method `flip_val` returns a value.  If the
+/// specified `endian` is the same with the endianness of the target
+/// system, it returns exactly the same value with `self`.  Otherwise,
+/// it returns the `endian-flip`ped value of `self`.  In contrast,
+/// Method `flip_var` flips the endianness of variable `self` if the
+/// specified `endian` is different from the endianness of the target
+/// system.  [`LE`] is an alias of [`Endian`]`::Little`, which means
+/// Little-Endian.  [`BE`] is an alias of [`Endian`]`::Big`, which
+/// means Big-Endian.
 ///
-/// * Method `flip_val` returns the `endian-flip`ped value of `self`.
-///   (e.g. `val1`, `0xABCD_u16`)
-/// * Method `flip_var` flips the endianness of `self`. (e.g. `val3`)
-///
-/// The former method is used internally in this crate.
+/// Method `flip_val` is used internally in this crate.
 ///
 pub trait Flip: Sized {
     /// Returns the endian-flipped value of `self`.
@@ -188,8 +210,6 @@ impl<T: Flip, const N: usize> Flip for [T; N] {
     fn flip_val_swapped(&self) -> Self
     {
 	unsafe {
-	    debug_assert_eq!(core::mem::size_of::<MaybeUninit<T>>(),
-			     core::mem::size_of::<T>());
 	    let mut array: [MaybeUninit<T>; N] =
 		MaybeUninit::uninit().assume_init();
 	    for i in 0 .. N {
@@ -197,141 +217,5 @@ impl<T: Flip, const N: usize> Flip for [T; N] {
 	    }
 	    return ptr::read(array.as_ptr() as *const [T; N]);
 	}
-
-	// The code fragment below is replaced by the code fragment above
-	// on 2022-03-21 (UTC), effective since castflip v0.1.2.
-	// The code fragment below and this comment will be removed
-	// when the code fragment above is tested enough.
-	// debug_assert_eq! above will also be removed.
-
-/*
-	let mut vec = Vec::new();
-	for i in 0 .. N {
-	    vec.push(self[i].flip_val_swapped());
-	}
-
-	match vec.try_into() {
-	    Ok(array) => array,
-	    Err(_e) => panic!(),
-	}
- */
-
     }
 }
-
-
-///
-/// Declares types whose values may not be `endian-flip`ped.
-///
-/// Note: In this crate, the term `encast` means decoding a number of
-/// bytes to one or more values, the term `decast` means encoding one
-/// or more variables to a number of bytes, and the term `endian-flip`
-/// means flipping the endianness of value(s).
-///
-/// # Description
-///
-/// A struct type may contain a union type as its member.  A union
-/// type can be `encast`ed and `decast`ed but cannot be automatically
-/// `endian-flip`ped.  In order to automatically flip the endianness
-/// of such container struct type without `endian-flip`ping its
-/// internal union type, trait `NopFlip` is defined.
-///
-/// It can be implemented by declaring `#[derive(NopFlip)]` for a
-/// struct type or a union type whose all members implement [`Flip`].
-/// It implements trait `NopFlip` as well as trait [`Flip`] whose
-/// methods do nothing (Nop = No operation).
-///
-/// Therefore, in the above example, if `NopFlip` is implemented for
-/// the internal union type, [`Flip`] can be implemented for the
-/// container struct type.
-///
-/// `NopFlip` has no method.
-///
-/// # Example
-///
-/// In the example below, `#[derive(NopFlip)]` marks `UnionB` as
-/// `endian-flip`pable but the implemented methods do nothing (Nop =
-/// No operation) so that method `encastf` and method `decastf` can
-/// flip the endianness of the container struct `StructC` except its
-/// internal union `UnionB`.
-///
-/// ```
-/// # use std::io::Result;
-/// # fn main() { test(); }
-/// # fn test() -> Result<()> {
-/// use std::io::Cursor;
-/// use castflip::{Cast, Flip, NopFlip, EncastIO, DecastIO, LE};
-///
-/// #[repr(C)]
-/// #[derive(Cast, Flip)]
-/// struct StructA {    // 8 bytes (total)
-///     x: [u8; 2],     // 2 bytes
-///     y: u16,         // 2 bytes
-///     z: u32,         // 4 bytes
-/// }
-///
-/// #[repr(C)]
-/// #[derive(Cast, NopFlip)]
-/// union UnionB {      // 4 bytes (largest)
-///     u: [u8; 4],     // 4 bytes
-///     v: [u16; 2],    // 4 bytes
-///     w: u32,         // 4 bytes
-/// }
-///
-/// #[repr(C)]
-/// #[derive(Cast, Flip)]
-/// struct StructC {    // 16 bytes (total)
-///     a: StructA,     //  8 bytes
-///     b: UnionB,      //  4 bytes
-///     f: f32,         //  4 bytes
-/// }
-///
-/// // Input data (16 bytes)
-/// let bytes1: [u8; 16] = [0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
-///                         0x18, 0x19, 0x1A, 0x1B, 0x00, 0x00, 0x48, 0x41];
-/// let mut input1 = Cursor::new(bytes1);
-///
-/// // Decode input `input1` to variable `var2_c` of type `StructC`.
-/// let var2_c: StructC = input1.encastf(LE)?;  // LE = Little-Endian
-///
-/// // Encode variable `var2_c` to bytes and write them to `output3`.
-/// let mut output3 = Cursor::new(vec![0_u8; 16]);
-/// output3.decastf(&var2_c, LE)?;
-///
-/// // Check the results (StructA in StructC)
-/// assert_eq!(var2_c.a.x, [0x10_u8, 0x11]);
-/// assert_eq!(var2_c.a.y, 0x1312);
-/// assert_eq!(var2_c.a.z, 0x17161514);
-///
-/// // Check the results (UnionB in StructC)
-/// unsafe {
-///     assert_eq!(var2_c.b.u, [0x18_u8, 0x19, 0x1A, 0x1B]);
-///     if cfg!(target_endian = "little") {
-///         assert_eq!(var2_c.b.v, [0x1918_u16, 0x1B1A]);
-///         assert_eq!(var2_c.b.w, 0x1B1A1918);
-///     } else if cfg!(target_endian = "big") {
-///         assert_eq!(var2_c.b.v, [0x1819_u16, 0x1A1B]);
-///         assert_eq!(var2_c.b.w, 0x18191A1B);
-///     }
-/// }
-///
-/// // Check the result (f32 in StructC)
-/// assert_eq!(var2_c.f, 12.5_f32);
-///
-/// // Check the result (output3)
-/// assert_eq!(&output3.into_inner(), &bytes1[..]);
-/// # Ok(())
-/// # }
-/// ```
-///
-/// In the example above, method `encastf` decodes bytes in `bytes1`
-/// in little-endian (`LE`) to variable `var2_c` of type `StructC`.
-/// Then, method `decastf` encodes the resulting value in `var2_c` to
-/// bytes in little-endian (`LE`) and stores them in `bytes3`.
-///
-/// As the results show, field `a` and `f` of `StructC` are
-/// `endian-flip`ped, but field `b` is not `endian-flip`ped.
-/// The endianness of the value(s) in field `b` needs to be
-/// flipped manually, e.g., by using the methods of [`Flip`].
-///
-pub trait NopFlip: Flip {}

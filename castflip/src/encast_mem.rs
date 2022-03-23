@@ -1,7 +1,7 @@
 use core::{mem, ptr};
 
 use crate::{Cast, Endian, Flip};
-#[allow(unused_imports)] use crate::BE; // used in document comment.
+#[cfg(doc)] use crate::BE;
 
 
 ///
@@ -55,7 +55,7 @@ use crate::{Cast, Endian, Flip};
 /// memory to one or more values of the specified type.  The type of
 /// the value(s) can be explicitly specified as the generic type
 /// parameter of the methods or implicitly specified so that the Rust
-/// compiler can infer.  The endianness of resulting value(s) is
+/// compiler can infer it.  The endianness of resulting value(s) is
 /// flipped when required and necessary.  Currently, only an
 /// implementation for `[u8]` is provided.
 ///

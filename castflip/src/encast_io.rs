@@ -3,7 +3,7 @@ use std::io::{Read, Result};
 
 use crate::{Cast, Endian, Flip};
 use crate::experimental::AsBytes;
-#[allow(unused_imports)] use crate::BE; // used in document comment.
+#[cfg(doc)] use crate::BE;
 
 
 ///
@@ -60,16 +60,16 @@ use crate::experimental::AsBytes;
 /// from I/O to one or more values of the specified type.  The type of
 /// the value(s) can be explicitly specified as the generic type
 /// parameter of the methods or implicitly specified so that the Rust
-/// compiler can infer.  The endianness of resulting value(s) is
+/// compiler can infer it.  The endianness of resulting value(s) is
 /// flipped when required and necessary.  Currently, only an
-/// implementation for trait `Read` is provided.
+/// implementation for trait `std::io::Read` is provided.
 ///
 /// The input `self` should have enough bytes to decode to the
 /// specified number of value(s) of the specified type `T`.  If there
 /// are enough bytes, the required number of bytes are read from I/O
 /// and decoded to the specified type of value(s), which is/are
 /// returned in `Ok`().  The remaining bytes in input `self` are
-/// untouched.  If I/O error is detected, `Err`(std::io::Error) is
+/// untouched.  If I/O error is detected, `Err`(`std::io::Error`) is
 /// returned.
 ///
 /// When argument `endian` is specified, the endianness of value(s) is

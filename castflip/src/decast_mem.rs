@@ -1,7 +1,7 @@
 use core::{mem, ptr};
 
 use crate::{Cast, Endian, Flip};
-#[allow(unused_imports)] use crate::BE; // used in document comment.
+#[cfg(doc)] use crate::BE;
 
 
 ///

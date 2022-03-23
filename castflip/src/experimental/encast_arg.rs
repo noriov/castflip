@@ -1,5 +1,5 @@
 use crate::{Cast, EncastMem, Endian, Flip};
-#[allow(unused_imports)] use crate::BE; // used in document comment.
+#[cfg(doc)] use crate::BE;
 
 
 ///

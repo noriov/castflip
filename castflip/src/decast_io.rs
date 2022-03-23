@@ -3,7 +3,7 @@ use std::io::{Write, Result};
 
 use crate::{Cast, Endian, Flip};
 use crate::experimental::AsBytes;
-#[allow(unused_imports)] use crate::BE; // used in document comment.
+#[cfg(doc)] use crate::BE;
 
 
 ///
@@ -43,13 +43,14 @@ use crate::experimental::AsBytes;
 /// // Because the UDP header is 8 bytes as defined above,
 /// // only the first 8 bytes of `output2` are filled with data.
 /// let mut output2 = Cursor::new(vec![0_u8; 16]);
-/// output2.decastf(&udp_hdr1, BE)?;
+/// let output2_bytes = output2.decastf(&udp_hdr1, BE)?;
 /// let bytes2 = output2.into_inner();
 ///
 /// // `udp_hdr1` should be encoded as following (8 bytes)
 /// let bytes3: [u8; 8] = [0xC3, 0xC9, 0x00, 0x35, 0x00, 0x32, 0x82, 0x3F];
 ///
 /// // Check the results.
+/// assert_eq!(output2_bytes, 8);
 /// assert_eq!(&bytes2[0..8], &bytes3[0..8]);
 /// assert_eq!(&bytes2[8..16], &[0_u8; 8]);
 /// # Ok(())
@@ -64,14 +65,14 @@ use crate::experimental::AsBytes;
 /// method or simply omitted because the Rust compiler can infer from
 /// the argument.  The endianness of resulting value(s) is flipped
 /// when required and necessary.  Currently, only an implementation
-/// for trait `Write` is provided.
+/// for trait `std::io::Write` is provided.
 ///
 /// The output `self` should have enough room to encode to the
 /// specified number of value(s) of the specified type `T`.  If there
 /// is enough room, the specified variable(s) is/are encoded to bytes
 /// and written to output `self`.  If successful, the size of written
 /// bytes are returned in `Ok`().  If I/O error is detected,
-/// `Err`(std::io::Error) is returned.
+/// `Err`(`std::io::Error`) is returned.
 ///
 /// When argument `endian` is specified, the endianness of resulting
 /// bytes is flipped if necessary.

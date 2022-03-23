@@ -47,7 +47,7 @@ use crate::experimental::Reslice;
 ///     let hdr: &ElfIdHdr = bytes1.deslice()?;
 ///
 ///     // Check the results.
-///     assert_eq!(&hdr.magic, b"\x7FELF"); // Magic Number: 0x7F "ELF"
+///     assert_eq!(&hdr.magic, b"\x7FELF"); // Magic Number: 7F 45 4C 46
 ///     assert_eq!(hdr.class, 2);           // File Class: 64-bit
 ///     assert_eq!(hdr.encoding, 1);        // Data Encoding: Little-Endian
 ///     assert_eq!(hdr.version, 1);         // Version 1

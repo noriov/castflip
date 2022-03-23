@@ -21,12 +21,14 @@
 /// As you may have noticed, all types implementing trait `Cast` can
 /// be duplicated simply by copying bits.  But trait `Cast` is not a
 /// subtrait of trait `Copy`.  The reasons why trait `Cast` is defined
-/// independently from trait `Copy` are (1) to exclude pointers and
-/// (2) to avoid unexpected copying to enjoy the merit of Rust's
-/// ownership system.  Hence, if a struct type or a union type need to
-/// be `Copy`, `#[derive(Clone, Copy)]` should also be declared.
+/// independently from trait `Copy` are (1) to exclude pointers, (2)
+/// to avoid unexpected copying, and (3) to enjoy the benefits of
+/// Rust's ownership system.  Hence, if a struct type or a union type
+/// need to be `Copy`, `#[derive(Clone, Copy)]` should also be
+/// declared.
 ///
-/// `Cast` has no method.
+/// Trait `Cast` has no method.  It is purely defined as a trait
+/// bound.
 ///
 /// # Example
 ///
@@ -58,12 +60,12 @@
 /// // Decode bytes `bytes1` to variable `id_hdr`.
 /// let id_hdr: ElfIdHdr = bytes1.encast()?;
 ///
-/// // Decode the resulting `id_hdr` to bytes `bytes3`.
+/// // Encode the resulting `id_hdr` to bytes `bytes3`.
 /// let mut bytes3 = [0_u8; 16];
 /// let bytes3_size = bytes3.decast(&id_hdr)?;
 ///
 /// // Check the results.
-/// assert_eq!(id_hdr.magic, *b"\x7FELF"); // Magic Number: 0x7F "ELF"
+/// assert_eq!(id_hdr.magic, *b"\x7FELF"); // Magic Number: 7F 45 4C 46
 /// assert_eq!(id_hdr.class, 2);           // File Class: 64-bit
 /// assert_eq!(id_hdr.encoding, 1);        // Encoding: Little-Endian
 /// assert_eq!(id_hdr.version, 1);         // Version 1

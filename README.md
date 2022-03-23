@@ -114,7 +114,7 @@ let var2_c: StructC = input1.encastf(LE)?;  // LE = Little-Endian
 
 // Encode variable `var2_c` to bytes and write them to `output3`.
 let mut output3 = Cursor::new(vec![0_u8; 16]);
-output3.decastf(&var2_c, LE)?;
+let output3_size = output3.decastf(&var2_c, LE)?;
 
 // Check the results (StructA in StructC)
 assert_eq!(var2_c.a.x, [0x10, 0x11]);  // x: [u8; 2],
@@ -137,6 +137,7 @@ unsafe {
 assert_eq!(var2_c.f, 12.5_f32);  // f: f32,
 
 // Check the result (output3)
+assert_eq!(output3_size, 16);
 assert_eq!(&output3.into_inner(), &bytes1[..]);
 ```
 
@@ -251,9 +252,11 @@ If successful, they return the number of resulting bytes.
 The endianness of resulting bytes is specified in the arguments of
 `decastf` and `decastvf`.
 
-Because this crate is very small, you can easily write your own traits
-to `encast` / `decast` on your system if the current API does not
-match your requirements.
+(The current API is designed for our private project.  Because this
+crate is very small except its document comments, if the current API
+does not match your requirements, you can easily modify the existing
+traits or you can easily write your own traits for your systems,
+e.g. embedded systems.)
 
 For more information, please see <https://docs.rs/castflip/>.
 
