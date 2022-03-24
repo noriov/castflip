@@ -6,7 +6,7 @@ description = "Library for encoding/decoding numeric variables, arrays and struc
 categories = ["encoding", "parsing"]
 keywords = ["endian", "cast"]
 license = "MIT-0"
-readme = "crates-io.md"
+readme = "README.md"
 repository = "https://github.com/noriov/castflip"
 
 [dependencies]
