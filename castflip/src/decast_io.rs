@@ -2,7 +2,7 @@ use core::mem;
 use std::io::{Write, Result};
 
 use crate::{Cast, Endian, Flip};
-use crate::experimental::AsBytes;
+use crate::experimental::AsifBytes;
 #[cfg(doc)] use crate::BE;
 
 
@@ -119,9 +119,9 @@ where
 	T: Cast
     {
 	unsafe {
-	    self.write_all(val_ptr.as_bytes_ref())?;
+	    self.write_all(val_ptr.asif_bytes_ref())?;
 	}
-	Ok(mem::size_of_val(val_ptr))
+	Ok(mem::size_of::<T>())
     }
 
     fn decastf<T>(&mut self, val_ptr: &T, endian: Endian) -> Result<usize>
@@ -140,9 +140,9 @@ where
 	T: Cast
     {
 	unsafe {
-	    self.write_all(slice.as_bytes_ref())?;
+	    self.write_all(slice.asif_bytes_ref())?;
 	}
-	Ok(slice.len())
+	Ok(mem::size_of::<T>() * slice.len())
     }
 
     fn decastvf<T>(&mut self, slice: &[T], endian: Endian) -> Result<usize>
@@ -155,7 +155,7 @@ where
 	    for elem in slice {
 		self.decast::<T>(&elem.flip_val_swapped())?;
 	    }
-	    Ok(slice.len())
+	    Ok(mem::size_of::<T>() * slice.len())
 	}
     }
 }

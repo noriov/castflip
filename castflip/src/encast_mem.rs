@@ -1,6 +1,9 @@
-use core::{mem, ptr};
+use core::mem::ManuallyDrop;
+use core::mem::MaybeUninit;
+use core::{mem, ptr, slice};
 
 use crate::{Cast, Endian, Flip};
+use crate::experimental::FlipUnsized;
 #[cfg(doc)] use crate::BE;
 
 
@@ -110,16 +113,28 @@ impl EncastMem for [u8]
     {
 	let bytes = self.get(0 .. mem::size_of::<T>())?;
 
+	// Create a value of type T decoded from bytes.
+	let mut val = MaybeUninit::<T>::uninit();
 	unsafe {
-	    Some(ptr::read_unaligned(bytes.as_ptr() as *const T))
+	    ptr::copy_nonoverlapping(bytes.as_ptr(),
+				     val.as_mut_ptr() as *mut u8,
+				     mem::size_of::<T>());
+	    Some(val.assume_init())
 	}
+
+	// The code fragment above is equivalent to:
+	// unsafe {
+	//     Some(ptr::read_unaligned(bytes.as_ptr() as *const T))
+	// }
     }
 
     fn encastf<T>(&self, endian: Endian) -> Option<T>
     where
 	T: Cast + Flip
     {
-	Some(self.encast::<T>()?.flip_val(endian))
+	let mut val: T = self.encast()?;
+	val.flip_var(endian);
+	Some(val)
     }
 
     fn encastv<T>(&self, nelem: usize) -> Option<Vec<T>>
@@ -128,29 +143,54 @@ impl EncastMem for [u8]
     {
 	let bytes = self.get(0 .. mem::size_of::<T>() * nelem)?;
 
-	let mut vec = Vec::<T>::with_capacity(nelem);
-	let mut off = 0;
-	for _i in 0 .. nelem {
-	    vec.push(bytes[off ..].encast::<T>()?);
-	    off += mem::size_of::<T>();
+	// Create a vector of type T filled with values decoded from bytes.
+	unsafe {
+	    new_vec(nelem, | new_slice | {
+		ptr::copy_nonoverlapping(bytes.as_ptr(),
+					 new_slice.as_mut_ptr() as *mut u8,
+					 bytes.len());
+		Some(())
+	    })
 	}
-
-	Some(vec)
     }
 
     fn encastvf<T>(&self, nelem: usize, endian: Endian) -> Option<Vec<T>>
     where
 	T: Cast + Flip
     {
-	let bytes = self.get(0 .. mem::size_of::<T>() * nelem)?;
-
-	let mut vec = Vec::<T>::with_capacity(nelem);
-	let mut off = 0;
-	for _i in 0 .. nelem {
-	    vec.push(bytes[off ..].encastf::<T>(endian)?);
-	    off += mem::size_of::<T>();
-	}
-
+	let mut vec = self.encastv(nelem)?;
+	vec.flip_var(endian);
 	Some(vec)
+    }
+}
+
+
+fn new_vec<T, F>(nelem: usize, fill_new_slice: F) -> Option<Vec<T>>
+where
+    F: Fn(&mut [T]) -> Option<()>
+{
+    // See the description and the example of Vec::from_raw_parts at
+    // https://doc.rust-lang.org/std/vec/struct.Vec.html#method.from_raw_parts
+
+    // Create a vector with enough size of hidden area.
+    let mut vec: Vec<T> = Vec::with_capacity(nelem);
+
+    // Fill hidden area with caller-supplied data.
+    // The hidden area is passed as an ephemeral slice (soon dropped).
+    unsafe {
+	fill_new_slice(
+	    slice::from_raw_parts_mut(vec.as_mut_ptr(),
+				      nelem))?;
+    }
+
+    // Prevent running vec's destructor.
+    let mut vec = ManuallyDrop::new(vec);
+
+    // Expose the hidden buffer by reassemble a new vector.
+    unsafe {
+	let vec2 = Vec::from_raw_parts(vec.as_mut_ptr(),
+				       nelem,
+				       vec.capacity());
+	Some(vec2)
     }
 }

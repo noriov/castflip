@@ -1,8 +1,11 @@
+use core::mem::ManuallyDrop;
 use core::mem::MaybeUninit;
+use core::slice;
 use std::io::{Read, Result};
 
 use crate::{Cast, Endian, Flip};
-use crate::experimental::AsBytes;
+use crate::experimental::AsifBytes;
+use crate::experimental::FlipUnsized;
 #[cfg(doc)] use crate::BE;
 
 
@@ -116,10 +119,11 @@ where
     where
 	T: Cast
     {
+	// Create a value of type T decoded from self.
 	unsafe {
-	    let mut val = MaybeUninit::<T>::uninit().assume_init();
-	    self.read_exact(val.as_bytes_mut())?;
-	    Ok(val)
+	    let mut val = MaybeUninit::<T>::uninit();
+	    self.read_exact(val.asif_bytes_mut())?;
+	    Ok(val.assume_init())
 	}
     }
 
@@ -127,28 +131,60 @@ where
     where
 	T: Cast + Flip
     {
-	Ok(self.encast::<T>()?.flip_val(endian))
+	let mut val: T = self.encast()?;
+	val.flip_var(endian);
+	Ok(val)
     }
 
     fn encastv<T>(&mut self, nelem: usize) -> Result<Vec<T>>
     where
 	T: Cast
     {
-	let mut vec = Vec::<T>::with_capacity(nelem);
-	for _i in 0 .. nelem {
-	    vec.push(self.encast::<T>()?);
+	// Create a vector of type T filled with values decoded from self.
+	unsafe {
+	    new_vec(nelem, | new_slice | {
+		self.read_exact(new_slice.asif_bytes_mut())
+	    })
 	}
-	Ok(vec)
     }
 
     fn encastvf<T>(&mut self, nelem: usize, endian: Endian) -> Result<Vec<T>>
     where
 	T: Cast + Flip
     {
-	let mut vec = Vec::<T>::with_capacity(nelem);
-	for _i in 0 .. nelem {
-	    vec.push(self.encastf::<T>(endian)?);
-	}
+	let mut vec = self.encastv(nelem)?;
+	vec.flip_var(endian);
 	Ok(vec)
+    }
+}
+
+
+fn new_vec<T, F>(nelem: usize, mut fill_new_slice: F) -> Result<Vec<T>>
+where
+    F: FnMut(&mut [T]) -> Result<()>
+{
+    // See the description and the example of Vec::from_raw_parts at
+    // https://doc.rust-lang.org/std/vec/struct.Vec.html#method.from_raw_parts
+
+    // Create a vector with enough size of hidden area.
+    let mut vec: Vec<T> = Vec::with_capacity(nelem);
+
+    // Fill hidden area with caller-supplied data.
+    // The hidden area is passed as an ephemeral slice (soon dropped).
+    unsafe {
+	fill_new_slice(
+	    slice::from_raw_parts_mut(vec.as_mut_ptr(),
+				      nelem))?;
+    }
+
+    // Prevent running vec's destructor.
+    let mut vec = ManuallyDrop::new(vec);
+
+    // Expose the hidden buffer by reassemble a new vector.
+    unsafe {
+	let vec2 = Vec::from_raw_parts(vec.as_mut_ptr(),
+				       nelem,
+				       vec.capacity());
+	Ok(vec2)
     }
 }

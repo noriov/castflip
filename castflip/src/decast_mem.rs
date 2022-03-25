@@ -115,25 +115,29 @@ impl DecastMem for [u8]
 	let bytes = self.get_mut(0 .. mem::size_of::<T>())?;
 
 	unsafe {
-	    ptr::write_unaligned(bytes.as_ptr() as *mut T,
-				 ptr::read(val_ptr));
+	    ptr::copy_nonoverlapping(val_ptr as *const T as *const u8,
+				     bytes.as_mut_ptr(),
+				     mem::size_of::<T>());
 	}
 
-	Some(bytes.len())
+	Some(mem::size_of::<T>())
+
+	// The unsafe block above is almost equivalent to:
+	// unsafe {
+	//    ptr::write_unaligned(bytes.as_mut_ptr() as *mut T,
+	//                         ptr::read(val_ptr))
+	// }
     }
 
     fn decastf<T>(&mut self, val_ptr: &T, endian: Endian) -> Option<usize>
     where
 	T: Cast + Flip
     {
-	let bytes = self.get_mut(0 .. mem::size_of::<T>())?;
-
-	unsafe {
-	    ptr::write_unaligned(bytes.as_ptr() as *mut T,
-				 val_ptr.flip_val(endian));
+	if !endian.need_swap() {
+	    self.decast(val_ptr)
+	} else {
+	    self.decast(&val_ptr.flip_val_swapped())
 	}
-
-	Some(bytes.len())
     }
 
     fn decastv<T>(&mut self, slice: &[T]) -> Option<usize>
@@ -143,7 +147,7 @@ impl DecastMem for [u8]
 	let bytes = self.get_mut(0 .. mem::size_of::<T>() * slice.len())?;
 
 	unsafe {
-	    ptr::copy_nonoverlapping(slice.as_ptr() as *mut u8,
+	    ptr::copy_nonoverlapping(slice.as_ptr() as *const u8,
 				     bytes.as_mut_ptr(),
 				     bytes.len());
 	}
@@ -155,23 +159,16 @@ impl DecastMem for [u8]
     where
 	T: Cast + Flip
     {
-	let bytes = self.get_mut(0 .. mem::size_of::<T>() * slice.len())?;
-
-	unsafe {
-	    if !endian.need_swap() {
-		ptr::copy_nonoverlapping(slice.as_ptr() as *mut u8,
-					 bytes.as_mut_ptr(),
-					 bytes.len());
-	    } else {
-		let mut off = 0;
-		for i in 0 .. slice.len() {
-		    ptr::write_unaligned(bytes[off ..].as_ptr() as *mut T,
-					 slice[i].flip_val_swapped());
-		    off += mem::size_of::<T>();
-		}
+	if !endian.need_swap() {
+	    self.decastv(slice)
+	} else {
+	    let bytes = self.get_mut(0 .. mem::size_of::<T>() * slice.len())?;
+	    let mut off = 0;
+	    for elem in slice {
+		bytes[off ..].decast(&elem.flip_val_swapped())?;
+		off += mem::size_of::<T>();
 	    }
+	    Some(off)
 	}
-
-	Some(bytes.len())
     }
 }
