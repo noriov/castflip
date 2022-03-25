@@ -45,7 +45,7 @@ use crate::experimental::AsBytes;
 /// // the first 8 bytes are decoded, remaining 8 bytes are ignored.
 /// let udp_hdr2: UdpHdr = input1.encastf(BE)?;  // BE = Big-Endian
 ///
-/// // Check the results.
+/// // Check the results (udp_hdr2)
 /// assert_eq!(udp_hdr2.sport, 0xC3C9); // = 50121
 /// assert_eq!(udp_hdr2.dport, 0x0035); // = 53 (DNS)
 /// assert_eq!(udp_hdr2.len,   0x0032); // = 50

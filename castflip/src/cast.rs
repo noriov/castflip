@@ -34,7 +34,8 @@
 ///
 /// In the example below, `#[derive(Cast)]` makes the values of
 /// `ElfIdHdr` `encast`able / `decast`able so that methods `encast`
-/// and method `decast` can work.
+/// and method `decast` can work.  Note that `#[repr(C)]` must also be
+/// declared.
 ///
 /// ```
 /// # fn main() { test(); }
@@ -62,9 +63,9 @@
 ///
 /// // Encode the resulting `id_hdr` to bytes `bytes3`.
 /// let mut bytes3 = [0_u8; 16];
-/// let bytes3_size = bytes3.decast(&id_hdr)?;
+/// let size3 = bytes3.decast(&id_hdr)?;
 ///
-/// // Check the results.
+/// // Check the results (id_hdr)
 /// assert_eq!(id_hdr.magic, *b"\x7FELF"); // Magic Number: 7F 45 4C 46
 /// assert_eq!(id_hdr.class, 2);           // File Class: 64-bit
 /// assert_eq!(id_hdr.encoding, 1);        // Encoding: Little-Endian
@@ -72,7 +73,9 @@
 /// assert_eq!(id_hdr.os_abi, 0);          // OS/ABI: unspecified
 /// assert_eq!(id_hdr.abi_ver, 0);         // ABI Ver: unspecified
 /// assert_eq!(id_hdr.pad, [0_u8; 7]);     // Padding
-/// assert_eq!(bytes3_size, 16);
+///
+/// // Check the results (bytes3)
+/// assert_eq!(size3, 16);
 /// assert_eq!(bytes3, bytes1);
 /// # Some(())
 /// # }

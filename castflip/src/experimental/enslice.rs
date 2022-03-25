@@ -54,7 +54,7 @@ use crate::experimental::Reslice;
 ///     // Hence, `bytes2` is the same with `bytes1`.
 ///     let bytes2: &[u8] = hdr1.enslice()?;
 ///
-///     // Check the result.
+///     // Check the result (bytes2)
 ///     assert_eq!(bytes2, &[0x7F, 0x45, 0x4C, 0x46, 0x02, 0x01, 0x01, 0x00,
 ///                          0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]);
 /// }

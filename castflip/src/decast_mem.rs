@@ -39,13 +39,13 @@ use crate::{Cast, Endian, Flip};
 /// // Because the UDP header is 8 bytes as defined above,
 /// // only the first 8 bytes of `bytes2` are filled with data.
 /// let mut bytes2 = [0_u8; 16];
-/// let bytes2_size = bytes2.decastf(&udp_hdr1, BE)?;  // BE = Big-Endian
+/// let size2 = bytes2.decastf(&udp_hdr1, BE)?;  // BE = Big-Endian
 ///
 /// // `udp_hdr1` should be encoded as following (8 bytes)
 /// let bytes3: [u8; 8] = [0xC3, 0xC9, 0x00, 0x35, 0x00, 0x32, 0x82, 0x3F];
 ///
-/// // Check the results.
-/// assert_eq!(bytes2_size, 8);
+/// // Check the results (bytes2)
+/// assert_eq!(size2, 8);
 /// assert_eq!(&bytes2[0..8], &bytes3[0..8]);
 /// assert_eq!(&bytes2[8..16], &[0_u8; 8]);
 /// # Some(())

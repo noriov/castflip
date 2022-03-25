@@ -1,4 +1,5 @@
 use crate::Flip;
+#[cfg(doc)] use crate::LE;
 
 
 ///
@@ -74,7 +75,7 @@ use crate::Flip;
 ///
 /// // Encode variable `var2_c` to bytes and write them to `output3`.
 /// let mut output3 = Cursor::new(vec![0_u8; 16]);
-/// output3.decastf(&var2_c, LE)?;
+/// let size3 = output3.decastf(&var2_c, LE)?;
 ///
 /// // Check the results (StructA in StructC)
 /// assert_eq!(var2_c.a.x, [0x10_u8, 0x11]);
@@ -97,15 +98,16 @@ use crate::Flip;
 /// assert_eq!(var2_c.f, 12.5_f32);
 ///
 /// // Check the result (output3)
+/// assert_eq!(size3, 16);
 /// assert_eq!(&output3.into_inner(), &bytes1[..]);
 /// # Ok(())
 /// # }
 /// ```
 ///
 /// In the example above, method `encastf` decodes bytes in `bytes1`
-/// in little-endian (`LE`) to variable `var2_c` of type `StructC`.
+/// in little-endian ([`LE`]) to variable `var2_c` of type `StructC`.
 /// Then, method `decastf` encodes the resulting value in `var2_c` to
-/// bytes in little-endian (`LE`) and stores them in `bytes3`.
+/// bytes in little-endian ([`LE`]) and stores them in `bytes3`.
 ///
 /// As the results show, field `a` and `f` of `StructC` are
 /// `endian-flip`ped, but field `b` is not `endian-flip`ped.  The

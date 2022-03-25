@@ -46,7 +46,7 @@ use crate::experimental::Reslice;
 ///     // Both &`bytes1` and `hdr` point to the same entity.
 ///     let hdr: &ElfIdHdr = bytes1.deslice()?;
 ///
-///     // Check the results.
+///     // Check the results (hdr)
 ///     assert_eq!(&hdr.magic, b"\x7FELF"); // Magic Number: 7F 45 4C 46
 ///     assert_eq!(hdr.class, 2);           // File Class: 64-bit
 ///     assert_eq!(hdr.encoding, 1);        // Data Encoding: Little-Endian

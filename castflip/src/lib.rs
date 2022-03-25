@@ -37,14 +37,16 @@ let udp_hdr2 = bytes1.encastf::<UdpHdr>(BE)?;  // BE = Big-Endian
 
 // Encode the resulting UDP header `udp_hdr2` to bytes `bytes3`.
 let mut bytes3 = [0_u8; 8];
-let bytes3_size = bytes3.decastf::<UdpHdr>(&udp_hdr2, BE)?;
+let size3 = bytes3.decastf::<UdpHdr>(&udp_hdr2, BE)?;
 
-// Check the results.
+// Check the results (udp_hdr2)
 assert_eq!(udp_hdr2.sport, 0xC3C9); // = 50121
 assert_eq!(udp_hdr2.dport, 0x0035); // = 53 (DNS)
 assert_eq!(udp_hdr2.len,   0x0032); // = 50
 assert_eq!(udp_hdr2.sum,   0x823F);
-assert_eq!(bytes3_size, 8);
+
+// Check the results (bytes3)
+assert_eq!(size3, 8);
 assert_eq!(bytes3, bytes1);
 # Some(())
 # }
@@ -112,7 +114,7 @@ let var2_c: StructC = input1.encastf(LE)?;  // LE = Little-Endian
 
 // Encode variable `var2_c` to bytes and write them to `output3`.
 let mut output3 = Cursor::new(vec![0_u8; 16]);
-let output3_size = output3.decastf(&var2_c, LE)?;
+let size3 = output3.decastf(&var2_c, LE)?;
 
 // Check the results (StructA in StructC)
 assert_eq!(var2_c.a.x, [0x10, 0x11]);  // x: [u8; 2],
@@ -134,8 +136,8 @@ unsafe {
 // Check the result (f32 in StructC)
 assert_eq!(var2_c.f, 12.5_f32);  // f: f32,
 
-// Check the result (output3)
-assert_eq!(output3_size, 16);
+// Check the results (output3)
+assert_eq!(size3, 16);
 assert_eq!(&output3.into_inner(), &bytes1[..]);
 # Ok(())
 # }
@@ -178,12 +180,14 @@ let vec2: Vec<Pair> = bytes1.encastvf(3, BE)?;  // 3 pairs, BE = Big-Endian
 
 // Encode variable `vec2` to bytes `bytes3`.
 let mut bytes3 = [0_u8; 12];
-let bytes3_size = bytes3.decastvf(&vec2, BE)?;
+let size3 = bytes3.decastvf(&vec2, BE)?;
 
-// Check the results.
+// Check the results (vec2)
 assert_eq!(vec2, vec![Pair(0x2021, 0x2223), Pair(0x2425, 0x2627),
                       Pair(0x2829, 0x2A2B)]);
-assert_eq!(bytes3_size, 12);
+
+// Check the results (bytes3)
+assert_eq!(size3, 12);
 assert_eq!(bytes3, bytes1);
 # Some(())
 # }
@@ -255,12 +259,6 @@ the methods defined in trait [`DecastIO`] returns `io::Result`.
 If successful, they return the number of resulting bytes.
 The endianness of resulting bytes is specified in the arguments of
 `decastf` and `decastvf`.
-
-(The current API is designed for our private project.  Because this
-crate is very small except its document comments, if the current API
-does not match your requirements, you can easily modify the existing
-traits or you can easily write your own traits for your systems,
-e.g. embedded systems.)
 
 For more information, please see the description of each trait and enum.
 

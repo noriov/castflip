@@ -47,14 +47,16 @@ let udp_hdr2 = bytes1.encastf::<UdpHdr>(BE)?;  // BE = Big-Endian
 
 // Encode the resulting UDP header `udp_hdr2` to bytes `bytes3`.
 let mut bytes3 = [0_u8; 8];
-let bytes3_size = bytes3.decastf::<UdpHdr>(&udp_hdr2, BE)?;
+let size3 = bytes3.decastf::<UdpHdr>(&udp_hdr2, BE)?;
 
-// Check the results.
+// Check the results (udp_hdr2)
 assert_eq!(udp_hdr2.sport, 0xC3C9); // = 50121
 assert_eq!(udp_hdr2.dport, 0x0035); // = 53 (DNS)
 assert_eq!(udp_hdr2.len,   0x0032); // = 50
 assert_eq!(udp_hdr2.sum,   0x823F);
-assert_eq!(bytes3_size, 8);
+
+// Check the results (bytes3)
+assert_eq!(size3, 8);
 assert_eq!(bytes3, bytes1);
 ```
 
