@@ -136,21 +136,18 @@ fn test_cast_nopflip() {
 }
 
 fn test_flip() {
-    #[repr(C)]
     #[derive(Flip)]
     struct NamedTest {
 	val1:	u16,
 	val2:	u16,
     }
 
-    #[repr(C)]
     #[derive(Flip)]
     struct UnnamedTest (
 	u16,
 	u16,
     );
 
-    #[repr(C)]
     #[derive(Flip)]
     struct UnitTest;
 
@@ -175,25 +172,21 @@ fn test_flip() {
 }
 
 fn test_nopflip() {
-    #[repr(C)]
     #[derive(NopFlip)]
     struct NamedTest {
 	val1:	u16,
 	val2:	u16,
     }
 
-    #[repr(C)]
     #[derive(NopFlip)]
     struct UnnamedTest (
 	u16,
 	u16,
     );
 
-    #[repr(C)]
     #[derive(NopFlip)]
     struct UnitTest;
 
-    #[repr(C)]
     #[derive(NopFlip)]
     union UnionTest {
 	val1:	u16,
@@ -210,14 +203,26 @@ fn test_nopflip() {
     let mut unnamed3 = unnamed1;
     unnamed3.flip_var(SE);
 
+    let union1 = UnionTest { val1: 0x1234 };
+    let union2 = union1.flip_val(SE);
+    let mut union3 = UnionTest { val2: 0x5678 };
+    union3.flip_var(SE);
+
     assert_eq!(named2.val1, 0x1234);
     assert_eq!(named2.val2, 0x5678);
     assert_eq!(named3.val1, 0x1234);
     assert_eq!(named3.val2, 0x5678);
+
     assert_eq!(unnamed2.0, 0x1234);
     assert_eq!(unnamed2.1, 0x5678);
     assert_eq!(unnamed3.0, 0x1234);
     assert_eq!(unnamed3.1, 0x5678);
+
+    unsafe {
+	assert_eq!(union1.val1, 0x1234);
+	assert_eq!(union2.val1, 0x1234);
+	assert_eq!(union3.val2, 0x5678);
+    }
 }
 
 #[test]
