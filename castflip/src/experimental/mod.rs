@@ -1,26 +1,35 @@
 //!
 //! Defines experimental traits and historical traits.
 //!
-//! - [`AsBytes`] converts a reference to a variable or a slice into a
-//!   phantom reference to bytes without copying data.  Although it is
-//!   useful in certain situations, its use cases will be limited
-//!   because its methods are considered unsafe.  It is used
-//!   internally in this crate.
+//! - [`AsifBytes`] converts a reference to a variable or a slice into
+//!   a phantom reference to a slice of bytes without copying data.
+//!   Although it is useful in certain situations, its use cases will
+//!   be limited because its methods are considered unsafe.  It is
+//!   used internally in this crate.
+//!
+//! - [`AsBytes`] is an older version of [`AsifBytes`].  It is
+//!   deprecated because one of its method names is conflicted with
+//!   `mem::MaybeUninit`.  In order to support method `as_bytes_mut`
+//!   for `mem::MaybeUninit`, [`AsBytes`] is renamed to [`AsifBytes`].
 //!
 //! - [`Deslice`], [`Enslice`] and [`Reslice`] are general-purpose
-//!   ancestors of [`AsBytes`].  Some of their methods were used
+//!   ancestors of [`AsifBytes`].  Some of their methods were used
 //!   internally in this crate.  They convert a reference to a
 //!   variable or a slice into a phantom reference to a slice or a
 //!   variable of the specified type without copying data.
 //!
-//! - [`EncastArg`], [`DecastArg`] and [`FlipUnsized`] provides some
-//!   older versions of APIs of this crate.  If no good use case can
-//!   be found, they may be removed in a future release.
+//! - [`EncastArg`] and [`DecastArg`] provide some older versions of
+//!   APIs of this crate.  If no good use case can be found, they may
+//!   be removed in a future release.
+//!
+//! - [`FlipUnsized`] provides method `flip_var` for slices and
+//!   tuples.  It is used internally in this crate.
 //!
 
 
 // Modules in files in the same directory.
 #[doc(hidden)] pub mod as_bytes;
+#[doc(hidden)] pub mod asif_bytes;
 #[doc(hidden)] pub mod decast_arg;
 #[doc(hidden)] pub mod deslice;
 #[doc(hidden)] pub mod encast_arg;
@@ -30,6 +39,7 @@
 
 // Experimental but internally used trait.
 #[doc(inline)] pub use self::as_bytes::AsBytes;
+#[doc(inline)] pub use self::asif_bytes::AsifBytes;
 
 // Experimental but historical traits.
 #[doc(inline)] pub use self::deslice::Deslice;

@@ -1,19 +1,23 @@
+use core::mem::MaybeUninit;
 use core::{mem, slice};
 
 use crate::Cast;
 
 
 ///
-/// Deprecated.  (Renamed to `AsifBytes`)
+/// Defines methods to convert a reference to a variable or a slice
+/// into a phantom reference to a lice of bytes without copying data.
+///
+/// Trait `AsifBytes` is used internally in this crate.
 ///
 /// # Example 1
 ///
-/// In the example below, method `as_bytes_ref` converts the original
-/// reference to type `ElfIdHdr` into a phantom reference to slice
-/// `bytes2` without copying data.
+/// In the example below, method `asif_bytes_ref` converts the
+/// original reference to type `ElfIdHdr` into a phantom reference to
+/// slice `bytes2` without copying data.
 ///
 /// ```
-/// use castflip::experimental::AsBytes;
+/// use castflip::experimental::AsifBytes;
 /// use castflip::Cast;
 ///
 /// #[repr(C)]
@@ -43,7 +47,7 @@ use crate::Cast;
 ///     // Convert the original reference to `hdr1` into `bytes2`.
 ///     // Both &`hdr1` and `bytes2` point to the same entity.
 ///     // Hence, `bytes2` is the same with `bytes1`.
-///     let bytes2 = hdr1.as_bytes_ref();
+///     let bytes2 = hdr1.asif_bytes_ref();
 ///
 ///     // Check the result (bytes2)
 ///     assert_eq!(bytes2, &[0x7F, 0x45, 0x4C, 0x46, 0x02, 0x01, 0x01, 0x00,
@@ -58,12 +62,12 @@ use crate::Cast;
 ///
 /// # Example 2
 ///
-/// In the example below, method `as_bytes_ref` converts the original
-/// reference to an array of type `Pair` into a phantom reference to
-/// slice `bytes2` without copying data.
+/// In the example below, method `asif_bytes_ref` converts the
+/// original reference to an array of type `Pair` into a phantom
+/// reference to slice `bytes2` without copying data.
 ///
 /// ```
-/// use castflip::experimental::AsBytes;
+/// use castflip::experimental::AsifBytes;
 /// use castflip::Cast;
 ///
 /// #[repr(C)]
@@ -78,7 +82,7 @@ use crate::Cast;
 ///     // Convert the original reference to `pairs1` into `bytes2`.
 ///     // Both &`pairs1` and `bytes2` point to the same entity.
 ///     // Hence, `bytes2` is the same with `bytes1`.
-///     let bytes2 = pairs1.as_bytes_ref();
+///     let bytes2 = pairs1.asif_bytes_ref();
 ///
 ///     // Check the result.
 ///     if cfg!(target_endian = "little") {
@@ -104,46 +108,62 @@ use crate::Cast;
 /// the original reference until the phantom reference is dropped,
 /// expecially when the original reference is mutable.
 ///
-pub trait AsBytes {
+pub trait AsifBytes {
     /// Converts a reference to `self` into a phantom reference to a
     /// slice of u8 without copying data.  `self` can be a variable or
     /// a slice.
-    unsafe fn as_bytes_ref(&self) -> &[u8];
+    unsafe fn asif_bytes_ref(&self) -> &[u8];
 
     /// Converts a mutable reference to `self` into a mutable phantom
     /// reference to a slice of u8 without copying data.  `self` can
     /// be a variable or a slice.
-    unsafe fn as_bytes_mut(&mut self) -> &mut [u8];
+    unsafe fn asif_bytes_mut(&mut self) -> &mut [u8];
 }
 
 
-impl<T> AsBytes for T
+impl<T> AsifBytes for T
 where
     T: Cast
 {
-    unsafe fn as_bytes_ref(&self) -> &[u8] {
+    unsafe fn asif_bytes_ref(&self) -> &[u8] {
 	slice::from_raw_parts::<u8>(self as *const T as *const u8,
 				    mem::size_of::<T>())
     }
 
-    unsafe fn as_bytes_mut(&mut self) -> &mut [u8] {
+    unsafe fn asif_bytes_mut(&mut self) -> &mut [u8] {
 	slice::from_raw_parts_mut::<u8>(self as *mut T as *mut u8,
 					mem::size_of::<T>())
     }
 }
 
 
-impl<T> AsBytes for [T]
+impl<T> AsifBytes for [T]
 where
     T: Cast
 {
-    unsafe fn as_bytes_ref(&self) -> &[u8] {
+    unsafe fn asif_bytes_ref(&self) -> &[u8] {
 	slice::from_raw_parts::<u8>(self as *const [T] as *const u8,
 				    mem::size_of::<T>() * self.len())
     }
 
-    unsafe fn as_bytes_mut(&mut self) -> &mut [u8] {
+    unsafe fn asif_bytes_mut(&mut self) -> &mut [u8] {
 	slice::from_raw_parts_mut::<u8>(self as *mut [T] as *mut u8,
 					mem::size_of::<T>() * self.len())
+    }
+}
+
+
+impl<T> AsifBytes for MaybeUninit<T>
+where
+    T: Cast
+{
+    unsafe fn asif_bytes_ref(&self) -> &[u8] {
+	slice::from_raw_parts::<u8>(self.as_ptr() as *const u8,
+				    mem::size_of::<T>())
+    }
+
+    unsafe fn asif_bytes_mut(&mut self) -> &mut [u8] {
+	slice::from_raw_parts_mut::<u8>(self.as_mut_ptr() as *mut u8,
+					mem::size_of::<T>())
     }
 }
