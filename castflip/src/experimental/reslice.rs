@@ -99,13 +99,13 @@ use crate::Cast;
 pub trait Reslice {
     /// Converts a reference to slice `self` of a type
     /// into a phantom reference to a slice of type `U`.
-    unsafe fn reslice<'a, U>(&'a self) -> Option<&'a [U]>
+    unsafe fn reslice<U>(&self) -> Option<&[U]>
     where
 	U: Cast;
 
     /// Converts a mutable reference to slice `self` of a type
     /// into a mutable phantom reference to a slice of type `U`.
-    unsafe fn reslice_mut<'a, U>(&'a mut self) -> Option<&'a mut [U]>
+    unsafe fn reslice_mut<U>(&mut self) -> Option<&mut [U]>
     where
 	U: Cast;
 }
@@ -115,36 +115,34 @@ impl<T> Reslice for [T]
 where
     T: Cast
 {
-    unsafe fn reslice<'a, U>(&'a self) -> Option<&'a [U]>
+    unsafe fn reslice<U>(&self) -> Option<&[U]>
     where
 	U: Cast
     {
-	let slice = self.as_ref();
-	let slice_size = mem::size_of::<T>() * slice.len();
+	let slice_size = mem::size_of::<T>() * self.len();
 	let new_len = slice_size / mem::size_of::<U>();
 
 	#[allow(unused_parens)]
 	if (slice_size == mem::size_of::<U>() * new_len &&
-	    slice.as_ptr().align_offset(mem::align_of::<U>()) == 0) {
-	    Some(slice::from_raw_parts::<U>(slice.as_ptr() as *const U,
+	    self.as_ptr().align_offset(mem::align_of::<U>()) == 0) {
+	    Some(slice::from_raw_parts::<U>(self.as_ptr() as *const U,
 					    new_len))
 	} else {
 	    None
 	}
     }
 
-    unsafe fn reslice_mut<'a, U>(&'a mut self) -> Option<&'a mut [U]>
+    unsafe fn reslice_mut<U>(&mut self) -> Option<&mut [U]>
     where
 	U: Cast
     {
-	let slice = self.as_mut();
-	let slice_size = mem::size_of::<T>() * slice.len();
+	let slice_size = mem::size_of::<T>() * self.len();
 	let new_len = slice_size / mem::size_of::<U>();
 
 	#[allow(unused_parens)]
 	if (slice_size == mem::size_of::<U>() * new_len &&
-	    slice.as_ptr().align_offset(mem::align_of::<U>()) == 0) {
-	    Some(slice::from_raw_parts_mut::<U>(slice.as_ptr() as *mut U,
+	    self.as_ptr().align_offset(mem::align_of::<U>()) == 0) {
+	    Some(slice::from_raw_parts_mut::<U>(self.as_ptr() as *mut U,
 						new_len))
 	} else {
 	    None

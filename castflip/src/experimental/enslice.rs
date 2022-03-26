@@ -81,13 +81,13 @@ use crate::experimental::Reslice;
 pub trait Enslice {
     /// Converts a reference to `self` of a type
     /// into a phantom reference to a slice of type `U`.
-    unsafe fn enslice<'a, U>(&'a self) -> Option<&'a [U]>
+    unsafe fn enslice<U>(&self) -> Option<&[U]>
     where
 	U: Cast;
 
     /// Converts a mutable reference to `self` of a type
     /// into a mutable phantom reference to a slice of type `U`.
-    unsafe fn enslice_mut<'a, U>(&'a mut self) -> Option<&'a mut [U]>
+    unsafe fn enslice_mut<U>(&mut self) -> Option<&mut [U]>
     where
 	U: Cast;
 }
@@ -97,7 +97,7 @@ impl<T> Enslice for T
 where
     T: Cast
 {
-    unsafe fn enslice<'a, U>(&'a self) -> Option<&'a [U]>
+    unsafe fn enslice<U>(&self) -> Option<&[U]>
     where
 	U: Cast
     {
@@ -105,7 +105,7 @@ where
 	    .reslice::<U>()
     }
 
-    unsafe fn enslice_mut<'a, U>(&'a mut self) -> Option<&'a mut [U]>
+    unsafe fn enslice_mut<U>(&mut self) -> Option<&mut [U]>
     where
 	U: Cast
     {

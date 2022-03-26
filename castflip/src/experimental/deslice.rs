@@ -81,13 +81,13 @@ use crate::experimental::Reslice;
 pub trait Deslice {
     /// Converts a reference to the slice `self` of a type
     /// into a phantom reference to a variable of type `U`.
-    unsafe fn deslice<'a, U>(&'a self) -> Option<&'a U>
+    unsafe fn deslice<U>(&self) -> Option<&U>
     where
 	U: Cast;
 
     /// Converts a mutable reference to the slice `self` of a type
     /// into a mutable phantom reference to a variable of type `U`.
-    unsafe fn deslice_mut<'a, U>(&'a mut self) -> Option<&'a mut U>
+    unsafe fn deslice_mut<U>(&mut self) -> Option<&mut U>
     where
 	U: Cast;
 }
@@ -97,7 +97,7 @@ impl<T> Deslice for [T]
 where
     T: Cast
 {
-    unsafe fn deslice<'a, U>(&'a self) -> Option<&'a U>
+    unsafe fn deslice<U>(&self) -> Option<&U>
     where
 	U: Cast
     {
@@ -109,7 +109,7 @@ where
 	}
     }
 
-    unsafe fn deslice_mut<'a, U>(&'a mut self) -> Option<&'a mut U>
+    unsafe fn deslice_mut<U>(&mut self) -> Option<&mut U>
     where
 	U: Cast
     {
