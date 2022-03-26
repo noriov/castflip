@@ -22,9 +22,9 @@ mod u2_flip_unsized_slice;
 mod u2_flip_unsized_tuple;
 mod u2_flip_unsized_vec;
 
-mod u2_mut_asbytes_u32;
+mod u2_mut_asifbytes_u32;
 mod u2_mut_reslice_u32;
-mod u2_ref_asbytes_u32;
+mod u2_ref_asifbytes_u32;
 mod u2_ref_reslice_u32;
 
 mod test_arg_decast_size;

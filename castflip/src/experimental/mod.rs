@@ -38,7 +38,7 @@
 #[doc(hidden)] pub mod reslice;
 
 // Experimental but internally used trait.
-#[doc(inline)] pub use self::as_bytes::AsBytes;
+#[allow(deprecated)] #[doc(inline)] pub use self::as_bytes::AsBytes;
 #[doc(inline)] pub use self::asif_bytes::AsifBytes;
 
 // Experimental but historical traits.

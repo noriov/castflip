@@ -1,10 +1,19 @@
 use core::{mem, slice};
 
 use crate::Cast;
+#[cfg(doc)] use crate::experimental::AsifBytes;
 
 
 ///
-/// Deprecated.  (Renamed to `AsifBytes`)
+/// Defines methods to convert a reference to a variable or a slice
+/// into a phantom reference to a lice of bytes without copying data.
+/// (Deprecated and renamed to [`AsifBytes`])
+///
+/// It is deprecated because one of its method names is conflicted
+/// with the one of `mem::MaybeUninit`.  In order to support method
+/// `as_bytes_mut` for `mem::MaybeUninit`, and to avoid possible other
+/// name conflict, [`AsBytes`] is renamed to [`AsifBytes`].  It will
+/// be removed in a future release.
 ///
 /// # Example 1
 ///
@@ -104,6 +113,7 @@ use crate::Cast;
 /// the original reference until the phantom reference is dropped,
 /// expecially when the original reference is mutable.
 ///
+#[deprecated(since = "0.1.5", note = "Trait AsBytes is renamed to AsifBytes")]
 pub trait AsBytes {
     /// Converts a reference to `self` into a phantom reference to a
     /// slice of u8 without copying data.  `self` can be a variable or
@@ -117,6 +127,7 @@ pub trait AsBytes {
 }
 
 
+#[allow(deprecated)]
 impl<T> AsBytes for T
 where
     T: Cast
@@ -133,6 +144,7 @@ where
 }
 
 
+#[allow(deprecated)]
 impl<T> AsBytes for [T]
 where
     T: Cast
