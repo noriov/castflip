@@ -205,32 +205,35 @@ where
 }
 
 
-fn new_vec<T, F>(nelem: usize, mut fill_new_slice: F) -> Result<Vec<T>>
+//
+// References to understand the function below:
+//
+// (1) The description and the example of Vec::from_raw_parts at
+// https://doc.rust-lang.org/std/vec/struct.Vec.html#method.from_raw_parts
+//
+// (2) Section "Relationship with ManuallyDrop" of mem::forget at
+// https://doc.rust-lang.org/stable/std/mem/fn.forget.html#relationship-with-manuallydrop
+//
+unsafe fn new_vec<T, F>(nelem: usize, mut fill_new_slice: F) -> Result<Vec<T>>
 where
+    T: Cast,
     F: FnMut(&mut [T]) -> Result<()>
 {
-    // See the description and the example of Vec::from_raw_parts at
-    // https://doc.rust-lang.org/std/vec/struct.Vec.html#method.from_raw_parts
-
     // Create a vector with enough size of hidden area.
-    let mut vec: Vec<T> = Vec::with_capacity(nelem);
+    let mut vec1: Vec<T> = Vec::with_capacity(nelem);
 
     // Fill hidden area with caller-supplied data.
     // The hidden area is passed as an ephemeral slice (soon dropped).
-    unsafe {
-	fill_new_slice(
-	    slice::from_raw_parts_mut(vec.as_mut_ptr(),
-				      nelem))?;
-    }
+    fill_new_slice(
+	slice::from_raw_parts_mut(vec1.as_mut_ptr(),
+				  nelem))?;
 
-    // Prevent running vec's destructor.
-    let mut vec = ManuallyDrop::new(vec);
+    // Prevent running vec1's destructor.
+    let mut vec1 = ManuallyDrop::new(vec1);
 
-    // Expose the hidden buffer by reassemble a new vector.
-    unsafe {
-	let vec2 = Vec::from_raw_parts(vec.as_mut_ptr(),
-				       nelem,
-				       vec.capacity());
-	Ok(vec2)
-    }
+    // Expose the hidden area by reassembling a new vector.
+    let (mut_ptr, capacity) = (vec1.as_mut_ptr(), vec1.capacity());
+    let vec2 = Vec::from_raw_parts(mut_ptr, nelem, capacity);
+
+    Ok(vec2)
 }
