@@ -149,13 +149,17 @@ and `StructC` `endian-flip`pable, and `#[derive(`[`NopFlip`]`)]` marks
 `UnionB` as `endian-flip`pable but the implemented operation is Nop
 (No operation).
 
-Trait [`EncastIO`] provides methods to `encast` from I/O, and trait
-[`DecastIO`] provides methods to `decast` to I/O.  The type of the
-value(s) can be explicitly specified as the generic type parameter of
-their methods or implicitly specified so that the Rust compiler can
-infer.  Their methods whose names end with 'f' flip the endianness of
-the results.  The endianness of bytes is specified in their argument.
-[`LE`] is an alias of [`Endian`]`::Little`, which means Little-Endian.
+Note that [`io::Cursor`] wraps an in-memory buffer and provides it
+through [`io::Read`] and [`io::Write`].
+
+Trait [`EncastIO`] provides methods to `encast` from [`io::Read`], and
+trait [`DecastIO`] provides methods to `decast` to [`io::Write`].  The
+type of the value(s) can be explicitly specified as the generic type
+parameter of their methods or implicitly specified so that the Rust
+compiler can infer.  Their methods whose names end with 'f' flip the
+endianness of the results.  The endianness of bytes is specified in
+their argument.  [`LE`] is an alias of [`Endian`]`::Little`, which
+means Little-Endian.
 
 # Example 3
 
@@ -199,14 +203,14 @@ the values of `Pair` `endian-flip`pable.
 
 Trait [`EncastMem`] provides methods to `encast` from memory, and
 trait [`DecastMem`] provides methods to `decast` to memory.  The type
-of the value(s) can be explicitly specified as the generic type parameter
-of their methods or implicitly specified so that the Rust compiler can
-infer.  The methods whose name contain 'v' (= vector) process a series
-of structured binary data, and the methods whose names end with 'f'
-flip the endianness of the results.  The number of elements is
-specified in the argument of method `encastvf`.  The endianness of
-bytes is specified in their argument.  [`BE`] is an alias of
-[`Endian`]`::Big`, which means Big-Endian.
+of the value(s) can be explicitly specified as the generic type
+parameter of their methods or implicitly specified so that the Rust
+compiler can infer.  The methods whose name contain 'v' (= vector)
+`encast` / `decast` a series of structured binary data, and the
+methods whose names end with 'f' flip the endianness of the results.
+The number of elements is specified in the argument of method
+`encastvf`.  The endianness of bytes is specified in their argument.
+[`BE`] is an alias of [`Endian`]`::Big`, which means Big-Endian.
 
 Note: The reason why `#[derive(PartialEq, Debug)]` is declared is that
 assert_eq! requires them.  This crate works without them.
@@ -215,6 +219,7 @@ assert_eq! requires them.  This crate works without them.
 
 This crate provides methods for encoding and decoding numeric
 variables, arrays and structures in little-endian and big-endian.
+They can be nested and arranged in a series.
 
 Two types of endianness is defined in enum [`Endian`]: relative endian
 (Native or Swapped) and absolute endian (Little or Big).
@@ -260,7 +265,18 @@ If successful, they return the number of resulting bytes.
 The endianness of resulting bytes is specified in the arguments of
 `decastf` and `decastvf`.
 
-For more information, please see the description of each trait and enum.
+## Notes on trait `EncastIO` and trait `DecastIO`
+
+[`EncastIO`] and [`DecastIO`] provide methods to `encast` / `decast`
+through [`io::Read`] and [`io::Write`].  Remember that [`io::Read`]
+and [`io::Write`] are implemented also for `&[u8]`.  Additionally,
+[`io::Cursor`] wraps an in-memory buffer and provides it through
+[`io::Read`] and [`io::Write`].  Therefore, [`EncastIO`] and
+[`DecastIO`] would enable to write a program code that can `encast`
+from and `decast` to file, network and memory.
+
+For more information, please see the description of each trait and
+enum listed below.
 
  */
 
@@ -296,6 +312,9 @@ pub mod experimental;
 #[doc(inline)] pub use self::encast_io::EncastIO;
 #[doc(inline)] pub use self::decast_io::DecastIO;
 
+
+// A module used in document comment.
+#[cfg(doc)] use std::io;
 
 // Make sure that this crate supports the endianness of the target system.
 #[cfg(not(any(target_endian = "little", target_endian = "big")))]

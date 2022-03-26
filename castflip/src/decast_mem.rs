@@ -46,8 +46,8 @@ use crate::{Cast, Endian, Flip};
 ///
 /// // Check the results (bytes2)
 /// assert_eq!(size2, 8);
-/// assert_eq!(&bytes2[0..8], &bytes3[0..8]);
-/// assert_eq!(&bytes2[8..16], &[0_u8; 8]);
+/// assert_eq!(&bytes2[0..8], &bytes3[0..8]);  // Written part
+/// assert_eq!(&bytes2[8..16], &[0_u8; 8]);    // Unwritten part
 /// # Some(())
 /// # }
 /// ```

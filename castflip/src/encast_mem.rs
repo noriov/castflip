@@ -1,5 +1,4 @@
-use core::mem::ManuallyDrop;
-use core::mem::MaybeUninit;
+use core::mem::{ManuallyDrop, MaybeUninit};
 use core::{mem, ptr, slice};
 
 use crate::{Cast, Endian, Flip};
@@ -113,7 +112,7 @@ impl EncastMem for [u8]
     {
 	let bytes = self.get(0 .. mem::size_of::<T>())?;
 
-	// Create a value of type T decoded from bytes.
+	// Decode a value of type T from `bytes`.
 	let mut val = MaybeUninit::<T>::uninit();
 	unsafe {
 	    ptr::copy_nonoverlapping(bytes.as_ptr(),
@@ -143,7 +142,7 @@ impl EncastMem for [u8]
     {
 	let bytes = self.get(0 .. mem::size_of::<T>() * nelem)?;
 
-	// Create a vector of type T filled with values decoded from bytes.
+	// Create a vector of type T filled with values decoded from `bytes`.
 	unsafe {
 	    new_vec(nelem, | new_slice | {
 		ptr::copy_nonoverlapping(bytes.as_ptr(),

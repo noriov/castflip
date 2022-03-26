@@ -1,5 +1,4 @@
-use core::mem::ManuallyDrop;
-use core::mem::MaybeUninit;
+use core::mem::{ManuallyDrop, MaybeUninit};
 use core::slice;
 use std::io::{Read, Result};
 
@@ -10,17 +9,19 @@ use crate::experimental::FlipUnsized;
 
 
 ///
-/// Defines methods to `encast` and `Flip` through I/O.
+/// Defines methods to `encast` and `Flip` through `io::Read`.
 ///
 /// Note: In this crate, the term `encast` means decoding a number of
 /// bytes to one or more values, the term `decast` means encoding one
 /// or more variables to a number of bytes, and the term `endian-flip`
 /// means flipping the endianness of value(s).
 ///
-/// # Example
+/// # Example 1
 ///
 /// In the example below, method `encastf` decodes bytes from `input1`
 /// in Big-Endian ([`BE`]) to variable `udp_hdr2` of type `UdpHdr`.
+/// Note that `io::Cursor` wraps an in-memory buffer and provides it
+/// through `io::Read`.
 ///
 /// ```
 /// # use std::io::Result;
@@ -78,6 +79,51 @@ use crate::experimental::FlipUnsized;
 /// When argument `endian` is specified, the endianness of value(s) is
 /// flipped if necessary.
 ///
+/// # Example 2
+///
+/// Because `io::Read` is implemented for `&[u8]`, `EncastIO` can
+/// `encast` from memory.  The example below is almost the same with
+/// Example 1 except it uses a mutable slice instead of `io::Cursor`.
+///
+/// ```
+/// # use std::io::Result;
+/// # fn main() { test(); }
+/// # fn test() -> Result<()> {
+/// use castflip::{Cast, Flip, EncastIO, BE};
+///
+/// #[repr(C)]
+/// #[derive(Cast, Flip)]
+/// struct UdpHdr {     // UDP: https://www.rfc-editor.org/rfc/rfc768.txt
+///     sport:  u16,    // UDP Source Port
+///     dport:  u16,    // UDP Destination Port
+///     len:    u16,    // UDP Length
+///     sum:    u16,    // UDP Checksum
+/// }
+///
+/// // Input data: UDP header (8 bytes) + part of DNS header (8 bytes)
+/// let bytes1: [u8; 16] = [0xC3, 0xC9, 0x00, 0x35, 0x00, 0x32, 0x82, 0x3F,
+///                         0x1A, 0xD1, 0x01, 0x20, 0x00, 0x01, 0x00, 0x00];
+/// let mut slice1 = &bytes1[..];
+///
+/// // Decode slice `slice1` to variable `udp_hdr2`.
+/// // Because the UDP header is 8 bytes as defined above, only
+/// // the first 8 bytes are decoded, remaining 8 bytes are ignored.
+/// let udp_hdr2: UdpHdr = slice1.encastf(BE)?;  // BE = Big-Endian
+///
+/// // Check the results (udp_hdr2)
+/// assert_eq!(udp_hdr2.sport, 0xC3C9); // = 50121
+/// assert_eq!(udp_hdr2.dport, 0x0035); // = 53 (DNS)
+/// assert_eq!(udp_hdr2.len,   0x0032); // = 50
+/// assert_eq!(udp_hdr2.sum,   0x823F);
+///
+/// // Check the result (slice1)
+/// // Note: `slice1` contains unread part.
+/// assert_eq!(slice1.len(), 8);
+/// assert_eq!(slice1, [0x1A, 0xD1, 0x01, 0x20, 0x00, 0x01, 0x00, 0x00]);
+/// # Ok(())
+/// # }
+/// ```
+///
 pub trait EncastIO {
     /// Decodes the bytes read from input `self` to a value of type `T`.
     /// The endianness of the resulting value is not flipped.
@@ -119,7 +165,7 @@ where
     where
 	T: Cast
     {
-	// Create a value of type T decoded from self.
+	// Decode a value of type T from from `self`.
 	unsafe {
 	    let mut val = MaybeUninit::<T>::uninit();
 	    self.read_exact(val.asif_bytes_mut())?;
@@ -140,7 +186,7 @@ where
     where
 	T: Cast
     {
-	// Create a vector of type T filled with values decoded from self.
+	// Create a vector of type T filled with values decoded from `self`.
 	unsafe {
 	    new_vec(nelem, | new_slice | {
 		self.read_exact(new_slice.asif_bytes_mut())
