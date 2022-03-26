@@ -215,7 +215,7 @@ impl<T: Flip, const N: usize> Flip for [T; N] {
 	    for i in 0 .. N {
 		array[i] = MaybeUninit::new(self[i].flip_val_swapped());
 	    }
-	    return ptr::read(array.as_ptr() as *const [T; N]);
+	    ptr::read(array.as_ptr() as *const [T; N])
 	}
     }
 }
