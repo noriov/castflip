@@ -11,9 +11,9 @@ pub fn proc_tokens(input: TokenStream) -> TokenStream {
 	Data::Struct(data_struct) =>
 	    match &data_struct.fields {
 		Fields::Named(fields_named) =>
-		    proc_named_struct(&ast.ident, &fields_named),
+		    proc_named_struct(&ast.ident, fields_named),
 		Fields::Unnamed(fields_unnamed) =>
-		    proc_unnamed_struct(&ast.ident, &fields_unnamed),
+		    proc_unnamed_struct(&ast.ident, fields_unnamed),
 		Fields::Unit =>
 		    proc_unit_struct(&ast.ident),
 	    },
