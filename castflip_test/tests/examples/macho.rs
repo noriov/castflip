@@ -8,6 +8,8 @@
 //	https://en.wikipedia.org/wiki/Mach-O
 //
 
+use core::mem::size_of_val;
+
 use castflip::{Cast, DecastMem, EncastMem, Endian, Flip};
 
 
@@ -55,7 +57,7 @@ impl FatInfo {
 
 	let hdr: FatHeader = bytes.encastf(endian)?;
 
-	let arch_off = ::core::mem::size_of_val(&hdr);
+	let arch_off = size_of_val(&hdr);
 	let narch = hdr.nfat_arch as usize;
 	let arch_vec = bytes[arch_off ..].encastvf(narch, endian)?;
 
