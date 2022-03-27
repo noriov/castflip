@@ -46,7 +46,6 @@ use crate::Cast;
 /// unsafe {
 ///     // Convert the original reference to `hdr1` into `bytes2`.
 ///     // Both &`hdr1` and `bytes2` point to the same entity.
-///     // Hence, `bytes2` is the same with `bytes1`.
 ///     let bytes2 = hdr1.asif_bytes_ref();
 ///
 ///     // Check the result (bytes2)
@@ -81,7 +80,6 @@ use crate::Cast;
 /// unsafe {
 ///     // Convert the original reference to `pairs1` into `bytes2`.
 ///     // Both &`pairs1` and `bytes2` point to the same entity.
-///     // Hence, `bytes2` is the same with `bytes1`.
 ///     let bytes2 = pairs1.asif_bytes_ref();
 ///
 ///     // Check the result.

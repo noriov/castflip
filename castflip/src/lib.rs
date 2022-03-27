@@ -186,7 +186,7 @@ let vec2: Vec<Pair> = bytes1.encastvf(3, BE)?;  // 3 pairs, BE = Big-Endian
 let mut bytes3 = [0_u8; 12];
 let size3 = bytes3.decastvf(&vec2, BE)?;
 
-// Check the results (vec2)
+// Check the result (vec2)
 assert_eq!(vec2, vec![Pair(0x2021, 0x2223), Pair(0x2425, 0x2627),
                       Pair(0x2829, 0x2A2B)]);
 
@@ -244,8 +244,8 @@ required conditions are met.
 * `encastvf` decodes a required number of bytes to a vector of value(s)
   with `endian-flip`ping.
 
-The methods defined in trait [`EncastMem`] returns `Option` and
-the methods defined in trait [`EncastIO`] returns `io::Result`.
+The methods defined in trait [`EncastMem`] returns [`Option`] and
+the methods defined in trait [`EncastIO`] returns [`io::Result`].
 If successful, they return the resulting value(s).
 The endianness of the bytes in `self` is specified in the arguments of
 `encastf` and `encastvf`.  The number of elements in the resulting
@@ -259,8 +259,8 @@ vector is specified in the arguments of `encastv` and `encastvf`.
 * `decastvf` encodes a slice of variable(s) to a number of bytes
   with `endian-flip`ping.
 
-The methods defined in trait [`DecastMem`] returns `Option` and
-the methods defined in trait [`DecastIO`] returns `io::Result`.
+The methods defined in trait [`DecastMem`] returns [`Option`] and
+the methods defined in trait [`DecastIO`] returns [`io::Result`].
 If successful, they return the number of resulting bytes.
 The endianness of resulting bytes is specified in the arguments of
 `decastf` and `decastvf`.
@@ -277,6 +277,8 @@ from and `decast` to file, network and memory.
 
 For more information, please see the description of each trait and
 enum listed below.
+
+[`Option`]: https://doc.rust-lang.org/core/option/index.html
 
  */
 

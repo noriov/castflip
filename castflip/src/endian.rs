@@ -1,5 +1,6 @@
 ///
-/// Defines variants of endianness.
+/// Defines two types of endianness: relative endian (Native or
+/// Swapped) and absolute endian (Little or Big).
 ///
 /// Note: In this crate, the term `encast` means decoding a number of
 /// bytes to one or more values, the term `decast` means encoding one

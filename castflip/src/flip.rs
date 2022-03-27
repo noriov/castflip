@@ -6,7 +6,7 @@ use crate::Endian;
 
 
 ///
-/// Declares types whose values can be `endian-flip`ped.
+/// Defines types whose values can be `endian-flip`ped.
 ///
 /// Note: In this crate, the term `encast` means decoding a number of
 /// bytes to one or more values, the term `decast` means encoding one
@@ -32,7 +32,7 @@ use crate::Endian;
 /// `#[derive(`[`Cast`]`)]`.  Because there is no automatic way to
 /// flip the endianness of a union type, `#[derive(Flip)]` does not
 /// support a union type.  This is the reason why trait `Flip` is
-/// defined independently from trait `Cast`.
+/// defined independently from trait [`Cast`].
 ///
 /// FYI: There would be a need to flip the endianness of a struct type
 /// containing a union type.  In such a case, those members whose types

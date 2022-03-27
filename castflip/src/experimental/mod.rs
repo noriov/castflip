@@ -1,27 +1,16 @@
 //!
 //! Defines experimental traits and historical traits.
 //!
-//! Experimental traits (in used)
+//! Experimental traits.  They are used internally in this crate.
 //!
 //! - [`AsifBytes`] converts a reference to a variable or a slice into
 //!   a phantom reference to a slice of bytes without copying data.
-//!   Although it is useful in certain situations, its use cases will
-//!   be limited because its methods are considered unsafe.
 //!
-//! - [`FlipUnsized`] provides method `flip_var` for slices and
-//!   tuples.
+//! - [`FlipUnsized`] provides method `flip_var` for a slice and
+//!   a tuple.
 //!
-//! Historical traits (not used)
-//!
-//! - [`Deslice`], [`Enslice`] and [`Reslice`] are general-purpose
-//!   ancestors of [`AsifBytes`].  Some of their methods were used
-//!   internally in this crate.  They convert a reference to a
-//!   variable or a slice into a phantom reference to a slice or a
-//!   variable of the specified type without copying data.
-//!
-//! - [`EncastArg`] and [`DecastArg`] provide some older versions of
-//!   APIs of this crate.  If no good use case can be found, they may
-//!   be removed in a future release.
+//! Historical traits.  Because they are not used now, they may be
+//! removed in a future release.
 //!
 //! - [`AsBytes`] is an older version of [`AsifBytes`].  It is
 //!   deprecated because one of its method names is conflicted with
@@ -29,6 +18,16 @@
 //!   `as_bytes_mut` for `mem::MaybeUninit`, and to avoid possible
 //!   other name conflict, [`AsBytes`] is renamed to [`AsifBytes`].
 //!   It will be removed in a future release.
+//!
+//! - [`Deslice`], [`Enslice`] and [`Reslice`] are general-purpose
+//!   ancestors of [`AsifBytes`].  They convert a reference to a
+//!   variable or a slice into a phantom reference to a slice or a
+//!   variable of the specified type without copying data.  Although
+//!   it is useful in certain situations, its use cases will be
+//!   limited because its methods are considered unsafe.
+//!
+//! - [`EncastArg`] and [`DecastArg`] provide some older versions of
+//!   APIs of this crate.
 //!
 
 

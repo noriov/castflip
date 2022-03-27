@@ -3,8 +3,7 @@ use core::slice;
 use std::io::{Read, Result};
 
 use crate::{Cast, Endian, Flip};
-use crate::experimental::AsifBytes;
-use crate::experimental::FlipUnsized;
+use crate::experimental::{AsifBytes, FlipUnsized};
 #[cfg(doc)] use crate::BE;
 
 
@@ -119,7 +118,7 @@ use crate::experimental::FlipUnsized;
 /// // Check the result (slice1)
 /// // Note: `slice1` contains unread part.
 /// assert_eq!(slice1.len(), 8);
-/// assert_eq!(slice1, [0x1A, 0xD1, 0x01, 0x20, 0x00, 0x01, 0x00, 0x00]);
+/// assert_eq!(slice1, &bytes1[8..16]);
 /// # Ok(())
 /// # }
 /// ```

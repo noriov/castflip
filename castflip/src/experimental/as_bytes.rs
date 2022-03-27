@@ -7,7 +7,7 @@ use crate::Cast;
 ///
 /// Defines methods to convert a reference to a variable or a slice
 /// into a phantom reference to a lice of bytes without copying data.
-/// (Deprecated and renamed to [`AsifBytes`])
+/// (Deprecated because it is renamed to [`AsifBytes`])
 ///
 /// It is deprecated because one of its method names is conflicted
 /// with the one of `mem::MaybeUninit`.  In order to support method
@@ -51,7 +51,6 @@ use crate::Cast;
 /// unsafe {
 ///     // Convert the original reference to `hdr1` into `bytes2`.
 ///     // Both &`hdr1` and `bytes2` point to the same entity.
-///     // Hence, `bytes2` is the same with `bytes1`.
 ///     let bytes2 = hdr1.as_bytes_ref();
 ///
 ///     // Check the result (bytes2)
@@ -86,7 +85,6 @@ use crate::Cast;
 /// unsafe {
 ///     // Convert the original reference to `pairs1` into `bytes2`.
 ///     // Both &`pairs1` and `bytes2` point to the same entity.
-///     // Hence, `bytes2` is the same with `bytes1`.
 ///     let bytes2 = pairs1.as_bytes_ref();
 ///
 ///     // Check the result.

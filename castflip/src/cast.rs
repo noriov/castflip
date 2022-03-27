@@ -1,5 +1,5 @@
 ///
-/// Declares types whose values can be `encast`ed and `decast`ed.
+/// Defines types whose values can be `encast`ed and `decast`ed.
 ///
 /// Note: In this crate, the term `encast` means decoding a number of
 /// bytes to one or more values, the term `decast` means encoding one
@@ -23,8 +23,8 @@
 /// subtrait of trait `Copy`.  The reasons why trait `Cast` is defined
 /// independently from trait `Copy` are (1) to exclude pointers, (2)
 /// to avoid unexpected copying, and (3) to enjoy the benefits of
-/// Rust's ownership system.  Hence, if a struct type or a union type
-/// need to be `Copy`, `#[derive(Clone, Copy)]` should also be
+/// Rust's ownership system.  Therefore, if a struct type or a union
+/// type need to be `Copy`, `#[derive(Clone, Copy)]` should also be
 /// declared.
 ///
 /// Trait `Cast` has no method.  It is purely defined as a trait

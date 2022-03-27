@@ -1,9 +1,10 @@
 use crate::{Endian, Flip};
+#[cfg(doc)] use crate::SE;
 
 
 ///
-/// Defines methods to flip the endianness of variables in slices and
-/// tuples.
+/// Defines methods to flip the endianness of variables in a slice and
+/// a tuple.
 ///
 /// Note: In this crate, the term `encast` means decoding a number of
 /// bytes to one or more values, the term `decast` means encoding one
@@ -23,7 +24,7 @@ use crate::{Endian, Flip};
 ///
 /// // Flip the endianness of a vector.
 /// let mut vec1 = vec![0xFEDC_u16, 0xBA98, 0x7654, 0x3210];
-/// vec1.flip_var(SE);
+/// vec1.flip_var(SE);  // SE = Swapped-Endian
 /// assert_eq!(vec1, vec![0xDCFE_u16, 0x98BA, 0x5476, 0x1032]);
 ///
 /// // Flip the endianness of a tuple.
@@ -35,8 +36,9 @@ use crate::{Endian, Flip};
 /// ```
 ///
 /// In the example above, method `flip_var` flips the endianness of
-/// `self` (e.g., `vec1` and `tuple2`).  [`Flip`] must be implemented
-/// for all the elements.
+/// `self` (i.e., `vec1`, `tuple2`).  [`Flip`] must be implemented for
+/// all the elements.  [`SE`] is an alias of [`Endian`]`::Swapped`,
+/// which means Swapped-Endian.
 ///
 pub trait FlipUnsized {
     /// Flips the endianness of the variable (`self`).
