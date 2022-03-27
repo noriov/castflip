@@ -16,7 +16,7 @@ fn udata2() {
     {
 	let udata2 = UData2::gen();
 
-	// The type parameter of encast_vec() can be omitted where
+	// The type parameter of encastv() can be omitted where
 	// the Rust compiler can infer the type of the result.
 	let ne_vec_from_raw: Vec<u32> =
 	    udata2.raw_bytes.encastv(NELEM2).unwrap();
