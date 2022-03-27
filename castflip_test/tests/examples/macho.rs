@@ -21,8 +21,10 @@ struct FatHeader {
     nfat_arch:	u32,
 }
 
-const FAT_MAGIC: u32 = 0xCAFEBABE;
-const FAT_CIGAM: u32 = 0xBEBAFECA;
+const FAT_MAGIC32: u32 = 0xCAFEBABE;	// Native Endian, 32-bit
+const FAT_MAGIC64: u32 = 0xCAFEBABF;	// Native Endian, 64-bit
+const FAT_CIGAM32: u32 = 0xBEBAFECA;	// Swapped Endian, 32-bit
+const FAT_CIGAM64: u32 = 0xBFBAFECA;	// Swapped Endian, 64-bit
 
 
 // Rust declaration of struct fat_arch
@@ -49,9 +51,11 @@ impl FatInfo {
     // DecastMem are omitted because the Rust compiler can infer them.
 
     fn read(bytes: &[u8]) -> Option<Self> {
-	let endian = match bytes.encast()? { // The type parameter is u32.
-	    FAT_MAGIC => Endian::Native,
-	    FAT_CIGAM => Endian::Swapped,
+	// The generic type parameter can be inferred as u32
+	// because the types of the constants are u32.
+	let endian = match bytes.encast()? {
+	    FAT_MAGIC32 | FAT_MAGIC64 => Endian::Native,
+	    FAT_CIGAM32 | FAT_CIGAM64 => Endian::Swapped,
 	    _ => { return None; },
 	};
 
@@ -100,7 +104,7 @@ fn test() {
     assert_eq!(bytes_output, bytes_input);
 
     // Check the input.
-    assert_eq!(fat.hdr.magic, FAT_MAGIC);		// = 0xCAFEBABE
+    assert_eq!(fat.hdr.magic, FAT_MAGIC32);		// = 0xCAFEBABE
     assert_eq!(fat.hdr.nfat_arch, 2);			// Number of archs
     assert_eq!(fat.arch_vec[0].cputype, 0x1000007);	// X86_64
     assert_eq!(fat.arch_vec[0].cpusubtype, 3);		// X86_ALL
