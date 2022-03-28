@@ -5,44 +5,25 @@ use crate::{IData1, UData1};
 
 
 macro_rules! test {
-    ( $data:expr, $field:ident, $ty:ty , $start:expr, $end:expr ) => {{
+    ( $data:expr, $field:ident, $ty:ty , $start:expr, $end:expr ) => {
 	{
 	    let data = $data;
 
-	    let ne_size =
-		data.raw_bytes[$start .. $end].encastf::<$ty>(NE).unwrap();
-	    let se_size =
-		data.raw_bytes[$start .. $end].encastf::<$ty>(SE).unwrap();
-	    let le_size =
-		data.raw_bytes[$start .. $end].encastf::<$ty>(LE).unwrap();
-	    let be_size =
-		data.raw_bytes[$start .. $end].encastf::<$ty>(BE).unwrap();
+	    let ne_size_from_ne =
+		data.ne_bytes[$start .. $end].encastf::<$ty>(NE).unwrap();
+	    let ne_size_from_se =
+		data.se_bytes[$start .. $end].encastf::<$ty>(SE).unwrap();
+	    let ne_size_from_le =
+		data.le_bytes[$start .. $end].encastf::<$ty>(LE).unwrap();
+	    let ne_size_from_be =
+		data.be_bytes[$start .. $end].encastf::<$ty>(BE).unwrap();
 
-	    assert_eq!(ne_size, data.ne_vals.$field as $ty);
-	    assert_eq!(se_size, data.se_vals.$field as $ty);
-	    assert_eq!(le_size, data.le_vals.$field as $ty);
-	    assert_eq!(be_size, data.be_vals.$field as $ty);
+	    assert_eq!(ne_size_from_ne, data.ne_vals.$field as $ty);
+	    assert_eq!(ne_size_from_se, data.ne_vals.$field as $ty);
+	    assert_eq!(ne_size_from_le, data.ne_vals.$field as $ty);
+	    assert_eq!(ne_size_from_be, data.ne_vals.$field as $ty);
 	}
-	{
-	    let data = $data;
-
-	    // The type parameter of encastf() can be omitted where
-	    // the Rust compiler can infer the type of the result.
-	    let ne_size: $ty =
-		data.raw_bytes[$start .. $end].encastf(NE).unwrap();
-	    let se_size: $ty =
-		data.raw_bytes[$start .. $end].encastf(SE).unwrap();
-	    let le_size: $ty =
-		data.raw_bytes[$start .. $end].encastf(LE).unwrap();
-	    let be_size: $ty =
-		data.raw_bytes[$start .. $end].encastf(BE).unwrap();
-
-	    assert_eq!(ne_size, data.ne_vals.$field as $ty);
-	    assert_eq!(se_size, data.se_vals.$field as $ty);
-	    assert_eq!(le_size, data.le_vals.$field as $ty);
-	    assert_eq!(be_size, data.be_vals.$field as $ty);
-	}
-    }}
+    }
 }
 
 

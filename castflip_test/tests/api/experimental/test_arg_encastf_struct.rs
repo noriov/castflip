@@ -9,15 +9,15 @@ macro_rules! test {
 	{
 	    let data = $data;
 
-	    let ne_vals_from_raw = <$ty>::encastf(&data.raw_bytes, NE).unwrap();
-	    let se_vals_from_raw = <$ty>::encastf(&data.raw_bytes, SE).unwrap();
-	    let le_vals_from_raw = <$ty>::encastf(&data.raw_bytes, LE).unwrap();
-	    let be_vals_from_raw = <$ty>::encastf(&data.raw_bytes, BE).unwrap();
+	    let ne_vals_from_ne = <$ty>::encastf(&data.ne_bytes, NE).unwrap();
+	    let ne_vals_from_se = <$ty>::encastf(&data.se_bytes, SE).unwrap();
+	    let ne_vals_from_le = <$ty>::encastf(&data.le_bytes, LE).unwrap();
+	    let ne_vals_from_be = <$ty>::encastf(&data.be_bytes, BE).unwrap();
 
-	    assert_eq!(ne_vals_from_raw, data.ne_vals);
-	    assert_eq!(se_vals_from_raw, data.se_vals);
-	    assert_eq!(le_vals_from_raw, data.le_vals);
-	    assert_eq!(be_vals_from_raw, data.be_vals);
+	    assert_eq!(ne_vals_from_ne, data.ne_vals);
+	    assert_eq!(ne_vals_from_se, data.ne_vals);
+	    assert_eq!(ne_vals_from_le, data.ne_vals);
+	    assert_eq!(ne_vals_from_be, data.ne_vals);
 	}
     }
 }

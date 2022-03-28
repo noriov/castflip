@@ -5,8 +5,10 @@ use castflip::{Cast, Flip};
 
 #[derive(Clone, Copy, Debug)]
 pub struct FData1 {
-    pub raw_bytes:	[u8; size_of::<FVals1>()],
-    pub swp_bytes:	[u8; size_of::<FVals1>()],
+    pub ne_bytes:	[u8; size_of::<FVals1>()],
+    pub se_bytes:	[u8; size_of::<FVals1>()],
+    pub le_bytes:	[u8; size_of::<FVals1>()],
+    pub be_bytes:	[u8; size_of::<FVals1>()],
     pub ne_vals:	FVals1,
     pub se_vals:	FVals1,
     pub le_vals:	FVals1,
@@ -25,72 +27,58 @@ pub struct FVals1 {
 
 impl FData1 {
     pub fn gen() -> FData1 {
-	// Construct FVals1 from native endian values.
-	let ne_vals = FVals1{
+	// Construct FVals1 from native-endian values.
+	let ne_vals = FVals1 {
 	    val1_f32:	::core::f32::consts::E,
 	    val2_f32:	::core::f32::consts::PI,
 	    val1_f64:	::core::f64::consts::E,
 	    val2_f64:	::core::f64::consts::PI,
 	};
 
-	// Convert native endian values to raw bytes data.
-	let ne_val1_f32_bytes = ne_vals.val1_f32.to_ne_bytes();
-	let ne_val2_f32_bytes = ne_vals.val2_f32.to_ne_bytes();
-	let ne_val1_f64_bytes = ne_vals.val1_f64.to_ne_bytes();
-	let ne_val2_f64_bytes = ne_vals.val2_f64.to_ne_bytes();
-
-	// Convert raw bytes data to swapped bytes data.
-	let mut se_val1_f32_bytes = ne_val1_f32_bytes;
-	let mut se_val2_f32_bytes = ne_val2_f32_bytes;
-	let mut se_val1_f64_bytes = ne_val1_f64_bytes;
-	let mut se_val2_f64_bytes = ne_val2_f64_bytes;
-	se_val1_f32_bytes.reverse();
-	se_val2_f32_bytes.reverse();
-	se_val1_f64_bytes.reverse();
-	se_val2_f64_bytes.reverse();
-
-	// Construct FVals1 of swapped endian values.
-	let se_vals = FVals1{
-	    val1_f32:	f32::from_ne_bytes(se_val1_f32_bytes),
-	    val2_f32:	f32::from_ne_bytes(se_val2_f32_bytes),
-	    val1_f64:	f64::from_ne_bytes(se_val1_f64_bytes),
-	    val2_f64:	f64::from_ne_bytes(se_val2_f64_bytes),
+	// Construct FVals1 from swapped-endian values.
+	let se_vals = FVals1 {
+	    val1_f32: f32::from_bits(ne_vals.val1_f32.to_bits().swap_bytes()),
+	    val2_f32: f32::from_bits(ne_vals.val2_f32.to_bits().swap_bytes()),
+	    val1_f64: f64::from_bits(ne_vals.val1_f64.to_bits().swap_bytes()),
+	    val2_f64: f64::from_bits(ne_vals.val2_f64.to_bits().swap_bytes()),
 	};
 
-	// Prepare two FVals1's of little endian values and big endian values.
-	let (le_vals, be_vals);
+	// Construct a vector in native-endian.
+	let mut ne_vec = Vec::<u8>::new();
+	ne_vec.extend_from_slice(&ne_vals.val1_f32.to_ne_bytes());
+	ne_vec.extend_from_slice(&ne_vals.val2_f32.to_ne_bytes());
+	ne_vec.extend_from_slice(&ne_vals.val1_f64.to_ne_bytes());
+	ne_vec.extend_from_slice(&ne_vals.val2_f64.to_ne_bytes());
+
+	// Construct a vector in swapped-endian.
+	let mut se_vec = Vec::<u8>::new();
+	se_vec.extend_from_slice(&se_vals.val1_f32.to_ne_bytes());
+	se_vec.extend_from_slice(&se_vals.val2_f32.to_ne_bytes());
+	se_vec.extend_from_slice(&se_vals.val1_f64.to_ne_bytes());
+	se_vec.extend_from_slice(&se_vals.val2_f64.to_ne_bytes());
+
+	// Convert vectors into arrays.
+	let ne_bytes: [u8; size_of::<FVals1>()] = ne_vec.try_into().unwrap();
+	let se_bytes: [u8; size_of::<FVals1>()] = se_vec.try_into().unwrap();
+
+	// Prepare LE and BE data.
+	let (le_bytes, be_bytes, le_vals, be_vals);
 	if cfg!(target_endian = "little") {
+	    le_bytes = ne_bytes;
+	    be_bytes = se_bytes;
 	    le_vals = ne_vals;
 	    be_vals = se_vals;
 	} else if cfg!(target_endian = "big") {
+	    le_bytes = se_bytes;
+	    be_bytes = ne_bytes;
 	    be_vals = ne_vals;
 	    le_vals = se_vals;
 	} else {
 	    panic!();
 	}
 
-	// Construct Vec<u8> from raw bytes data.
-	let mut ne_bytes2 = Vec::<u8>::new();
-	ne_bytes2.extend_from_slice(&ne_val1_f32_bytes);
-	ne_bytes2.extend_from_slice(&ne_val2_f32_bytes);
-	ne_bytes2.extend_from_slice(&ne_val1_f64_bytes);
-	ne_bytes2.extend_from_slice(&ne_val2_f64_bytes);
-
-	// Construct Vec<u8> from swapped bytes data.
-	let mut se_bytes2 = Vec::<u8>::new();
-	se_bytes2.extend_from_slice(&se_val1_f32_bytes);
-	se_bytes2.extend_from_slice(&se_val2_f32_bytes);
-	se_bytes2.extend_from_slice(&se_val1_f64_bytes);
-	se_bytes2.extend_from_slice(&se_val2_f64_bytes);
-
-	// Construct two arrays of raw bytes data and swapped bytes data.
-	let mut raw_bytes = [0_u8; size_of::<FVals1>()];
-	let mut swp_bytes = [0_u8; size_of::<FVals1>()];
-	raw_bytes.copy_from_slice(&ne_bytes2);
-	swp_bytes.copy_from_slice(&se_bytes2);
-
 	// Construct FData1.
-	return FData1{ raw_bytes, swp_bytes,
-		       ne_vals, se_vals, le_vals, be_vals, };
+	return FData1 { ne_bytes, se_bytes, le_bytes, be_bytes,
+			ne_vals, se_vals, le_vals, be_vals, };
     }
 }

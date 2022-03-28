@@ -4,28 +4,15 @@ use crate::{FData1, FVals1, IData1, IVals1, UData1, UVals1,
 
 
 macro_rules! test {
-    ( $data:expr, $ty:ty ) => {{
+    ( $data:expr, $ty:ty ) => {
 	{
 	    let data = $data;
 
-	    let ne_vals_from_raw = data.raw_bytes.encast::<$ty>().unwrap();
-	    let se_vals_from_swp = data.swp_bytes.encast::<$ty>().unwrap();
+	    let ne_vals_from_ne = data.ne_bytes.encast::<$ty>().unwrap();
 
-	    assert_eq!(ne_vals_from_raw, data.ne_vals);
-	    assert_eq!(se_vals_from_swp, data.se_vals);
+	    assert_eq!(ne_vals_from_ne, data.ne_vals);
 	}
-	{
-	    let data = $data;
-
-	    // The type parameter of encast() can be omitted where
-	    // the Rust compiler can infer the type of the result.
-	    let ne_vals_from_raw: $ty = data.raw_bytes.encast().unwrap();
-	    let se_vals_from_swp: $ty = data.swp_bytes.encast().unwrap();
-
-	    assert_eq!(ne_vals_from_raw, data.ne_vals);
-	    assert_eq!(se_vals_from_swp, data.se_vals);
-	}
-    }}
+    }
 }
 
 

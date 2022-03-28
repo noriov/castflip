@@ -6,46 +6,26 @@ use crate::{FData1, FVals1, IData1, IVals1, UData1, UVals1,
 
 
 macro_rules! test {
-    ( $data:expr, $ty:ty ) => {{
+    ( $data:expr, $ty:ty ) => {
 	{
 	    let data = $data;
 
-	    let mut raw_input1 = Cursor::new(data.raw_bytes.clone());
-	    let mut raw_input2 = Cursor::new(data.raw_bytes.clone());
-	    let mut raw_input3 = Cursor::new(data.raw_bytes.clone());
-	    let mut raw_input4 = Cursor::new(data.raw_bytes.clone());
+	    let mut ne_input = Cursor::new(data.ne_bytes.clone());
+	    let mut se_input = Cursor::new(data.se_bytes.clone());
+	    let mut le_input = Cursor::new(data.le_bytes.clone());
+	    let mut be_input = Cursor::new(data.be_bytes.clone());
 
-	    let ne_vals_from_raw = raw_input1.encastf::<$ty>(NE).unwrap();
-	    let se_vals_from_raw = raw_input2.encastf::<$ty>(SE).unwrap();
-	    let le_vals_from_raw = raw_input3.encastf::<$ty>(LE).unwrap();
-	    let be_vals_from_raw = raw_input4.encastf::<$ty>(BE).unwrap();
+	    let ne_vals_from_ne = ne_input.encastf::<$ty>(NE).unwrap();
+	    let ne_vals_from_se = se_input.encastf::<$ty>(SE).unwrap();
+	    let ne_vals_from_le = le_input.encastf::<$ty>(LE).unwrap();
+	    let ne_vals_from_be = be_input.encastf::<$ty>(BE).unwrap();
 
-	    assert_eq!(ne_vals_from_raw, data.ne_vals);
-	    assert_eq!(se_vals_from_raw, data.se_vals);
-	    assert_eq!(le_vals_from_raw, data.le_vals);
-	    assert_eq!(be_vals_from_raw, data.be_vals);
+	    assert_eq!(ne_vals_from_ne, data.ne_vals);
+	    assert_eq!(ne_vals_from_se, data.ne_vals);
+	    assert_eq!(ne_vals_from_le, data.ne_vals);
+	    assert_eq!(ne_vals_from_be, data.ne_vals);
 	}
-	{
-	    let data = $data;
-
-	    let mut raw_input1 = Cursor::new(data.raw_bytes.clone());
-	    let mut raw_input2 = Cursor::new(data.raw_bytes.clone());
-	    let mut raw_input3 = Cursor::new(data.raw_bytes.clone());
-	    let mut raw_input4 = Cursor::new(data.raw_bytes.clone());
-
-	    // The type parameter of encastf() can be omitted where
-	    // the Rust compiler can infer the type of the result.
-	    let ne_vals_from_raw: $ty = raw_input1.encastf(NE).unwrap();
-	    let se_vals_from_raw: $ty = raw_input2.encastf(SE).unwrap();
-	    let le_vals_from_raw: $ty = raw_input3.encastf(LE).unwrap();
-	    let be_vals_from_raw: $ty = raw_input4.encastf(BE).unwrap();
-
-	    assert_eq!(ne_vals_from_raw, data.ne_vals);
-	    assert_eq!(se_vals_from_raw, data.se_vals);
-	    assert_eq!(le_vals_from_raw, data.le_vals);
-	    assert_eq!(be_vals_from_raw, data.be_vals);
-	}
-    }}
+    }
 }
 
 

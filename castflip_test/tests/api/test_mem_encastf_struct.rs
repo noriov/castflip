@@ -4,34 +4,21 @@ use crate::{FData1, FVals1, IData1, IVals1, UData1, UVals1,
 
 
 macro_rules! test {
-    ( $data:expr, $ty:ty ) => {{
+    ( $data:expr, $ty:ty ) => {
 	{
 	    let data = $data;
 
-	    let ne_vals_from_raw = data.raw_bytes.encastf::<$ty>(NE).unwrap();
-	    let se_vals_from_raw = data.raw_bytes.encastf::<$ty>(SE).unwrap();
-	    let le_vals_from_raw = data.raw_bytes.encastf::<$ty>(LE).unwrap();
-	    let be_vals_from_raw = data.raw_bytes.encastf::<$ty>(BE).unwrap();
+	    let ne_vals_from_ne = data.ne_bytes.encastf::<$ty>(NE).unwrap();
+	    let ne_vals_from_se = data.se_bytes.encastf::<$ty>(SE).unwrap();
+	    let ne_vals_from_le = data.le_bytes.encastf::<$ty>(LE).unwrap();
+	    let ne_vals_from_be = data.be_bytes.encastf::<$ty>(BE).unwrap();
 
-	    assert_eq!(ne_vals_from_raw, data.ne_vals);
-	    assert_eq!(se_vals_from_raw, data.se_vals);
-	    assert_eq!(le_vals_from_raw, data.le_vals);
-	    assert_eq!(be_vals_from_raw, data.be_vals);
+	    assert_eq!(ne_vals_from_ne, data.ne_vals);
+	    assert_eq!(ne_vals_from_se, data.ne_vals);
+	    assert_eq!(ne_vals_from_le, data.ne_vals);
+	    assert_eq!(ne_vals_from_be, data.ne_vals);
 	}
-	{
-	    let data = $data;
-
-	    let ne_vals_from_raw: $ty = data.raw_bytes.encastf(NE).unwrap();
-	    let se_vals_from_raw: $ty = data.raw_bytes.encastf(SE).unwrap();
-	    let le_vals_from_raw: $ty = data.raw_bytes.encastf(LE).unwrap();
-	    let be_vals_from_raw: $ty = data.raw_bytes.encastf(BE).unwrap();
-
-	    assert_eq!(ne_vals_from_raw, data.ne_vals);
-	    assert_eq!(se_vals_from_raw, data.se_vals);
-	    assert_eq!(le_vals_from_raw, data.le_vals);
-	    assert_eq!(be_vals_from_raw, data.be_vals);
-	}
-    }}
+    }
 }
 
 

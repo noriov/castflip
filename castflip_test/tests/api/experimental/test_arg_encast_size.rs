@@ -10,7 +10,7 @@ macro_rules! test {
 	    let data = $data;
 
 	    let ne_size =
-		<$ty>::encast(&data.raw_bytes[$start ..  $end]).unwrap();
+		<$ty>::encast(&data.ne_bytes[$start ..  $end]).unwrap();
 
 	    assert_eq!(ne_size, data.ne_vals.$field as $ty);
 	}

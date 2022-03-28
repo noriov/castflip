@@ -9,32 +9,29 @@ macro_rules! test {
 	{
 	    let data = $data;
 
-	    let mut se_val_from_ne = data.ne_vals.$field as $ty;
-	    let mut ne_val_from_se = data.se_vals.$field as $ty;
+	    let mut se_val = data.ne_vals.$field as $ty;
 
-	    se_val_from_ne.flip_var_swapped();
-	    ne_val_from_se.flip_var_swapped();
+	    se_val.flip_var_swapped();
 
-	    assert_eq!(se_val_from_ne, data.se_vals.$field as $ty);
-	    assert_eq!(ne_val_from_se, data.ne_vals.$field as $ty);
+	    assert_eq!(se_val, data.se_vals.$field as $ty);
 	}
 	{
 	    let data = $data;
 
-	    let mut ne_val_from_ne = data.ne_vals.$field as $ty;
-	    let mut se_val_from_ne = data.ne_vals.$field as $ty;
-	    let mut le_val_from_ne = data.ne_vals.$field as $ty;
-	    let mut be_val_from_ne = data.ne_vals.$field as $ty;
+	    let mut ne_val = data.ne_vals.$field as $ty;
+	    let mut se_val = data.ne_vals.$field as $ty;
+	    let mut le_val = data.ne_vals.$field as $ty;
+	    let mut be_val = data.ne_vals.$field as $ty;
 
-	    ne_val_from_ne.flip_var(NE);
-	    se_val_from_ne.flip_var(SE);
-	    le_val_from_ne.flip_var(LE);
-	    be_val_from_ne.flip_var(BE);
+	    ne_val.flip_var(NE);
+	    se_val.flip_var(SE);
+	    le_val.flip_var(LE);
+	    be_val.flip_var(BE);
 
-	    assert_eq!(ne_val_from_ne, data.ne_vals.$field as $ty);
-	    assert_eq!(se_val_from_ne, data.se_vals.$field as $ty);
-	    assert_eq!(le_val_from_ne, data.le_vals.$field as $ty);
-	    assert_eq!(be_val_from_ne, data.be_vals.$field as $ty);
+	    assert_eq!(ne_val, data.ne_vals.$field as $ty);
+	    assert_eq!(se_val, data.se_vals.$field as $ty);
+	    assert_eq!(le_val, data.le_vals.$field as $ty);
+	    assert_eq!(be_val, data.be_vals.$field as $ty);
 	}
     }}
 }

@@ -6,34 +6,17 @@ use crate::{FData1, FVals1, IData1, IVals1, UData1, UVals1,
 
 
 macro_rules! test {
-    ( $data:expr, $ty:ty ) => {{
+    ( $data:expr, $ty:ty ) => {
 	{
 	    let data = $data;
 
-	    let mut raw_input = Cursor::new(data.raw_bytes.clone());
-	    let mut swp_input = Cursor::new(data.swp_bytes.clone());
+	    let mut ne_input = Cursor::new(data.ne_bytes.clone());
 
-	    let ne_vals_from_raw = raw_input.encast::<$ty>().unwrap();
-	    let se_vals_from_swp = swp_input.encast::<$ty>().unwrap();
+	    let ne_vals_from_ne = ne_input.encast::<$ty>().unwrap();
 
-	    assert_eq!(ne_vals_from_raw, data.ne_vals);
-	    assert_eq!(se_vals_from_swp, data.se_vals);
+	    assert_eq!(ne_vals_from_ne, data.ne_vals);
 	}
-	{
-	    let data = $data;
-
-	    let mut raw_input = Cursor::new(data.raw_bytes.clone());
-	    let mut swp_input = Cursor::new(data.swp_bytes.clone());
-
-	    // The type parameter of encast() can be omitted where
-	    // the Rust compiler can infer the type of the result.
-	    let ne_vals_from_raw: $ty = raw_input.encast().unwrap();
-	    let se_vals_from_swp: $ty = swp_input.encast().unwrap();
-
-	    assert_eq!(ne_vals_from_raw, data.ne_vals);
-	    assert_eq!(se_vals_from_swp, data.se_vals);
-	}
-    }}
+    }
 }
 
 

@@ -45,10 +45,20 @@ mod u2_data;
 mod u2_flip_var_array;
 mod u2_flip_var_box;
 
+mod u2_io_decasts;
+mod u2_io_decastsf;
+mod u2_io_encasts;
+mod u2_io_encastsf;
+
 mod u2_io_decastv;
 mod u2_io_decastvf;
 mod u2_io_encastv;
 mod u2_io_encastvf;
+
+mod u2_mem_decasts;
+mod u2_mem_decastsf;
+mod u2_mem_encasts;
+mod u2_mem_encastsf;
 
 mod u2_mem_decastv;
 mod u2_mem_decastvf;

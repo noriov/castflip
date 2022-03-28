@@ -9,12 +9,12 @@ macro_rules! test {
 	{
 	    let data = $data;
 
-	    let mut raw_bytes_from_ne = [0_u8; size_of::<$ty>()];
+	    let mut ne_bytes = [0_u8; size_of::<$ty>()];
 	    let ne_size = data.ne_vals.$field as $ty;
 
-	    <$ty>::decast(&mut raw_bytes_from_ne, &ne_size).unwrap();
+	    <$ty>::decast(&mut ne_bytes, &ne_size).unwrap();
 
-	    assert_eq!(raw_bytes_from_ne, data.raw_bytes[$start .. $end]);
+	    assert_eq!(ne_bytes, data.ne_bytes[$start .. $end]);
 	}
     }
 }

@@ -6,30 +6,18 @@ use crate::{IData1, UData1};
 
 
 macro_rules! test {
-    ( $data:expr, $field:ident, $ty:ty , $start:expr, $end:expr ) => {{
+    ( $data:expr, $field:ident, $ty:ty , $start:expr, $end:expr ) => {
 	{
 	    let data = $data;
 
-	    let mut raw_input =
-		Cursor::new(data.raw_bytes[$start .. $end].to_vec());
+	    let mut ne_input =
+		Cursor::new(data.ne_bytes[$start .. $end].to_vec());
 
-	    let ne_size = raw_input.encast::<$ty>().unwrap();
-
-	    assert_eq!(ne_size, data.ne_vals.$field as $ty);
-	}
-	{
-	    let data = $data;
-
-	    let mut raw_input =
-		Cursor::new(data.raw_bytes[$start .. $end].to_vec());
-
-	    // The type parameter of encast() can be omitted where
-	    // the Rust compiler can infer the type of the result.
-	    let ne_size: $ty = raw_input.encast().unwrap();
+	    let ne_size = ne_input.encast::<$ty>().unwrap();
 
 	    assert_eq!(ne_size, data.ne_vals.$field as $ty);
 	}
-    }}
+    }
 }
 
 

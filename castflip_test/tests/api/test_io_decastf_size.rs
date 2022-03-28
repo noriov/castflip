@@ -6,7 +6,7 @@ use crate::{IData1, UData1};
 
 
 macro_rules! test {
-    ( $data:expr, $field:ident, $ty:ty , $start:expr, $end:expr ) => {{
+    ( $data:expr, $field:ident, $ty:ty , $start:expr, $end:expr ) => {
 	{
 	    let data = $data;
 
@@ -16,46 +16,18 @@ macro_rules! test {
 	    let mut be_output = Cursor::new(vec![0_u8; size_of::<$ty>()]);
 
 	    let ne_size = data.ne_vals.$field as $ty;
-	    let se_size = data.se_vals.$field as $ty;
-	    let le_size = data.le_vals.$field as $ty;
-	    let be_size = data.be_vals.$field as $ty;
 
 	    ne_output.decastf::<$ty>(&ne_size, NE).unwrap();
-	    se_output.decastf::<$ty>(&se_size, SE).unwrap();
-	    le_output.decastf::<$ty>(&le_size, LE).unwrap();
-	    be_output.decastf::<$ty>(&be_size, BE).unwrap();
+	    se_output.decastf::<$ty>(&ne_size, SE).unwrap();
+	    le_output.decastf::<$ty>(&ne_size, LE).unwrap();
+	    be_output.decastf::<$ty>(&ne_size, BE).unwrap();
 
-	    assert_eq!(ne_output.into_inner(), data.raw_bytes[$start .. $end]);
-	    assert_eq!(se_output.into_inner(), data.raw_bytes[$start .. $end]);
-	    assert_eq!(le_output.into_inner(), data.raw_bytes[$start .. $end]);
-	    assert_eq!(be_output.into_inner(), data.raw_bytes[$start .. $end]);
+	    assert_eq!(ne_output.into_inner(), data.ne_bytes[$start .. $end]);
+	    assert_eq!(se_output.into_inner(), data.se_bytes[$start .. $end]);
+	    assert_eq!(le_output.into_inner(), data.le_bytes[$start .. $end]);
+	    assert_eq!(be_output.into_inner(), data.be_bytes[$start .. $end]);
 	}
-	{
-	    let data = $data;
-
-	    let mut ne_output = Cursor::new(vec![0_u8; size_of::<$ty>()]);
-	    let mut se_output = Cursor::new(vec![0_u8; size_of::<$ty>()]);
-	    let mut le_output = Cursor::new(vec![0_u8; size_of::<$ty>()]);
-	    let mut be_output = Cursor::new(vec![0_u8; size_of::<$ty>()]);
-
-	    let ne_size = data.ne_vals.$field as $ty;
-	    let se_size = data.se_vals.$field as $ty;
-	    let le_size = data.le_vals.$field as $ty;
-	    let be_size = data.be_vals.$field as $ty;
-
-	    // The type parameter of decastf() can be omitted where
-	    // the Rust compiler can infer the type of the result.
-	    ne_output.decastf(&ne_size, NE).unwrap();
-	    se_output.decastf(&se_size, SE).unwrap();
-	    le_output.decastf(&le_size, LE).unwrap();
-	    be_output.decastf(&be_size, BE).unwrap();
-
-	    assert_eq!(ne_output.into_inner(), data.raw_bytes[$start .. $end]);
-	    assert_eq!(se_output.into_inner(), data.raw_bytes[$start .. $end]);
-	    assert_eq!(le_output.into_inner(), data.raw_bytes[$start .. $end]);
-	    assert_eq!(be_output.into_inner(), data.raw_bytes[$start .. $end]);
-	}
-    }}
+    }
 }
 
 

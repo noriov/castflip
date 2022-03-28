@@ -5,56 +5,28 @@ use crate::{IData1, UData1};
 
 
 macro_rules! test {
-    ( $data:expr, $field:ident, $ty:ty , $start:expr, $end:expr ) => {{
+    ( $data:expr, $field:ident, $ty:ty , $start:expr, $end:expr ) => {
 	{
 	    let data = $data;
 
-	    let mut raw_bytes_from_ne = [0_u8; size_of::<$ty>()];
-	    let mut raw_bytes_from_se = [0_u8; size_of::<$ty>()];
-	    let mut raw_bytes_from_le = [0_u8; size_of::<$ty>()];
-	    let mut raw_bytes_from_be = [0_u8; size_of::<$ty>()];
+	    let mut ne_bytes = [0_u8; size_of::<$ty>()];
+	    let mut se_bytes = [0_u8; size_of::<$ty>()];
+	    let mut le_bytes = [0_u8; size_of::<$ty>()];
+	    let mut be_bytes = [0_u8; size_of::<$ty>()];
 
 	    let ne_size = data.ne_vals.$field as $ty;
-	    let se_size = data.se_vals.$field as $ty;
-	    let le_size = data.le_vals.$field as $ty;
-	    let be_size = data.be_vals.$field as $ty;
 
-	    raw_bytes_from_ne.decastf::<$ty>(&ne_size, NE).unwrap();
-	    raw_bytes_from_se.decastf::<$ty>(&se_size, SE).unwrap();
-	    raw_bytes_from_le.decastf::<$ty>(&le_size, LE).unwrap();
-	    raw_bytes_from_be.decastf::<$ty>(&be_size, BE).unwrap();
+	    ne_bytes.decastf::<$ty>(&ne_size, NE).unwrap();
+	    se_bytes.decastf::<$ty>(&ne_size, SE).unwrap();
+	    le_bytes.decastf::<$ty>(&ne_size, LE).unwrap();
+	    be_bytes.decastf::<$ty>(&ne_size, BE).unwrap();
 
-	    assert_eq!(raw_bytes_from_ne, data.raw_bytes[$start .. $end]);
-	    assert_eq!(raw_bytes_from_se, data.raw_bytes[$start .. $end]);
-	    assert_eq!(raw_bytes_from_le, data.raw_bytes[$start .. $end]);
-	    assert_eq!(raw_bytes_from_be, data.raw_bytes[$start .. $end]);
+	    assert_eq!(ne_bytes, data.ne_bytes[$start .. $end]);
+	    assert_eq!(se_bytes, data.se_bytes[$start .. $end]);
+	    assert_eq!(le_bytes, data.le_bytes[$start .. $end]);
+	    assert_eq!(be_bytes, data.be_bytes[$start .. $end]);
 	}
-	{
-	    let data = $data;
-
-	    let mut raw_bytes_from_ne = [0_u8; size_of::<$ty>()];
-	    let mut raw_bytes_from_se = [0_u8; size_of::<$ty>()];
-	    let mut raw_bytes_from_le = [0_u8; size_of::<$ty>()];
-	    let mut raw_bytes_from_be = [0_u8; size_of::<$ty>()];
-
-	    let ne_size = data.ne_vals.$field as $ty;
-	    let se_size = data.se_vals.$field as $ty;
-	    let le_size = data.le_vals.$field as $ty;
-	    let be_size = data.be_vals.$field as $ty;
-
-	    // The type parameter of decastf() can be omitted where
-	    // the Rust compiler can infer the type of the result.
-	    raw_bytes_from_ne.decastf(&ne_size, NE).unwrap();
-	    raw_bytes_from_se.decastf(&se_size, SE).unwrap();
-	    raw_bytes_from_le.decastf(&le_size, LE).unwrap();
-	    raw_bytes_from_be.decastf(&be_size, BE).unwrap();
-
-	    assert_eq!(raw_bytes_from_ne, data.raw_bytes[$start .. $end]);
-	    assert_eq!(raw_bytes_from_se, data.raw_bytes[$start .. $end]);
-	    assert_eq!(raw_bytes_from_le, data.raw_bytes[$start .. $end]);
-	    assert_eq!(raw_bytes_from_be, data.raw_bytes[$start .. $end]);
-	}
-    }}
+    }
 }
 
 

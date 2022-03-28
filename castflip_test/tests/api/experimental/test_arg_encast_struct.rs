@@ -8,11 +8,9 @@ macro_rules! test {
 	{
 	    let data = $data;
 
-	    let ne_vals_from_raw = <$ty>::encast(&data.raw_bytes).unwrap();
-	    let se_vals_from_swp = <$ty>::encast(&data.swp_bytes).unwrap();
+	    let ne_vals_from_ne = <$ty>::encast(&data.ne_bytes).unwrap();
 
-	    assert_eq!(ne_vals_from_raw, data.ne_vals);
-	    assert_eq!(se_vals_from_swp, data.se_vals);
+	    assert_eq!(ne_vals_from_ne, data.ne_vals);
 	}
     }
 }

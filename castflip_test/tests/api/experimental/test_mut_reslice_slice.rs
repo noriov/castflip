@@ -10,50 +10,35 @@ macro_rules! test {
 
 	    let data = $data;
 
-	    let mut raw_bytes = data.raw_bytes;
-	    let mut swp_bytes = data.swp_bytes;
+	    let mut ne_bytes = data.ne_bytes;
 
-	    let raw_slice_u8 = &mut raw_bytes[..];
-	    let swp_slice_u8 = &mut swp_bytes[..];
+	    let ne_slice_u8 = &mut ne_bytes[..];
 
-	    let raw_slice_vals = raw_slice_u8.reslice_mut::<$ty>().unwrap();
+	    let ne_slice_vals = ne_slice_u8.reslice_mut::<$ty>().unwrap();
 
-	    // The type parameter of reslice() can be omitted where
-	    // the Rust compiler can infer the type of the result.
-	    let swp_slice_vals: &mut [$ty] =
-		swp_slice_u8.reslice_mut().unwrap();
-
-	    assert_eq!(raw_slice_vals[0], data.ne_vals);
-	    assert_eq!(swp_slice_vals[0], data.se_vals);
+	    assert_eq!(ne_slice_vals[0], data.ne_vals);
 	}
 	unsafe {
 	    // Test2: Vec<u8> -> &[$ty]
 
 	    let data = $data;
 
-	    let mut raw_vec_u8 = data.raw_bytes.to_vec();
-	    let mut swp_vec_u8 = data.swp_bytes.to_vec();
+	    let mut ne_vec_u8 = data.ne_bytes.to_vec();
 
-	    let raw_slice_vals = raw_vec_u8.reslice_mut::<$ty>().unwrap();
-	    let swp_slice_vals: &mut [$ty] = swp_vec_u8.reslice_mut().unwrap();
+	    let ne_slice_vals = ne_vec_u8.reslice_mut::<$ty>().unwrap();
 
-	    assert_eq!(raw_slice_vals[0], data.ne_vals);
-	    assert_eq!(swp_slice_vals[0], data.se_vals);
+	    assert_eq!(ne_slice_vals[0], data.ne_vals);
 	}
 	unsafe {
-	    // Test3: [u8;N] -> &[$ty]
+	    // Test3: [u8; N] -> &[$ty]
 
 	    let data = $data;
 
-	    let mut raw_array_u8 = data.raw_bytes;
-	    let mut swp_array_u8 = data.swp_bytes;
+	    let mut ne_array_u8 = data.ne_bytes;
 
-	    let raw_slice_vals = raw_array_u8.reslice_mut::<$ty>().unwrap();
-	    let swp_slice_vals: &mut [$ty] =
-		swp_array_u8.reslice_mut().unwrap();
+	    let ne_slice_vals = ne_array_u8.reslice_mut::<$ty>().unwrap();
 
-	    assert_eq!(raw_slice_vals[0], data.ne_vals);
-	    assert_eq!(swp_slice_vals[0], data.se_vals);
+	    assert_eq!(ne_slice_vals[0], data.ne_vals);
 	}
 	unsafe {
 	    // Test4: &[$ty] -> &[u8]
@@ -61,13 +46,10 @@ macro_rules! test {
 	    let data = $data;
 
 	    let ne_slice_vals = &mut [data.ne_vals];
-	    let se_slice_vals = &mut [data.se_vals];
 
-	    let raw_slice_u8 = ne_slice_vals.reslice_mut::<u8>().unwrap();
-	    let swp_slice_u8: &mut [u8] = se_slice_vals.reslice_mut().unwrap();
+	    let ne_slice_u8 = ne_slice_vals.reslice_mut::<u8>().unwrap();
 
-	    assert_eq!(raw_slice_u8, &data.raw_bytes[..]);
-	    assert_eq!(swp_slice_u8, &data.swp_bytes[..]);
+	    assert_eq!(ne_slice_u8, &data.ne_bytes[..]);
 	}
     }}
 }

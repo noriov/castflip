@@ -8,28 +8,25 @@ macro_rules! test {
 	    let data = $data;
 
 	    let ne_vals = data.ne_vals;
-	    let se_vals = data.se_vals;
 
-	    let se_vals_from_ne = ne_vals.flip_val_swapped();
-	    let ne_vals_from_se = se_vals.flip_val_swapped();
+	    let se_vals = ne_vals.flip_val_swapped();
 
-	    assert_eq!(se_vals_from_ne, data.se_vals);
-	    assert_eq!(ne_vals_from_se, data.ne_vals);
+	    assert_eq!(se_vals, data.se_vals);
 	}
 	{
 	    let data = $data;
 
 	    let ne_vals = data.ne_vals;
 
-	    let ne_vals_from_ne = ne_vals.flip_val(NE);
-	    let se_vals_from_ne = ne_vals.flip_val(SE);
-	    let le_vals_from_ne = ne_vals.flip_val(LE);
-	    let be_vals_from_ne = ne_vals.flip_val(BE);
+	    let ne_vals = ne_vals.flip_val(NE);
+	    let se_vals = ne_vals.flip_val(SE);
+	    let le_vals = ne_vals.flip_val(LE);
+	    let be_vals = ne_vals.flip_val(BE);
 
-	    assert_eq!(ne_vals_from_ne, data.ne_vals);
-	    assert_eq!(se_vals_from_ne, data.se_vals);
-	    assert_eq!(le_vals_from_ne, data.le_vals);
-	    assert_eq!(be_vals_from_ne, data.be_vals);
+	    assert_eq!(ne_vals, data.ne_vals);
+	    assert_eq!(se_vals, data.se_vals);
+	    assert_eq!(le_vals, data.le_vals);
+	    assert_eq!(be_vals, data.be_vals);
 	}
     }}
 }

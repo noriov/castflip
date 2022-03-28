@@ -6,54 +6,30 @@ use crate::{IData1, UData1};
 
 
 macro_rules! test {
-    ( $data:expr, $field:ident, $ty:ty , $start:expr, $end:expr ) => {{
+    ( $data:expr, $field:ident, $ty:ty , $start:expr, $end:expr ) => {
 	{
 	    let data = $data;
 
-	    let mut raw_input1 =
-		Cursor::new(data.raw_bytes[$start .. $end].to_vec());
-	    let mut raw_input2 =
-		Cursor::new(data.raw_bytes[$start .. $end].to_vec());
-	    let mut raw_input3 =
-		Cursor::new(data.raw_bytes[$start .. $end].to_vec());
-	    let mut raw_input4 =
-		Cursor::new(data.raw_bytes[$start .. $end].to_vec());
+	    let mut ne_input =
+		Cursor::new(data.ne_bytes[$start .. $end].to_vec());
+	    let mut se_input =
+		Cursor::new(data.se_bytes[$start .. $end].to_vec());
+	    let mut le_input =
+		Cursor::new(data.le_bytes[$start .. $end].to_vec());
+	    let mut be_input =
+		Cursor::new(data.be_bytes[$start .. $end].to_vec());
 
-	    let ne_size = raw_input1.encastf::<$ty>(NE).unwrap();
-	    let se_size = raw_input2.encastf::<$ty>(SE).unwrap();
-	    let le_size = raw_input3.encastf::<$ty>(LE).unwrap();
-	    let be_size = raw_input4.encastf::<$ty>(BE).unwrap();
+	    let ne_size_from_ne = ne_input.encastf::<$ty>(NE).unwrap();
+	    let ne_size_from_se = se_input.encastf::<$ty>(SE).unwrap();
+	    let ne_size_from_le = le_input.encastf::<$ty>(LE).unwrap();
+	    let ne_size_from_be = be_input.encastf::<$ty>(BE).unwrap();
 
-	    assert_eq!(ne_size, data.ne_vals.$field as $ty);
-	    assert_eq!(se_size, data.se_vals.$field as $ty);
-	    assert_eq!(le_size, data.le_vals.$field as $ty);
-	    assert_eq!(be_size, data.be_vals.$field as $ty);
+	    assert_eq!(ne_size_from_ne, data.ne_vals.$field as $ty);
+	    assert_eq!(ne_size_from_se, data.ne_vals.$field as $ty);
+	    assert_eq!(ne_size_from_le, data.ne_vals.$field as $ty);
+	    assert_eq!(ne_size_from_be, data.ne_vals.$field as $ty);
 	}
-	{
-	    let data = $data;
-
-	    let mut raw_input1 =
-		Cursor::new(data.raw_bytes[$start .. $end].to_vec());
-	    let mut raw_input2 =
-		Cursor::new(data.raw_bytes[$start .. $end].to_vec());
-	    let mut raw_input3 =
-		Cursor::new(data.raw_bytes[$start .. $end].to_vec());
-	    let mut raw_input4 =
-		Cursor::new(data.raw_bytes[$start .. $end].to_vec());
-
-	    // The type parameter of encastf() can be omitted where
-	    // the Rust compiler can infer the type of the result.
-	    let ne_size: $ty = raw_input1.encastf(NE).unwrap();
-	    let se_size: $ty = raw_input2.encastf(SE).unwrap();
-	    let le_size: $ty = raw_input3.encastf(LE).unwrap();
-	    let be_size: $ty = raw_input4.encastf(BE).unwrap();
-
-	    assert_eq!(ne_size, data.ne_vals.$field as $ty);
-	    assert_eq!(se_size, data.se_vals.$field as $ty);
-	    assert_eq!(le_size, data.le_vals.$field as $ty);
-	    assert_eq!(be_size, data.be_vals.$field as $ty);
-	}
-    }}
+    }
 }
 
 

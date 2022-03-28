@@ -6,46 +6,26 @@ use crate::{FData1, FVals1, IData1, IVals1, UData1, UVals1,
 
 
 macro_rules! test {
-    ( $data:expr, $ty:ty ) => {{
+    ( $data:expr, $ty:ty ) => {
 	{
 	    let data = $data;
 
-	    let mut raw_bytes_from_ne = [0_u8; size_of::<$ty>()];
-	    let mut raw_bytes_from_se = [0_u8; size_of::<$ty>()];
-	    let mut raw_bytes_from_le = [0_u8; size_of::<$ty>()];
-	    let mut raw_bytes_from_be = [0_u8; size_of::<$ty>()];
+	    let mut ne_bytes = [0_u8; size_of::<$ty>()];
+	    let mut se_bytes = [0_u8; size_of::<$ty>()];
+	    let mut le_bytes = [0_u8; size_of::<$ty>()];
+	    let mut be_bytes = [0_u8; size_of::<$ty>()];
 
-	    raw_bytes_from_ne.decastf::<$ty>(&data.ne_vals, NE).unwrap();
-	    raw_bytes_from_se.decastf::<$ty>(&data.se_vals, SE).unwrap();
-	    raw_bytes_from_le.decastf::<$ty>(&data.le_vals, LE).unwrap();
-	    raw_bytes_from_be.decastf::<$ty>(&data.be_vals, BE).unwrap();
+	    ne_bytes.decastf::<$ty>(&data.ne_vals, NE).unwrap();
+	    se_bytes.decastf::<$ty>(&data.ne_vals, SE).unwrap();
+	    le_bytes.decastf::<$ty>(&data.ne_vals, LE).unwrap();
+	    be_bytes.decastf::<$ty>(&data.ne_vals, BE).unwrap();
 
-	    assert_eq!(raw_bytes_from_ne, data.raw_bytes);
-	    assert_eq!(raw_bytes_from_se, data.raw_bytes);
-	    assert_eq!(raw_bytes_from_le, data.raw_bytes);
-	    assert_eq!(raw_bytes_from_be, data.raw_bytes);
+	    assert_eq!(ne_bytes, data.ne_bytes);
+	    assert_eq!(se_bytes, data.se_bytes);
+	    assert_eq!(le_bytes, data.le_bytes);
+	    assert_eq!(be_bytes, data.be_bytes);
 	}
-	{
-	    let data = $data;
-
-	    let mut raw_bytes_from_ne = [0_u8; size_of::<$ty>()];
-	    let mut raw_bytes_from_se = [0_u8; size_of::<$ty>()];
-	    let mut raw_bytes_from_le = [0_u8; size_of::<$ty>()];
-	    let mut raw_bytes_from_be = [0_u8; size_of::<$ty>()];
-
-	    // The type parameter of decastf() can be omitted where
-	    // the Rust compiler can infer the type of the result.
-	    raw_bytes_from_ne.decastf(&data.ne_vals, NE).unwrap();
-	    raw_bytes_from_se.decastf(&data.se_vals, SE).unwrap();
-	    raw_bytes_from_le.decastf(&data.le_vals, LE).unwrap();
-	    raw_bytes_from_be.decastf(&data.be_vals, BE).unwrap();
-
-	    assert_eq!(raw_bytes_from_ne, data.raw_bytes);
-	    assert_eq!(raw_bytes_from_se, data.raw_bytes);
-	    assert_eq!(raw_bytes_from_le, data.raw_bytes);
-	    assert_eq!(raw_bytes_from_be, data.raw_bytes);
-	}
-    }}
+    }
 }
 
 

@@ -8,28 +8,11 @@ macro_rules! test {
 	unsafe {
 	    let data = $data;
 
-	    let raw_slice_u8 = &data.raw_bytes[..];
-	    let swp_slice_u8 = &data.swp_bytes[..];
+	    let ne_slice_u8 = &data.ne_bytes[..];
 
-	    let raw_vals_ptr = raw_slice_u8.deslice::<$ty>().unwrap();
-	    let swp_vals_ptr = swp_slice_u8.deslice::<$ty>().unwrap();
+	    let ne_vals_ptr = ne_slice_u8.deslice::<$ty>().unwrap();
 
-	    assert_eq!(*raw_vals_ptr, data.ne_vals);
-	    assert_eq!(*swp_vals_ptr, data.se_vals);
-	}
-	unsafe {
-	    let data = $data;
-
-	    let raw_slice_u8 = &data.raw_bytes[..];
-	    let swp_slice_u8 = &data.swp_bytes[..];
-
-	    // The type parameter of deslice() can be omitted where
-	    // the Rust compiler can infer the type of the result.
-	    let raw_vals_ptr: &$ty = raw_slice_u8.deslice().unwrap();
-	    let swp_vals_ptr: &$ty = swp_slice_u8.deslice().unwrap();
-
-	    assert_eq!(*raw_vals_ptr, data.ne_vals);
-	    assert_eq!(*swp_vals_ptr, data.se_vals);
+	    assert_eq!(*ne_vals_ptr, data.ne_vals);
 	}
     }}
 }

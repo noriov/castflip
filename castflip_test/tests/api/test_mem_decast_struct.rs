@@ -6,34 +6,17 @@ use crate::{FData1, FVals1, IData1, IVals1, UData1, UVals1,
 
 
 macro_rules! test {
-    ( $data:expr, $ty:ty ) => {{
+    ( $data:expr, $ty:ty ) => {
 	{
 	    let data = $data;
 
-	    let mut raw_bytes_from_ne = [0_u8; size_of::<$ty>()];
-	    let mut swp_bytes_from_se = [0_u8; size_of::<$ty>()];
+	    let mut ne_bytes_from_ne = [0_u8; size_of::<$ty>()];
 
-	    raw_bytes_from_ne.decast::<$ty>(&data.ne_vals).unwrap();
-	    swp_bytes_from_se.decast::<$ty>(&data.se_vals).unwrap();
+	    ne_bytes_from_ne.decast::<$ty>(&data.ne_vals).unwrap();
 
-	    assert_eq!(raw_bytes_from_ne, data.raw_bytes);
-	    assert_eq!(swp_bytes_from_se, data.swp_bytes);
+	    assert_eq!(ne_bytes_from_ne, data.ne_bytes);
 	}
-	{
-	    let data = $data;
-
-	    let mut raw_bytes_from_ne = [0_u8; size_of::<$ty>()];
-	    let mut swp_bytes_from_se = [0_u8; size_of::<$ty>()];
-
-	    // The type parameter of decast() can be omitted where
-	    // the Rust compiler can infer the type of the result.
-	    raw_bytes_from_ne.decast(&data.ne_vals).unwrap();
-	    swp_bytes_from_se.decast(&data.se_vals).unwrap();
-
-	    assert_eq!(raw_bytes_from_ne, data.raw_bytes);
-	    assert_eq!(swp_bytes_from_se, data.swp_bytes);
-	}
-    }}
+    }
 }
 
 

@@ -11,20 +11,20 @@ macro_rules! test {
 	{
 	    let data = $data;
 
-	    let mut raw_bytes_from_ne = [0_u8; size_of::<$ty>()];
-	    let mut raw_bytes_from_se = [0_u8; size_of::<$ty>()];
-	    let mut raw_bytes_from_le = [0_u8; size_of::<$ty>()];
-	    let mut raw_bytes_from_be = [0_u8; size_of::<$ty>()];
+	    let mut ne_bytes = [0_u8; size_of::<$ty>()];
+	    let mut se_bytes = [0_u8; size_of::<$ty>()];
+	    let mut le_bytes = [0_u8; size_of::<$ty>()];
+	    let mut be_bytes = [0_u8; size_of::<$ty>()];
 
-	    <$ty>::decastf(&mut raw_bytes_from_ne, &data.ne_vals, NE).unwrap();
-	    <$ty>::decastf(&mut raw_bytes_from_se, &data.se_vals, SE).unwrap();
-	    <$ty>::decastf(&mut raw_bytes_from_le, &data.le_vals, LE).unwrap();
-	    <$ty>::decastf(&mut raw_bytes_from_be, &data.be_vals, BE).unwrap();
+	    <$ty>::decastf(&mut ne_bytes, &data.ne_vals, NE).unwrap();
+	    <$ty>::decastf(&mut se_bytes, &data.ne_vals, SE).unwrap();
+	    <$ty>::decastf(&mut le_bytes, &data.ne_vals, LE).unwrap();
+	    <$ty>::decastf(&mut be_bytes, &data.ne_vals, BE).unwrap();
 
-	    assert_eq!(raw_bytes_from_ne, data.raw_bytes);
-	    assert_eq!(raw_bytes_from_se, data.raw_bytes);
-	    assert_eq!(raw_bytes_from_le, data.raw_bytes);
-	    assert_eq!(raw_bytes_from_be, data.raw_bytes);
+	    assert_eq!(ne_bytes, data.ne_bytes);
+	    assert_eq!(se_bytes, data.se_bytes);
+	    assert_eq!(le_bytes, data.le_bytes);
+	    assert_eq!(be_bytes, data.be_bytes);
 	}
     }
 }

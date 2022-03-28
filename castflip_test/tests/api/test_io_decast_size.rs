@@ -6,7 +6,7 @@ use crate::{IData1, UData1};
 
 
 macro_rules! test {
-    ( $data:expr, $field:ident, $ty:ty , $start:expr, $end:expr ) => {{
+    ( $data:expr, $field:ident, $ty:ty , $start:expr, $end:expr ) => {
 	{
 	    let data = $data;
 
@@ -15,21 +15,9 @@ macro_rules! test {
 
 	    ne_output.decast::<$ty>(&ne_size).unwrap();
 
-	    assert_eq!(ne_output.into_inner(), data.raw_bytes[$start .. $end]);
+	    assert_eq!(ne_output.into_inner(), data.ne_bytes[$start .. $end]);
 	}
-	{
-	    let data = $data;
-
-	    let mut ne_output = Cursor::new(vec![0_u8; size_of::<$ty>()]);
-	    let ne_size = data.ne_vals.$field as $ty;
-
-	    // The type parameter of decast() can be omitted where
-	    // the Rust compiler can infer the type of the result.
-	    ne_output.decast(&ne_size).unwrap();
-
-	    assert_eq!(ne_output.into_inner(), data.raw_bytes[$start .. $end]);
-	}
-    }}
+    }
 }
 
 

@@ -13,12 +13,12 @@ fn udata2() {
     let mut le_bytes = [0_u8; size_of::<u32>() * NELEM2];
     let mut be_bytes = [0_u8; size_of::<u32>() * NELEM2];
 
-    let ne_vec = udata2.ne_vals.array.to_vec();
+    let ne_slice = &udata2.ne_vals.array[..];
 
-    let ne_size = ne_bytes.decastvf::<u32>(&ne_vec, NE).unwrap();
-    let se_size = se_bytes.decastvf::<u32>(&ne_vec, SE).unwrap();
-    let le_size = le_bytes.decastvf::<u32>(&ne_vec, LE).unwrap();
-    let be_size = be_bytes.decastvf::<u32>(&ne_vec, BE).unwrap();
+    let ne_size = ne_bytes.decastsf::<u32>(ne_slice, NE).unwrap();
+    let se_size = se_bytes.decastsf::<u32>(ne_slice, SE).unwrap();
+    let le_size = le_bytes.decastsf::<u32>(ne_slice, LE).unwrap();
+    let be_size = be_bytes.decastsf::<u32>(ne_slice, BE).unwrap();
 
     assert_eq!(ne_size, size_of::<u32>() * NELEM2);
     assert_eq!(se_size, size_of::<u32>() * NELEM2);

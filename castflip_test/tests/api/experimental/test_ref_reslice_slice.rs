@@ -10,45 +10,33 @@ macro_rules! test {
 
 	    let data = $data;
 
-	    let raw_slice_u8 = &data.raw_bytes[..];
-	    let swp_slice_u8 = &data.swp_bytes[..];
+	    let ne_slice_u8 = &data.ne_bytes[..];
 
-	    let raw_slice_vals = raw_slice_u8.reslice::<$ty>().unwrap();
+	    let ne_slice_vals = ne_slice_u8.reslice::<$ty>().unwrap();
 
-	    // The type parameter of reslice() can be omitted where
-	    // the Rust compiler can infer the type of the result.
-	    let swp_slice_vals: &[$ty] = swp_slice_u8.reslice().unwrap();
-
-	    assert_eq!(raw_slice_vals[0], data.ne_vals);
-	    assert_eq!(swp_slice_vals[0], data.se_vals);
+	    assert_eq!(ne_slice_vals[0], data.ne_vals);
 	}
 	unsafe {
 	    // Test2: Vec<u8> -> &[$ty]
 
 	    let data = $data;
 
-	    let raw_vec_u8 = data.raw_bytes.to_vec();
-	    let swp_vec_u8 = data.swp_bytes.to_vec();
+	    let ne_vec_u8 = data.ne_bytes.to_vec();
 
-	    let raw_slice_vals = raw_vec_u8.reslice::<$ty>().unwrap();
-	    let swp_slice_vals: &[$ty] = swp_vec_u8.reslice().unwrap();
+	    let ne_slice_vals = ne_vec_u8.reslice::<$ty>().unwrap();
 
-	    assert_eq!(raw_slice_vals[0], data.ne_vals);
-	    assert_eq!(swp_slice_vals[0], data.se_vals);
+	    assert_eq!(ne_slice_vals[0], data.ne_vals);
 	}
 	unsafe {
-	    // Test3: [u8;N] -> &[$ty]
+	    // Test3: [u8; N] -> &[$ty]
 
 	    let data = $data;
 
-	    let raw_array_u8 = data.raw_bytes;
-	    let swp_array_u8 = data.swp_bytes;
+	    let ne_array_u8 = data.ne_bytes;
 
-	    let raw_slice_vals = raw_array_u8.reslice::<$ty>().unwrap();
-	    let swp_slice_vals: &[$ty] = swp_array_u8.reslice().unwrap();
+	    let ne_slice_vals = ne_array_u8.reslice::<$ty>().unwrap();
 
-	    assert_eq!(raw_slice_vals[0], data.ne_vals);
-	    assert_eq!(swp_slice_vals[0], data.se_vals);
+	    assert_eq!(ne_slice_vals[0], data.ne_vals);
 	}
 	unsafe {
 	    // Test4: &[$ty] -> &[u8]
@@ -56,13 +44,10 @@ macro_rules! test {
 	    let data = $data;
 
 	    let ne_slice_vals = &[data.ne_vals];
-	    let se_slice_vals = &[data.se_vals];
 
-	    let raw_slice_u8 = ne_slice_vals.reslice::<u8>().unwrap();
-	    let swp_slice_u8: &[u8] = se_slice_vals.reslice().unwrap();
+	    let ne_slice_u8 = ne_slice_vals.reslice::<u8>().unwrap();
 
-	    assert_eq!(raw_slice_u8, &data.raw_bytes[..]);
-	    assert_eq!(swp_slice_u8, &data.swp_bytes[..]);
+	    assert_eq!(ne_slice_u8, &data.ne_bytes[..]);
 	}
     }}
 }

@@ -10,10 +10,8 @@ fn udata2() {
 	let udata2 = UData2::gen();
 
 	let ne_slice_u8 = udata2.ne_vals.asif_bytes_ref();
-	let se_slice_u8 = udata2.se_vals.asif_bytes_ref();
 
-	assert_eq!(ne_slice_u8, &udata2.raw_bytes[..]);
-	assert_eq!(se_slice_u8, &udata2.swp_bytes[..]);
+	assert_eq!(ne_slice_u8, &udata2.ne_bytes[..]);
     }
     unsafe {
 	// Test2: &[u32] -> &[u8]
@@ -21,13 +19,10 @@ fn udata2() {
 	let udata2 = UData2::gen();
 
 	let ne_slice_u32 = &udata2.ne_vals.array[..];
-	let se_slice_u32 = &udata2.se_vals.array[..];
 
-	let raw_slice_u8 = ne_slice_u32.asif_bytes_ref();
-	let swp_slice_u8 = se_slice_u32.asif_bytes_ref();
+	let ne_slice_u8 = ne_slice_u32.asif_bytes_ref();
 
-	assert_eq!(raw_slice_u8, &udata2.raw_bytes[..]);
-	assert_eq!(swp_slice_u8, &udata2.swp_bytes[..]);
+	assert_eq!(ne_slice_u8, &udata2.ne_bytes[..]);
     }
     unsafe {
 	// Test3: empty &[u32] -> empty &[u8]

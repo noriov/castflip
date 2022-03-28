@@ -10,14 +10,11 @@ macro_rules! test {
 	{
 	    let data = $data;
 
-	    let mut raw_bytes_from_ne = [0_u8; size_of::<$ty>()];
-	    let mut swp_bytes_from_se = [0_u8; size_of::<$ty>()];
+	    let mut ne_bytes = [0_u8; size_of::<$ty>()];
 
-	    <$ty>::decast(&mut raw_bytes_from_ne, &data.ne_vals).unwrap();
-	    <$ty>::decast(&mut swp_bytes_from_se, &data.se_vals).unwrap();
+	    <$ty>::decast(&mut ne_bytes, &data.ne_vals).unwrap();
 
-	    assert_eq!(raw_bytes_from_ne, data.raw_bytes);
-	    assert_eq!(swp_bytes_from_se, data.swp_bytes);
+	    assert_eq!(ne_bytes, data.ne_bytes);
 	}
     }
 }

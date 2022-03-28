@@ -5,12 +5,14 @@ use castflip::{Cast, Flip};
 
 #[derive(Debug)]
 pub struct UData2 {
-    pub raw_bytes:	[u8; size_of::<UVals2>()],
-    pub swp_bytes:	[u8; size_of::<UVals2>()],
     pub ne_vals:	UVals2,
     pub se_vals:	UVals2,
     pub le_vals:	UVals2,
     pub be_vals:	UVals2,
+    pub ne_bytes:	[u8; size_of::<UVals2>()],
+    pub se_bytes:	[u8; size_of::<UVals2>()],
+    pub le_bytes:	[u8; size_of::<UVals2>()],
+    pub be_bytes:	[u8; size_of::<UVals2>()],
 }
 
 #[repr(C)]
@@ -24,91 +26,89 @@ pub const NELEM2: usize = 4;
 
 impl UData2 {
     pub fn gen() -> UData2 {
-	let mut raw_bytes = [0_u8; size_of::<UVals2>()];
-	let mut swp_bytes = [0_u8; size_of::<UVals2>()];
+	let mut ne_bytes = [0_u8; size_of::<UVals2>()];
+	let mut se_bytes = [0_u8; size_of::<UVals2>()];
 
-	// Generate raw bytes data.
-	for i in 0 .. raw_bytes.len() {
-	    raw_bytes[i] = ((255 - i * 3) & 0xFF) as u8;
+	// Generate bytes in native-endian.
+	for i in 0 .. ne_bytes.len() {
+	    ne_bytes[i] = ((255 - i * 3) & 0xFF) as u8;
 	}
 
-	// Construct swapped bytes data from raw bytes data.
+	// Constuct bytes in swapped-endian.
 
 	// array[0]
-	swp_bytes[0x00] = raw_bytes[0x03];
-	swp_bytes[0x01] = raw_bytes[0x02];
-	swp_bytes[0x02] = raw_bytes[0x01];
-	swp_bytes[0x03] = raw_bytes[0x00];
+	se_bytes[0x00] = ne_bytes[0x03];
+	se_bytes[0x01] = ne_bytes[0x02];
+	se_bytes[0x02] = ne_bytes[0x01];
+	se_bytes[0x03] = ne_bytes[0x00];
 
 	// array[1]
-	swp_bytes[0x04] = raw_bytes[0x07];
-	swp_bytes[0x05] = raw_bytes[0x06];
-	swp_bytes[0x06] = raw_bytes[0x05];
-	swp_bytes[0x07] = raw_bytes[0x04];
+	se_bytes[0x04] = ne_bytes[0x07];
+	se_bytes[0x05] = ne_bytes[0x06];
+	se_bytes[0x06] = ne_bytes[0x05];
+	se_bytes[0x07] = ne_bytes[0x04];
 
 	// array[2]
-	swp_bytes[0x08] = raw_bytes[0x0B];
-	swp_bytes[0x09] = raw_bytes[0x0A];
-	swp_bytes[0x0A] = raw_bytes[0x09];
-	swp_bytes[0x0B] = raw_bytes[0x08];
+	se_bytes[0x08] = ne_bytes[0x0B];
+	se_bytes[0x09] = ne_bytes[0x0A];
+	se_bytes[0x0A] = ne_bytes[0x09];
+	se_bytes[0x0B] = ne_bytes[0x08];
 
 	// array[3]
-	swp_bytes[0x0C] = raw_bytes[0x0F];
-	swp_bytes[0x0D] = raw_bytes[0x0E];
-	swp_bytes[0x0E] = raw_bytes[0x0D];
-	swp_bytes[0x0F] = raw_bytes[0x0C];
+	se_bytes[0x0C] = ne_bytes[0x0F];
+	se_bytes[0x0D] = ne_bytes[0x0E];
+	se_bytes[0x0E] = ne_bytes[0x0D];
+	se_bytes[0x0F] = ne_bytes[0x0C];
 
-	#[allow(unused_parens)]
-	let val1 = (((raw_bytes[0x00] as  u32)) |
-		    ((raw_bytes[0x01] as  u32) <<   8) |
-		    ((raw_bytes[0x02] as  u32) <<  16) |
-		    ((raw_bytes[0x03] as  u32) <<  24));
-	#[allow(unused_parens)]
-	let val2 = (((raw_bytes[0x04] as  u32)) |
-		    ((raw_bytes[0x05] as  u32) <<   8) |
-		    ((raw_bytes[0x06] as  u32) <<  16) |
-		    ((raw_bytes[0x07] as  u32) <<  24));
-	#[allow(unused_parens)]
-	let val3 = (((raw_bytes[0x08] as  u32)) |
-		    ((raw_bytes[0x09] as  u32) <<   8) |
-		    ((raw_bytes[0x0A] as  u32) <<  16) |
-		    ((raw_bytes[0x0B] as  u32) <<  24));
-	#[allow(unused_parens)]
-	let val4 = (((raw_bytes[0x0C] as  u32)) |
-		    ((raw_bytes[0x0D] as  u32) <<   8) |
-		    ((raw_bytes[0x0E] as  u32) <<  16) |
-		    ((raw_bytes[0x0F] as  u32) <<  24));
+	// Construct values in little-endian.
+	let le_vals = UVals2 {
+	    array:	[ (((ne_bytes[0x00] as u32)) |
+			   ((ne_bytes[0x01] as u32) <<   8) |
+			   ((ne_bytes[0x02] as u32) <<  16) |
+			   ((ne_bytes[0x03] as u32) <<  24)),
 
-	// Construct little endian values.
-	let le_vals = UVals2{
-	    array:	[ val1, val2, val3, val4 ],
+			  (((ne_bytes[0x04] as u32)) |
+			   ((ne_bytes[0x05] as u32) <<   8) |
+			   ((ne_bytes[0x06] as u32) <<  16) |
+			   ((ne_bytes[0x07] as u32) <<  24)),
+
+			  (((ne_bytes[0x08] as u32)) |
+			   ((ne_bytes[0x09] as u32) <<   8) |
+			   ((ne_bytes[0x0A] as u32) <<  16) |
+			   ((ne_bytes[0x0B] as u32) <<  24)),
+
+			  (((ne_bytes[0x0C] as u32)) |
+			   ((ne_bytes[0x0D] as u32) <<   8) |
+			   ((ne_bytes[0x0E] as u32) <<  16) |
+			   ((ne_bytes[0x0F] as u32) <<  24)) ],
 	};
 
-	// Calculate big endian values.
-	let be_vals = UVals2{
-	    array:	[ val1.swap_bytes(),
-			  val2.swap_bytes(),
-			  val3.swap_bytes(),
-			  val4.swap_bytes() ],
+	// Calculate values in big-endian.
+	let be_vals = UVals2 {
+	    array:	[ le_vals.array[0].swap_bytes(),
+			  le_vals.array[1].swap_bytes(),
+			  le_vals.array[2].swap_bytes(),
+			  le_vals.array[3].swap_bytes() ],
 	};
 
-	// Calculate native endian values.
-	let ne_vals = UVals2{
-	    array:	[ u32::from_le(val1),
-			  u32::from_le(val2),
-			  u32::from_le(val3),
-			  u32::from_le(val4) ],
-	};
+	// Prepare LE and BE data.
+	let (le_bytes, be_bytes, ne_vals, se_vals);
+	if cfg!(target_endian = "little") {
+	    le_bytes = ne_bytes;
+	    be_bytes = se_bytes;
+	    ne_vals = le_vals;
+	    se_vals = be_vals;
+	} else if cfg!(target_endian = "big") {
+	    le_bytes = se_bytes;
+	    be_bytes = ne_bytes;
+	    ne_vals = be_vals;
+	    se_vals = le_vals;
+	} else {
+	    panic!();
+	}
 
-	// Calculate swapped endian values.
-	let se_vals = UVals2{
-	    array:	[ ne_vals.array[0].swap_bytes(),
-			  ne_vals.array[1].swap_bytes(),
-			  ne_vals.array[2].swap_bytes(),
-			  ne_vals.array[3].swap_bytes(), ],
-	};
-
-	return UData2{ raw_bytes, swp_bytes,
-		       ne_vals, se_vals, le_vals, be_vals, };
+	// Construct UData2.
+	return UData2 { ne_bytes, se_bytes, le_bytes, be_bytes,
+			ne_vals, se_vals, le_vals, be_vals, };
     }
 }

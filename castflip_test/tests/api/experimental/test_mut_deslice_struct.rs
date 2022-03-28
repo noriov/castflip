@@ -8,34 +8,13 @@ macro_rules! test {
 	unsafe {
 	    let data = $data;
 
-	    let mut raw_bytes = data.raw_bytes;
-	    let mut swp_bytes = data.swp_bytes;
+	    let mut ne_bytes = data.ne_bytes;
 
-	    let raw_slice_u8 = &mut raw_bytes[..];
-	    let swp_slice_u8 = &mut swp_bytes[..];
+	    let ne_slice_u8 = &mut ne_bytes[..];
 
-	    let raw_vals_ptr = raw_slice_u8.deslice_mut::<$ty>().unwrap();
-	    let swp_vals_ptr = swp_slice_u8.deslice_mut::<$ty>().unwrap();
+	    let ne_vals_ptr = ne_slice_u8.deslice_mut::<$ty>().unwrap();
 
-	    assert_eq!(*raw_vals_ptr, data.ne_vals);
-	    assert_eq!(*swp_vals_ptr, data.se_vals);
-	}
-	unsafe {
-	    let data = $data;
-
-	    let mut raw_bytes = data.raw_bytes;
-	    let mut swp_bytes = data.swp_bytes;
-
-	    let raw_slice_u8 = &mut raw_bytes[..];
-	    let swp_slice_u8 = &mut swp_bytes[..];
-
-	    // The type parameter of deslice_mut() can be omitted where
-	    // the Rust compiler can infer the type of the result.
-	    let raw_vals_ptr: &mut $ty = raw_slice_u8.deslice_mut().unwrap();
-	    let swp_vals_ptr: &mut $ty = swp_slice_u8.deslice_mut().unwrap();
-
-	    assert_eq!(*raw_vals_ptr, data.ne_vals);
-	    assert_eq!(*swp_vals_ptr, data.se_vals);
+	    assert_eq!(*ne_vals_ptr, data.ne_vals);
 	}
     }}
 }
