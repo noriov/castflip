@@ -1,6 +1,6 @@
 use core::option::Option::{self, Some};
-use core::mem::{ManuallyDrop, MaybeUninit};
-use core::{mem, ptr, slice};
+use core::mem::MaybeUninit;
+use core::{mem, ptr};
 
 use crate::{Cast, Endian, Flip};
 use crate::experimental::FlipUnsized;
@@ -86,6 +86,21 @@ pub trait EncastMem {
     where
 	T: Cast + Flip;
 
+    /// Decodes the bytes at the head of `self` to value(s) of type
+    /// `T` and fill `slice` with the result.  The endianness of the
+    /// resulting value(s) is not flipped.
+    fn encasts<T>(&self, slice: &mut [T]) -> Option<usize>
+    where
+	T: Cast;
+
+    /// Decodes the bytes at the head of `self` to value(s) of type
+    /// `T` and fill `slice` with the result.  The endianness of the
+    /// resulting value(s) is flipped if necessary.  The endianness of
+    /// the bytes is specified in `endian`.
+    fn encastsf<T>(&self, slice: &mut [T], endian: Endian) -> Option<usize>
+    where
+	T: Cast + Flip;
+
     /// Decodes the bytes at the head of `self` to a vector of
     /// value(s) of type `T`.  The endianness of the resulting
     /// value(s) is not flipped.  The number of elements in the
@@ -139,21 +154,38 @@ impl EncastMem for [u8]
 	Some(val)
     }
 
+    fn encasts<T>(&self, slice: &mut [T]) -> Option<usize>
+    where
+	T: Cast
+    {
+	let bytes = self.get(0 .. mem::size_of::<T>() * slice.len())?;
+
+	unsafe {
+	    ptr::copy_nonoverlapping(bytes.as_ptr(),
+				     slice.as_mut_ptr() as *mut u8,
+				     bytes.len());
+	}
+
+	Some(bytes.len())
+    }
+
+    fn encastsf<T>(&self, slice: &mut [T], endian: Endian) -> Option<usize>
+    where
+	T: Cast + Flip
+    {
+	let size = self.encasts(slice)?;
+	slice.flip_var(endian);
+	Some(size)
+    }
+
     #[cfg(feature = "std")]
     fn encastv<T>(&self, nelem: usize) -> Option<Vec<T>>
     where
 	T: Cast
     {
-	let bytes = self.get(0 .. mem::size_of::<T>() * nelem)?;
-
-	// Create a vector of type T filled with values decoded from `bytes`.
+	// Create a vector of type `T` filled with values decoded from `bytes`.
 	unsafe {
-	    new_vec(nelem, | new_slice | {
-		ptr::copy_nonoverlapping(bytes.as_ptr(),
-					 new_slice.as_mut_ptr() as *mut u8,
-					 bytes.len());
-		Some(())
-	    })
+	    new_vec(nelem, | new_slice | { self.encasts(new_slice) })
 	}
     }
 
@@ -182,8 +214,11 @@ impl EncastMem for [u8]
 unsafe fn new_vec<T, F>(nelem: usize, fill_new_slice: F) -> Option<Vec<T>>
 where
     T: Cast,
-    F: Fn(&mut [T]) -> Option<()>
+    F: Fn(&mut [T]) -> Option<usize>
 {
+    use core::mem::ManuallyDrop;
+    use core::slice;
+
     // Create a vector with enough size of hidden area.
     let mut vec1: Vec<T> = Vec::with_capacity(nelem);
 

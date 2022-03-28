@@ -1,5 +1,5 @@
-use core::mem::{ManuallyDrop, MaybeUninit};
-use core::slice;
+use core::mem::MaybeUninit;
+use core::mem;
 use std::io::{Read, Result};
 
 use crate::{Cast, Endian, Flip};
@@ -137,6 +137,21 @@ pub trait EncastIO {
     where
 	T: Cast + Flip;
 
+    /// Decodes the bytes read from input `self` to value(s) of type
+    /// `T` and fill `slice` with the result.  The endianness of the
+    /// resulting value(s) is not flipped.
+    fn encasts<T>(&mut self, slice: &mut [T]) -> Result<usize>
+    where
+	T: Cast;
+
+    /// Decodes the bytes read from input `self` to value(s) of type
+    /// `T` and fill `slice` with the result.  The endianness of the
+    /// resulting value(s) is flipped if necessary.  The endianness of
+    /// the bytes is specified in `endian`.
+    fn encastsf<T>(&mut self, slice: &mut [T], endian: Endian) -> Result<usize>
+    where
+	T: Cast + Flip;
+
     /// Decodes the bytes read from input `self` to a vector of
     /// value(s) of type `T`.  The endianness of the resulting
     /// value(s) is not flipped.  The number of elements in the
@@ -181,15 +196,32 @@ where
 	Ok(val)
     }
 
+    fn encasts<T>(&mut self, slice: &mut [T]) -> Result<usize>
+    where
+	T: Cast
+    {
+	unsafe {
+	    self.read_exact(slice.asif_bytes_mut())?;
+	}
+	Ok(mem::size_of::<T>() * slice.len())
+    }
+
+    fn encastsf<T>(&mut self, slice: &mut [T], endian: Endian) -> Result<usize>
+    where
+	T: Cast + Flip
+    {
+	let size = self.encasts(slice)?;
+	slice.flip_var(endian);
+	Ok(size)
+    }
+
     fn encastv<T>(&mut self, nelem: usize) -> Result<Vec<T>>
     where
 	T: Cast
     {
-	// Create a vector of type T filled with values decoded from `self`.
+	// Create a vector of type `T` filled with values decoded from `self`.
 	unsafe {
-	    new_vec(nelem, | new_slice | {
-		self.read_exact(new_slice.asif_bytes_mut())
-	    })
+	    new_vec(nelem, | new_slice | { self.encasts(new_slice) })
 	}
     }
 
@@ -216,8 +248,11 @@ where
 unsafe fn new_vec<T, F>(nelem: usize, mut fill_new_slice: F) -> Result<Vec<T>>
 where
     T: Cast,
-    F: FnMut(&mut [T]) -> Result<()>
+    F: FnMut(&mut [T]) -> Result<usize>
 {
+    use core::mem::ManuallyDrop;
+    use core::slice;
+
     // Create a vector with enough size of hidden area.
     let mut vec1: Vec<T> = Vec::with_capacity(nelem);
 

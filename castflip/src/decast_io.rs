@@ -142,17 +142,34 @@ pub trait DecastIO {
     where
 	T: Cast + Flip;
 
-    /// Encodes the slice of value(s) of type `T` pointed by `slice`
-    /// to bytes and writes them to output `self`.  The endianness of
-    /// the resulting bytes is not flipped.
+    /// Encodes value(s) in `slice` of type `T` to bytes and writes
+    /// them to output `self`.  The endianness of the resulting bytes
+    /// is not flipped.
+    fn decasts<T>(&mut self, slice: &[T]) -> Result<usize>
+    where
+	T: Cast;
+
+    /// Encodes value(s) in `slice` of type `T` to bytes and writes
+    /// them to output `self`.  The endianness of the resulting bytes
+    /// is flipped if necessary.  The endianness of the resulting
+    /// bytes is specified in `endian`.
+    fn decastsf<T>(&mut self, slice: &[T], endian: Endian) -> Result<usize>
+    where
+	T: Cast + Flip;
+
+    /// Encodes value(s) in `slice` of type `T` to bytes and writes
+    /// them to output `self`.  The endianness of the resulting bytes
+    /// is not flipped.
+    /// (This method will be replaced by `decasts`)
     fn decastv<T>(&mut self, slice: &[T]) -> Result<usize>
     where
 	T: Cast;
 
-    /// Encodes the slice of value(s) of type `T` pointed by `slice`
-    /// to bytes and writes them to output `self`.  The endianness of
-    /// the resulting bytes is flipped if necessary.  The endianness
-    /// of the resulting bytes is specified in `endian`.
+    /// Encodes value(s) in `slice` of type `T` to bytes and writes
+    /// them to output `self`.  The endianness of the resulting bytes
+    /// is flipped if necessary.  The endianness of the resulting
+    /// bytes is specified in `endian`.
+    /// (This method will be replaced by `decastsf`)
     fn decastvf<T>(&mut self, slice: &[T], endian: Endian) -> Result<usize>
     where
 	T: Cast + Flip;
@@ -184,7 +201,7 @@ where
 	}
     }
 
-    fn decastv<T>(&mut self, slice: &[T]) -> Result<usize>
+    fn decasts<T>(&mut self, slice: &[T]) -> Result<usize>
     where
 	T: Cast
     {
@@ -194,7 +211,7 @@ where
 	Ok(mem::size_of::<T>() * slice.len())
     }
 
-    fn decastvf<T>(&mut self, slice: &[T], endian: Endian) -> Result<usize>
+    fn decastsf<T>(&mut self, slice: &[T], endian: Endian) -> Result<usize>
     where
 	T: Cast + Flip
     {
@@ -206,5 +223,19 @@ where
 	    }
 	    Ok(mem::size_of::<T>() * slice.len())
 	}
+    }
+
+    fn decastv<T>(&mut self, slice: &[T]) -> Result<usize>
+    where
+	T: Cast
+    {
+	self.decasts(slice)
+    }
+
+    fn decastvf<T>(&mut self, slice: &[T], endian: Endian) -> Result<usize>
+    where
+	T: Cast + Flip
+    {
+	self.decastsf(slice, endian)
     }
 }
