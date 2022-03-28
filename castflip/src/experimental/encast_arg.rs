@@ -82,6 +82,20 @@ pub trait EncastArg: Cast {
     where
 	Self: Flip;
 
+    /// Decodes the bytes at the head of `bytes` to value(s) of type
+    /// `T` and fill `slice` with the result.  The endianness of the
+    /// resulting value(s) is not flipped.
+    fn encasts(bytes: &[u8], slice: &mut [Self]) -> Option<usize>;
+
+    /// Decodes the bytes at the head of `bytes` to value(s) of type
+    /// `T` and fill `slice` with the result.  The endianness of the
+    /// resulting value(s) is flipped if necessary.  The endianness of
+    /// the bytes is specified in `endian`.
+    fn encastsf(bytes: &[u8], slice: &mut [Self], endian: Endian)
+		-> Option<usize>
+    where
+	Self: Flip;
+
     /// Decodes the bytes at the head of `bytes` to a vector of
     /// value(s) of type `T`.  The endianness of the resulting
     /// value(s) is not flipped.  The number of elements in the
@@ -116,6 +130,19 @@ where
 	Self: Flip
     {
 	bytes.encastf(endian)
+    }
+
+    fn encasts(bytes: &[u8], slice: &mut [Self]) -> Option<usize>
+    {
+	bytes.encasts(slice)
+    }
+
+    fn encastsf(bytes: &[u8], slice: &mut [Self], endian: Endian)
+		-> Option<usize>
+    where
+	Self: Flip
+    {
+	bytes.encastsf(slice, endian)
     }
 
     #[cfg(feature = "std")]

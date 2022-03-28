@@ -13,6 +13,11 @@ mod u1_arg_decastf_num;
 mod u1_arg_encast_num;
 mod u1_arg_encastf_num;
 
+mod u2_arg_decasts;
+mod u2_arg_decastsf;
+mod u2_arg_encasts;
+mod u2_arg_encastsf;
+
 mod u2_arg_decastv;
 mod u2_arg_decastvf;
 mod u2_arg_encastv;
