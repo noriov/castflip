@@ -1,3 +1,5 @@
+use core::option::Option;
+
 use crate::{Cast, DecastMem, Endian, Flip};
 #[cfg(doc)] use crate::BE;
 

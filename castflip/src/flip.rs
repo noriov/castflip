@@ -1,3 +1,4 @@
+use core::marker::Sized;
 use core::mem::MaybeUninit;
 use core::ptr;
 

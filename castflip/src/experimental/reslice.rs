@@ -1,3 +1,4 @@
+use core::option::Option::{self, Some, None};
 use core::{mem, slice};
 
 use crate::Cast;

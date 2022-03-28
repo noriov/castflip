@@ -1,3 +1,5 @@
+use core::option::Option;
+
 use crate::{Cast, EncastMem, Endian, Flip};
 #[cfg(doc)] use crate::BE;
 
@@ -84,6 +86,7 @@ pub trait EncastArg: Cast {
     /// value(s) of type `T`.  The endianness of the resulting
     /// value(s) is not flipped.  The number of elements in the
     /// resulting vecotr is specified in `nelem`.
+    #[cfg(feature = "std")]
     fn encastv(bytes: &[u8], nelem: usize) -> Option<Vec<Self>>;
 
     /// Decodes the bytes at the head of `bytes` to a vector of
@@ -91,6 +94,7 @@ pub trait EncastArg: Cast {
     /// value(s) is flipped if necessary.  The endianness of the bytes
     /// is specified in `endian`.  The number of elements in the
     /// resulting vecotr is specified in `nelem`.
+    #[cfg(feature = "std")]
     fn encastvf(bytes: &[u8], nelem: usize, endian: Endian)
 		-> Option<Vec<Self>>
     where
@@ -114,11 +118,13 @@ where
 	bytes.encastf(endian)
     }
 
+    #[cfg(feature = "std")]
     fn encastv(bytes: &[u8], nelem: usize) -> Option<Vec<Self>>
     {
 	bytes.encastv(nelem)
     }
 
+    #[cfg(feature = "std")]
     fn encastvf(bytes: &[u8], nelem: usize, endian: Endian)
 		-> Option<Vec<Self>>
     where

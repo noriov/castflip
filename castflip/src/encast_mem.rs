@@ -1,3 +1,4 @@
+use core::option::Option::{self, Some};
 use core::mem::{ManuallyDrop, MaybeUninit};
 use core::{mem, ptr, slice};
 
@@ -89,6 +90,7 @@ pub trait EncastMem {
     /// value(s) of type `T`.  The endianness of the resulting
     /// value(s) is not flipped.  The number of elements in the
     /// resulting vecotr is specified in `nelem`.
+    #[cfg(feature = "std")]
     fn encastv<T>(&self, nelem: usize) -> Option<Vec<T>>
     where
 	T: Cast;
@@ -98,6 +100,7 @@ pub trait EncastMem {
     /// value(s) is flipped if necessary.  The endianness of the bytes
     /// is specified in `endian`.  The number of elements in the
     /// resulting vecotr is specified in `nelem`.
+    #[cfg(feature = "std")]
     fn encastvf<T>(&self, nelem: usize, endian: Endian) -> Option<Vec<T>>
     where
 	T: Cast + Flip;
@@ -136,6 +139,7 @@ impl EncastMem for [u8]
 	Some(val)
     }
 
+    #[cfg(feature = "std")]
     fn encastv<T>(&self, nelem: usize) -> Option<Vec<T>>
     where
 	T: Cast
@@ -153,6 +157,7 @@ impl EncastMem for [u8]
 	}
     }
 
+    #[cfg(feature = "std")]
     fn encastvf<T>(&self, nelem: usize, endian: Endian) -> Option<Vec<T>>
     where
 	T: Cast + Flip
@@ -173,6 +178,7 @@ impl EncastMem for [u8]
 // (2) Section "Relationship with ManuallyDrop" of mem::forget at
 // https://doc.rust-lang.org/stable/std/mem/fn.forget.html#relationship-with-manuallydrop
 //
+#[cfg(feature = "std")]
 unsafe fn new_vec<T, F>(nelem: usize, fill_new_slice: F) -> Option<Vec<T>>
 where
     T: Cast,

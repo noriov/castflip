@@ -283,15 +283,19 @@ enum listed below.
  */
 
 
+#![cfg_attr(not(feature = "std"), no_std)]
+
+
 // Modules in files in the same directory.
 #[doc(hidden)] pub mod cast;
-#[doc(hidden)] pub mod decast_io;
 #[doc(hidden)] pub mod decast_mem;
-#[doc(hidden)] pub mod encast_io;
 #[doc(hidden)] pub mod encast_mem;
 #[doc(hidden)] pub mod endian;
 #[doc(hidden)] pub mod flip;
 #[doc(hidden)] pub mod nop_flip;
+
+#[doc(hidden)] #[cfg(feature = "std")] pub mod decast_io;
+#[doc(hidden)] #[cfg(feature = "std")] pub mod encast_io;
 
 // A module in a subdirectory.
 pub mod experimental;
@@ -311,11 +315,11 @@ pub mod experimental;
 #[doc(inline)] pub use self::decast_mem::DecastMem;
 
 // Traits to encast and decast through I/O.
-#[doc(inline)] pub use self::encast_io::EncastIO;
-#[doc(inline)] pub use self::decast_io::DecastIO;
+#[doc(inline)] #[cfg(feature = "std")] pub use self::encast_io::EncastIO;
+#[doc(inline)] #[cfg(feature = "std")] pub use self::decast_io::DecastIO;
 
 
-// A module used in document comment.
+// A module used in document comment above.
 #[cfg(doc)] use std::io;
 
 // Make sure that this crate supports the endianness of the target system.

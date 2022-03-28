@@ -11,3 +11,7 @@ repository = "https://github.com/noriov/castflip"
 
 [dependencies]
 castflip_derive = { path = "../castflip_derive", version = "0.1" }
+
+[features]
+default = ["std"]
+std = []
