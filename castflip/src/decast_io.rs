@@ -220,7 +220,7 @@ where
 	T: Cast + Flip
     {
 	if !endian.need_swap() {
-	    self.decastv::<T>(slice)
+	    self.decasts::<T>(slice)
 	} else {
 	    for elem in slice {
 		self.decast::<T>(&elem.flip_val_swapped())?;

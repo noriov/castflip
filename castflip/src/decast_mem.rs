@@ -181,7 +181,7 @@ impl DecastMem for [u8]
 	T: Cast + Flip
     {
 	if !endian.need_swap() {
-	    self.decastv(slice)
+	    self.decasts(slice)
 	} else {
 	    let bytes = self.get_mut(0 .. mem::size_of::<T>() * slice.len())?;
 	    let mut off = 0;
