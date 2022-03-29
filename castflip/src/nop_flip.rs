@@ -122,7 +122,7 @@ use crate::Flip;
 /// keep the original value.
 /// In the example below, a struct type containing a magic number
 /// which indicates whether native-endian or swapped-endian is
-/// declared as `NopFlip` to ease debugging.
+/// declared as `NopFlip` to help debugging.
 ///
 /// ```
 /// # fn main() { test(); }
@@ -146,16 +146,17 @@ use crate::Flip;
 /// #[repr(C)]
 /// #[derive(Cast, Flip)]
 /// struct FatHeader {
-///     magic:     FatMagic,
-///     nfat_arch: u32,
+///     magic:     FatMagic,  // Magic number (See above)
+///     nfat_arch: u32,       // Number of architectures in this file.
 /// }
 ///
+/// // Input data (8 bytes)
 /// let bytes1: [u8; 8] = [0xCA, 0xFE, 0xBA, 0xBE, 0x00, 0x00, 0x00, 0x02];
 ///
 /// // Decode the first 4 bytes in `bytes1` without endian-flipping
 /// // to determine the endianness of `FatHeader`.
-/// // The generic type parameter can be inferred as u32
-/// // because the types of the constants are u32.
+/// // (The generic type parameter `u32` is omitted because it can be inferred
+/// //  from the fact that the return value is compared with u32 constants)
 /// let endian = match bytes1.encast()? {
 ///     FAT_MAGIC32 | FAT_MAGIC64 => Endian::Native,
 ///     FAT_CIGAM32 | FAT_CIGAM64 => Endian::Swapped,
@@ -165,28 +166,34 @@ use crate::Flip;
 /// // Decode bytes `bytes1` to variable `fat_hdr2` of type `FatHeader`.
 /// let fat_hdr2: FatHeader = bytes1.encastf(endian)?;
 ///
-/// // Check the results (fat_hdr2)
+/// // Check the result (endian); The magic number says it is in big-endian.
+/// assert_eq!(endian.absolute(), Endian::Big);
+///
+/// // Check the results (fat_hdr2); `FatMagic` is not endian-flipped.
 /// if cfg!(target_endian = "little") {
-///     assert_eq!(fat_hdr2.magic.number, FAT_CIGAM32); // Not endian-flipped.
+///     assert_eq!(fat_hdr2.magic.number, FAT_CIGAM32);
 /// } else if cfg!(target_endian = "big") {
-///     assert_eq!(fat_hdr2.magic.number, FAT_MAGIC32); // Not endian-flipped.
+///     assert_eq!(fat_hdr2.magic.number, FAT_MAGIC32);
 /// # } else {
 /// #   panic!();
 /// }
-/// assert_eq!(fat_hdr2.nfat_arch, 2);  // Endian-flipped.
+/// assert_eq!(fat_hdr2.nfat_arch, 2);  // This number is endian-flipped.
 /// # Some(())
 /// # }
 /// ```
 ///
-/// The example above decodes the fat header located at the head of
-/// [Mach-o].  It has two fields: magic number (4 bytes) and the
-/// number of architectures in the file (4 bytes).
+/// The example above decodes the first 8 bytes of the fat header
+/// located at the head of the [Mach-o] file format.  It has two
+/// fields: magic number (4 bytes) and the number of architectures in
+/// the file (4 bytes).
 ///
 /// In the example above, at first, method `encast` decodes the first
-/// 4 bytes in `bytes1` without endian-flipping in order to determine
-/// the endianness of `FatHeader`.  Then, method `encastf` decodes the
-/// first 8 bytes in `bytes1` to variable `fat_hdr2` of `FatHeader`
-/// according to the determined endianness.
+/// 4 bytes in `bytes1` without endian-flipping to determine the
+/// endianness of `FatHeader`.  Then, method `encastf` decodes the
+/// first 8 bytes in `bytes1` to variable `fat_hdr2` of `FatHeader` by
+/// using the determined endianness.  Note that the first 4 bytes
+/// (i.e., magic number) are read twice in this example for
+/// simplicity.
 ///
 /// Note: [Mach-o] is a file format for executable files.
 /// It is used by most systems based on the Mach kernel.

@@ -175,7 +175,7 @@ use castflip::{Cast, Flip, EncastMem, DecastMem, BE};
 #[derive(Cast, Flip, PartialEq, Debug)]
 struct Pair (u16, u16); // 4 bytes
 
-// Input data.
+// Input data (12 bytes)
 let bytes1: [u8; 12] = [0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27,
                         0x28, 0x29, 0x2A, 0x2B];
 
@@ -184,7 +184,7 @@ let vec2: Vec<Pair> = bytes1.encastvf(3, BE)?;  // 3 pairs, BE = Big-Endian
 
 // Encode variable `vec2` to bytes `bytes3`.
 let mut bytes3 = [0_u8; 12];
-let size3 = bytes3.decastvf(&vec2, BE)?;
+let size3 = bytes3.decastsf(&vec2, BE)?;
 
 // Check the result (vec2)
 assert_eq!(vec2, vec![Pair(0x2021, 0x2223), Pair(0x2425, 0x2627),
@@ -205,12 +205,13 @@ Trait [`EncastMem`] provides methods to `encast` from memory, and
 trait [`DecastMem`] provides methods to `decast` to memory.  The type
 of the value(s) can be explicitly specified as the generic type
 parameter of their methods or implicitly specified so that the Rust
-compiler can infer.  The methods whose name contain 'v' (= vector)
-`encast` / `decast` a series of structured binary data, and the
-methods whose names end with 'f' flip the endianness of the results.
-The number of elements is specified in the argument of method
-`encastvf`.  The endianness of bytes is specified in their argument.
-[`BE`] is an alias of [`Endian`]`::Big`, which means Big-Endian.
+compiler can infer.  The methods whose name contain 'v' (= vector) or
+'s' (= slice) `encast` / `decast` a series of structured binary data,
+and the methods whose names end with 'f' flip the endianness of the
+results.  The number of elements is specified in the argument of
+method `encastvf`.  The endianness of bytes is specified in their
+argument.  [`BE`] is an alias of [`Endian`]`::Big`, which means
+Big-Endian.
 
 Note: The reason why `#[derive(PartialEq, Debug)]` is declared is that
 assert_eq! requires them.  This crate works without them.
@@ -240,40 +241,62 @@ required conditions are met.
 * `encast` decodes a required number of bytes to a value.
 * `encastf` decodes a required number of bytes to a value with
   `endian-flip`ping.
+* `encasts` decodes a required number of bytes to a slice of value(s).
+* `encastsf` decodes a required number of bytes to a slice of value(s)
+  with `endian-flip`ping.
 * `encastv` decodes a required number of bytes to a vector of value(s).
 * `encastvf` decodes a required number of bytes to a vector of value(s)
   with `endian-flip`ping.
 
-The methods defined in trait [`EncastMem`] returns [`Option`] and
-the methods defined in trait [`EncastIO`] returns [`io::Result`].
-If successful, they return the resulting value(s).
-The endianness of the bytes in `self` is specified in the arguments of
-`encastf` and `encastvf`.  The number of elements in the resulting
-vector is specified in the arguments of `encastv` and `encastvf`.
+The methods defined in trait [`EncastMem`] returns [`Option`] and the
+methods defined in trait [`EncastIO`] returns [`io::Result`].  If
+successful, they return the resulting value(s) or size.  The
+endianness of the bytes in `self` is specified in the arguments of
+`encastf`, `encastsf` and `encastvf`.  The number of elements in the
+resulting vector is specified in the arguments of `encastv` and
+`encastvf`.
 
 ## List of methods defined in trait [`DecastMem`] and trait [`DecastIO`]
 
 * `decast` encodes a variable to a number of bytes.
 * `decastf` encodes a variable to a number of bytes with `endian-flip`ping.
-* `decastv` encodes a slice of variable(s) to a number of bytes.
-* `decastvf` encodes a slice of variable(s) to a number of bytes
+* `decasts` encodes a slice of variable(s) to a number of bytes.
+* `decastsf` encodes a slice of variable(s) to a number of bytes
   with `endian-flip`ping.
 
-The methods defined in trait [`DecastMem`] returns [`Option`] and
-the methods defined in trait [`DecastIO`] returns [`io::Result`].
-If successful, they return the number of resulting bytes.
-The endianness of resulting bytes is specified in the arguments of
-`decastf` and `decastvf`.
+The methods defined in trait [`DecastMem`] returns [`Option`] and the
+methods defined in trait [`DecastIO`] returns [`io::Result`].  If
+successful, they return the number of resulting bytes.  The endianness
+of resulting bytes is specified in the arguments of `decastf` and
+`decastsf`.  (FYI: `decastv` and `decastvf` will be deprecated)
 
 ## Notes on trait `EncastIO` and trait `DecastIO`
 
-[`EncastIO`] and [`DecastIO`] provide methods to `encast` / `decast`
-through [`io::Read`] and [`io::Write`].  Remember that [`io::Read`]
-and [`io::Write`] are implemented also for `&[u8]`.  Additionally,
-[`io::Cursor`] wraps an in-memory buffer and provides it through
-[`io::Read`] and [`io::Write`].  Therefore, [`EncastIO`] and
-[`DecastIO`] would enable to write a program code that can `encast`
-from and `decast` to file, network and memory.
+[`EncastIO`] provides methods to `encast` from [`io::Read`], and
+[`DecastIO`] provides methods `decast` to [`io::Write`].  Remember
+that [`io::Read`] and [`io::Write`] are implemented also for `&[u8]`.
+Additionally, [`io::Cursor`] wraps an in-memory buffer and provides it
+through [`io::Read`] and [`io::Write`].  Therefore, [`EncastIO`] and
+[`DecastIO`] would enable to write a library that can `encast` from
+and `decast` to file, network and memory.
+
+## Notes on `#![no_std]`
+
+This crate has a feature `std` that is enabled by default.  To build
+this crate for no_std environments, add the following dependencies in
+`Cargo.toml`.  With the current version of this crate, [`EncastMem`]
+and [`DecastMem`] except methods `encastv` and `encastvf` are
+available.
+
+However, because we do not have good no_std environments nor good
+experiences, we are not sure that the current version of this crate
+provides sufficient features for no_std environments.  Feedbacks are
+welcome!
+
+```toml
+[dependencies]
+castflip = { version = "0.1", default-features = false }
+```
 
 For more information, please see the description of each trait and
 enum listed below.

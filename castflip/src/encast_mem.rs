@@ -58,63 +58,69 @@ use crate::experimental::FlipUnsized;
 /// memory to one or more values of the specified type.  The type of
 /// the value(s) can be explicitly specified as the generic type
 /// parameter of the methods or implicitly specified so that the Rust
-/// compiler can infer it.  The endianness of resulting value(s) is
-/// flipped when required and necessary.  Currently, only an
-/// implementation for `[u8]` is provided.
+/// compiler can infer it.  The methods whose name contain 's' (=
+/// slice) or 'v' (= vector) `encast` a series of structured binary
+/// data.  The methods whose names end with 'f' flip the endianness of
+/// the results.  Currently, only an implementation for `[u8]` is
+/// provided.
 ///
 /// The size of `self` should be larger than or equal to the specified
 /// number of value(s) of the specified type `T`.  If there are enough
 /// bytes, the required number of bytes at the head of `self` are
-/// decoded to the specified type of value(s), which is/are returned
-/// in `Some`().  The remaining bytes are ignored.  If there are not
-/// enough bytes, `None` is returned.
+/// decoded to the specified type of value(s).  The remaining bytes
+/// are ignored.  If successful, return value is enclosed in `Some`().
+/// If there are not enough bytes, `None` is returned.
 ///
 /// When argument `endian` is specified, the endianness of value(s) is
 /// flipped if necessary.
 ///
 pub trait EncastMem {
-    /// Decodes the bytes at the head of `self` to a value of type `T`.
-    /// The endianness of the resulting value is not flipped.
+    /// Decodes the bytes at the head of `self` to a value of type `T`
+    /// and returns the value.  The endianness of the resulting value
+    /// is not flipped.
     fn encast<T>(&self) -> Option<T>
     where
 	T: Cast;
 
-    /// Decodes the bytes at the head of `self` to a value of type `T`.
-    /// The endianness of the resulting value is flipped if necessary.
-    /// The endianness of the bytes is specified in `endian`.
+    /// Decodes the bytes at the head of `self` to a value of type `T`
+    /// and returns the value.  The endianness of the resulting value
+    /// is flipped if necessary.  The endianness of the bytes is
+    /// specified in `endian`.
     fn encastf<T>(&self, endian: Endian) -> Option<T>
     where
 	T: Cast + Flip;
 
     /// Decodes the bytes at the head of `self` to value(s) of type
-    /// `T` and fill `slice` with the result.  The endianness of the
-    /// resulting value(s) is not flipped.
+    /// `T` and fill `slice` with the value(s).  It returns the number
+    /// of decoded bytes.  The endianness of the resulting value(s) is
+    /// not flipped.
     fn encasts<T>(&self, slice: &mut [T]) -> Option<usize>
     where
 	T: Cast;
 
     /// Decodes the bytes at the head of `self` to value(s) of type
-    /// `T` and fill `slice` with the result.  The endianness of the
-    /// resulting value(s) is flipped if necessary.  The endianness of
-    /// the bytes is specified in `endian`.
+    /// `T` and fill `slice` with the value(s).  It returns the number
+    /// of decoded bytes.  The endianness of the resulting value(s) is
+    /// flipped if necessary.  The endianness of the bytes is
+    /// specified in `endian`.
     fn encastsf<T>(&self, slice: &mut [T], endian: Endian) -> Option<usize>
     where
 	T: Cast + Flip;
 
     /// Decodes the bytes at the head of `self` to a vector of
-    /// value(s) of type `T`.  The endianness of the resulting
-    /// value(s) is not flipped.  The number of elements in the
-    /// resulting vecotr is specified in `nelem`.
+    /// value(s) of type `T` and returns the vector.  The endianness
+    /// of the resulting value(s) is not flipped.  The number of
+    /// elements in the resulting vecotr is specified in `nelem`.
     #[cfg(feature = "std")]
     fn encastv<T>(&self, nelem: usize) -> Option<Vec<T>>
     where
 	T: Cast;
 
     /// Decodes the bytes at the head of `self` to a vector of
-    /// value(s) of type `T`.  The endianness of the resulting
-    /// value(s) is flipped if necessary.  The endianness of the bytes
-    /// is specified in `endian`.  The number of elements in the
-    /// resulting vecotr is specified in `nelem`.
+    /// value(s) of type `T` and returns the vector.  The endianness
+    /// of the resulting value(s) is flipped if necessary.  The
+    /// endianness of the bytes is specified in `endian`.  The number
+    /// of elements in the resulting vecotr is specified in `nelem`.
     #[cfg(feature = "std")]
     fn encastvf<T>(&self, nelem: usize, endian: Endian) -> Option<Vec<T>>
     where

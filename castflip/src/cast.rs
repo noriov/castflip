@@ -58,21 +58,21 @@
 /// let bytes1: [u8; 16] = [0x7F, 0x45, 0x4C, 0x46, 0x02, 0x01, 0x01, 0x00,
 ///                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00];
 ///
-/// // Decode bytes `bytes1` to variable `id_hdr`.
-/// let id_hdr: ElfIdHdr = bytes1.encast()?;
+/// // Decode bytes `bytes1` to variable `id_hdr2`.
+/// let id_hdr2: ElfIdHdr = bytes1.encast()?;
 ///
-/// // Encode the resulting `id_hdr` to bytes `bytes3`.
+/// // Encode the resulting `id_hdr2` to bytes `bytes3`.
 /// let mut bytes3 = [0_u8; 16];
-/// let size3 = bytes3.decast(&id_hdr)?;
+/// let size3 = bytes3.decast(&id_hdr2)?;
 ///
-/// // Check the results (id_hdr)
-/// assert_eq!(id_hdr.magic, *b"\x7FELF"); // Magic Number: 7F 45 4C 46
-/// assert_eq!(id_hdr.class, 2);           // File Class: 64-bit
-/// assert_eq!(id_hdr.encoding, 1);        // Encoding: Little-Endian
-/// assert_eq!(id_hdr.version, 1);         // Version 1
-/// assert_eq!(id_hdr.os_abi, 0);          // OS/ABI: unspecified
-/// assert_eq!(id_hdr.abi_ver, 0);         // ABI Ver: unspecified
-/// assert_eq!(id_hdr.pad, [0_u8; 7]);     // Padding
+/// // Check the results (id_hdr2)
+/// assert_eq!(id_hdr2.magic, *b"\x7FELF"); // Magic Number: 7F 45 4C 46
+/// assert_eq!(id_hdr2.class, 2);           // File Class: 64-bit
+/// assert_eq!(id_hdr2.encoding, 1);        // Encoding: Little-Endian
+/// assert_eq!(id_hdr2.version, 1);         // Version 1
+/// assert_eq!(id_hdr2.os_abi, 0);          // OS/ABI: unspecified
+/// assert_eq!(id_hdr2.abi_ver, 0);         // ABI Ver: unspecified
+/// assert_eq!(id_hdr2.pad, [0_u8; 7]);     // Padding
 ///
 /// // Check the results (bytes3)
 /// assert_eq!(size3, 16);

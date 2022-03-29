@@ -24,9 +24,8 @@
 /// For convenience, their short aliases are exported as
 /// [`NE`], [`SE`], [`LE`] and [`BE`], respectively.
 ///
-/// The purpose of enum `Endian` is to specify the endianness of input
-/// / output bytes of the methods to `encast` or `decast` data with
-/// `endian-flip`ping.
+/// The purpose of enum `Endian` is to specify the endianness of the
+/// bytes to be `encast`ed or `decast`ed in the arguments of methods.
 ///
 /// # Example
 ///
@@ -35,15 +34,15 @@
 /// ```
 /// use castflip::Endian;
 ///
-/// let endian = Endian::Native.absolute();
-/// let endian_name = endian.name();
+/// let abs_endian = Endian::Native.absolute();
+/// let abs_name = abs_endian.name();
 ///
 /// if cfg!(target_endian = "little") {
-///     assert_eq!(endian, Endian::Little);
-///     assert_eq!(endian_name, "Little");
+///     assert_eq!(abs_endian, Endian::Little);
+///     assert_eq!(abs_name, "Little");
 /// } else if cfg!(target_endian = "big") {
-///     assert_eq!(endian, Endian::Big);
-///     assert_eq!(endian_name, "Big");
+///     assert_eq!(abs_endian, Endian::Big);
+///     assert_eq!(abs_name, "Big");
 /// # } else {
 /// #   panic!();
 /// }
@@ -91,7 +90,7 @@ pub enum Endian {
 
 
 impl Endian {
-    /// Returns the corresponding relative endian.
+    /// Returns the corresponding relative endianness.
     ///
     /// ```
     /// use castflip::Endian;
@@ -130,7 +129,7 @@ impl Endian {
 	}
     }
 
-    /// Returns the corresponding absolute endian.
+    /// Returns the corresponding absolute endianness.
     ///
     /// ```
     /// use castflip::Endian;

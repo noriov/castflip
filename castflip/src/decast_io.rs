@@ -64,9 +64,11 @@ use crate::experimental::AsifBytes;
 /// a number of bytes and writes to I/O.  The type of the value(s) can
 /// be explicitly specified as the generic type parameter of its
 /// method or simply omitted because the Rust compiler can infer from
-/// the argument.  The endianness of resulting value(s) is flipped
-/// when required and necessary.  Currently, only an implementation
-/// for trait `std::io::Write` is provided.
+/// the argument.  The methods whose name contain 's' (= slice) or 'v'
+/// (= vector) `decast` to a series of structured binary data.  The
+/// methods whose names end with 'f' flip the endianness of the
+/// results.  Currently, only an implementation for trait
+/// `std::io::Write` is provided.
 ///
 /// The output `self` should have enough room to encode to the
 /// specified number of value(s) of the specified type `T`.  If there
@@ -160,7 +162,7 @@ pub trait DecastIO {
     /// Encodes value(s) in `slice` of type `T` to bytes and writes
     /// them to output `self`.  The endianness of the resulting bytes
     /// is not flipped.
-    /// (This method will be replaced by `decasts`)
+    /// (This method is replaced by `decasts`)
     fn decastv<T>(&mut self, slice: &[T]) -> Result<usize>
     where
 	T: Cast;
@@ -169,7 +171,7 @@ pub trait DecastIO {
     /// them to output `self`.  The endianness of the resulting bytes
     /// is flipped if necessary.  The endianness of the resulting
     /// bytes is specified in `endian`.
-    /// (This method will be replaced by `decastsf`)
+    /// (This method is replaced by `decastsf`)
     fn decastvf<T>(&mut self, slice: &[T], endian: Endian) -> Result<usize>
     where
 	T: Cast + Flip;

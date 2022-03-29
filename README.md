@@ -7,7 +7,7 @@ variables, arrays and structures in little-endian and big-endian.
 * License: <https://spdx.org/licenses/MIT-0.html>
 * How to use: Add the following line to Cargo.toml:
 
-```
+```toml
 [dependencies]
 castflip = { version = "0.1" }
 ```

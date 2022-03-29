@@ -56,9 +56,11 @@ use crate::{Cast, DecastMem, Endian, Flip};
 /// # Description
 ///
 /// All functions in trait `DecastArg` `decast` one or more variables
-/// to a number of bytes on memory.  The endianness of resulting
-/// value(s) is flipped when required and necessary.  Currently, only
-/// an implementation for `[u8]` is provided.
+/// to a number of bytes on memory.  The methods whose name contain
+/// 's' (= slice) or 'v' (= vector) `decast` to a series of structured
+/// binary data.  The methods whose names end with 'f' flip the
+/// endianness of the results.  Currently, only an implementation for
+/// `[u8]` is provided.
 ///
 /// The size of argument `bytes` should be larger than or equal to the
 /// specified number of value(s) of the specified type `T`.  If there
@@ -104,6 +106,7 @@ pub trait DecastArg: Cast {
     /// Encodes the slice of value(s) of type `T` pointed by `slice`
     /// to bytes and stores them at the head of `bytes`.  The
     /// endianness of the resulting bytes is not flipped.
+    /// (This method is replaced by `decasts`)
     fn decastv(bytes: &mut [u8], slice: &[Self]) -> Option<usize>;
 
     /// Encodes the slice of value(s) of type `T` pointed by `slice`
@@ -111,6 +114,7 @@ pub trait DecastArg: Cast {
     /// endianness of the resulting bytes is flipped if necessary.
     /// The endianness of the resulting bytes is specified in
     /// `endian`.
+    /// (This method is replaced by `decastsf`)
     fn decastvf(bytes: &mut [u8], slice: &[Self], endian: Endian)
 		-> Option<usize>
     where

@@ -99,11 +99,11 @@ use crate::Endian;
 ///
 /// # Example 2
 ///
-/// Trait `Flip` has two types of methods.  Typically, they are called
+/// In typical cases, the methods defined in trait `Flip` are called
 /// automatically inside this crate.  However, users may need to call
 /// them explicitly in certain situations, e.g. to flip the endianness
-/// of union types.  The example below shows how to use the methods of
-/// trait `Flip`.
+/// of union types.  As the example below shows, trait `Flip` has two
+/// types of methods: `flip_val` and `flip_var`.
 ///
 /// ```
 /// # fn main() { test(); }
@@ -137,14 +137,14 @@ use crate::Endian;
 /// ```
 ///
 /// In the example above, method `flip_val` returns a value.  If the
-/// specified `endian` is the same with the endianness of the target
-/// system, it returns exactly the same value with `self`.  Otherwise,
+/// specified `endian` is the same as the endianness of the target
+/// system, it returns exactly the same value as `self`.  Otherwise,
 /// it returns the `endian-flip`ped value of `self`.  In contrast,
 /// method `flip_var` flips the endianness of variable `self` if the
 /// specified `endian` is different from the endianness of the target
-/// system.  Here, [`LE`] is an alias of [`Endian`]`::Little`, which
-/// means Little-Endian.  [`BE`] is an alias of [`Endian`]`::Big`,
-/// which means Big-Endian.
+/// system.  Note that [`LE`] is an alias of [`Endian`]`::Little`,
+/// which means Little-Endian.  And [`BE`] is an alias of
+/// [`Endian`]`::Big`, which means Big-Endian.
 ///
 pub trait Flip: Sized {
     /// Returns the endian-flipped value of `self`.
@@ -152,7 +152,7 @@ pub trait Flip: Sized {
 
     /// Returns the endian-flipped value of `self` if `endian` is
     /// different from the endianness of the target system.
-    /// Otherwise, returns the same value with `self`.
+    /// Otherwise, returns exactly the same value as `self`.
     fn flip_val(&self, endian: Endian) -> Self {
 	if !endian.need_swap() {
 	    unsafe {
