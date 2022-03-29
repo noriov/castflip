@@ -219,4 +219,10 @@ impl<T: Flip, const N: usize> Flip for [T; N] {
 	    ptr::read(array.as_ptr() as *const [T; N])
 	}
     }
+
+    fn flip_var_swapped(&mut self) {
+	for elem in self {
+	    elem.flip_var_swapped();
+	}
+    }
 }
