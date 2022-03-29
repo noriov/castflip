@@ -110,6 +110,7 @@ pub trait DecastMem {
     /// them at the head of `self`.  The endianness of the resulting
     /// bytes is not flipped.
     /// (This method is replaced by `decasts`)
+    #[cfg(feature = "std")]
     fn decastv<T>(&mut self, slice: &[T]) -> Option<usize>
     where
 	T: Cast;
@@ -119,6 +120,7 @@ pub trait DecastMem {
     /// bytes is flipped if necessary.  The endianness of the
     /// resulting bytes is specified in `endian`.
     /// (This method is replaced by `decastsf`)
+    #[cfg(feature = "std")]
     fn decastvf<T>(&mut self, slice: &[T], endian: Endian) -> Option<usize>
     where
 	T: Cast + Flip;
@@ -191,6 +193,7 @@ impl DecastMem for [u8]
 	}
     }
 
+    #[cfg(feature = "std")]
     fn decastv<T>(&mut self, slice: &[T]) -> Option<usize>
     where
 	T: Cast
@@ -198,6 +201,7 @@ impl DecastMem for [u8]
 	self.decasts(slice)
     }
 
+    #[cfg(feature = "std")]
     fn decastvf<T>(&mut self, slice: &[T], endian: Endian) -> Option<usize>
     where
 	T: Cast + Flip
