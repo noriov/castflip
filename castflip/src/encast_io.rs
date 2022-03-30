@@ -251,6 +251,7 @@ where
 // (2) Section "Relationship with ManuallyDrop" of mem::forget at
 // https://doc.rust-lang.org/stable/std/mem/fn.forget.html#relationship-with-manuallydrop
 //
+#[inline]
 unsafe fn new_vec<T, F>(nelem: usize, mut fill_new_slice: F) -> Result<Vec<T>>
 where
     T: Cast,

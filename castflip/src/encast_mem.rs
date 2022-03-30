@@ -216,6 +216,7 @@ impl EncastMem for [u8]
 // (2) Section "Relationship with ManuallyDrop" of mem::forget at
 // https://doc.rust-lang.org/stable/std/mem/fn.forget.html#relationship-with-manuallydrop
 //
+#[inline]
 #[cfg(feature = "std")]
 unsafe fn new_vec<T, F>(nelem: usize, fill_new_slice: F) -> Option<Vec<T>>
 where
