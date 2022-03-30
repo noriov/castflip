@@ -156,7 +156,7 @@ pub trait Flip: Sized {
     fn flip_val(&self, endian: Endian) -> Self {
 	if !endian.need_swap() {
 	    unsafe {
-		ptr::read(self)
+		ptr::read(self)  // Note: Flip is not a subtrait of Copy.
 	    }
 	} else {
 	    self.flip_val_swapped()
@@ -213,10 +213,34 @@ impl<T: Flip, const N: usize> Flip for [T; N] {
 	unsafe {
 	    let mut array: [MaybeUninit<T>; N] =
 		MaybeUninit::uninit().assume_init();
+
 	    for i in 0 .. N {
 		array[i] = MaybeUninit::new(self[i].flip_val_swapped());
 	    }
+
 	    ptr::read(array.as_ptr() as *const [T; N])
+
+	    // (1) The reason why we use `as` to cast between types is:
+	    //
+	    // The Rust compiler does not allow the following expression
+	    //
+	    //     core::mem::transmute::<_, [T; N]>(array)
+	    //
+	    // because [T; N] is considered as dependently-sized type in
+	    // this context.  It seems that const N is not a real const.
+
+	    // (2) The reason why we use ptr::read() to return the
+	    //     resulting value is:
+	    //
+	    // The Rust compiler does not allow the following expression
+	    //
+	    //     *(array.as_ptr() as *const [T; N])
+	    //
+	    // because Flip is not a subtrait of Copy.
+	    //
+	    // BTW: ptr::read() calls copy_nonoverlapping() inside it.
+	    // We expect the number of copying will be reduced by
+	    // the Rust optimizer.
 	}
     }
 
