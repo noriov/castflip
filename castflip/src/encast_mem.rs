@@ -139,9 +139,9 @@ impl EncastMem for [u8]
 	// Decode a value of type T from `bytes`.
 	let mut val = MaybeUninit::<T>::uninit();
 	unsafe {
-	    ptr::copy_nonoverlapping(bytes.as_ptr(),
-				     val.as_mut_ptr() as *mut u8,
-				     mem::size_of::<T>());
+	    ptr::copy_nonoverlapping::<u8>(bytes.as_ptr(),
+					   val.as_mut_ptr() as *mut u8,
+					   mem::size_of::<T>());
 	    Some(val.assume_init())
 	}
 
@@ -167,9 +167,9 @@ impl EncastMem for [u8]
 	let bytes = self.get(0 .. mem::size_of::<T>() * slice.len())?;
 
 	unsafe {
-	    ptr::copy_nonoverlapping(bytes.as_ptr(),
-				     slice.as_mut_ptr() as *mut u8,
-				     bytes.len());
+	    ptr::copy_nonoverlapping::<u8>(bytes.as_ptr(),
+					   slice.as_mut_ptr() as *mut u8,
+					   bytes.len());
 	}
 
 	Some(bytes.len())

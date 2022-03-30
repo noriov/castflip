@@ -136,9 +136,9 @@ impl DecastMem for [u8]
 	let bytes = self.get_mut(0 .. mem::size_of::<T>())?;
 
 	unsafe {
-	    ptr::copy_nonoverlapping(val_ptr as *const T as *const u8,
-				     bytes.as_mut_ptr(),
-				     mem::size_of::<T>());
+	    ptr::copy_nonoverlapping::<u8>(val_ptr as *const T as *const u8,
+					   bytes.as_mut_ptr(),
+					   mem::size_of::<T>());
 	}
 
 	Some(mem::size_of::<T>())
@@ -168,9 +168,9 @@ impl DecastMem for [u8]
 	let bytes = self.get_mut(0 .. mem::size_of::<T>() * slice.len())?;
 
 	unsafe {
-	    ptr::copy_nonoverlapping(slice.as_ptr() as *const u8,
-				     bytes.as_mut_ptr(),
-				     bytes.len());
+	    ptr::copy_nonoverlapping::<u8>(slice.as_ptr() as *const u8,
+					   bytes.as_mut_ptr(),
+					   bytes.len());
 	}
 
 	Some(bytes.len())
