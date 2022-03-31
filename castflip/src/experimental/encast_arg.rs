@@ -130,19 +130,19 @@ where
 {
     fn encast(bytes: &[u8]) -> Option<Self>
     {
-	bytes.encast()
+	bytes.encast::<Self>()
     }
 
     fn encastf(bytes: &[u8], endian: Endian) -> Option<Self>
     where
 	Self: Flip
     {
-	bytes.encastf(endian)
+	bytes.encastf::<Self>(endian)
     }
 
     fn encasts(bytes: &[u8], slice: &mut [Self]) -> Option<usize>
     {
-	bytes.encasts(slice)
+	bytes.encasts::<Self>(slice)
     }
 
     fn encastsf(bytes: &[u8], slice: &mut [Self], endian: Endian)
@@ -150,13 +150,13 @@ where
     where
 	Self: Flip
     {
-	bytes.encastsf(slice, endian)
+	bytes.encastsf::<Self>(slice, endian)
     }
 
     #[cfg(feature = "alloc")]
     fn encastv(bytes: &[u8], nelem: usize) -> Option<Vec<Self>>
     {
-	bytes.encastv(nelem)
+	bytes.encastv::<Self>(nelem)
     }
 
     #[cfg(feature = "alloc")]
@@ -165,6 +165,6 @@ where
     where
 	Self: Flip
     {
-	bytes.encastvf(nelem, endian)
+	bytes.encastvf::<Self>(nelem, endian)
     }
 }

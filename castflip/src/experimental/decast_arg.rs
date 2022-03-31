@@ -130,19 +130,19 @@ where
 {
     fn decast(bytes: &mut [u8], val_ptr: &T) -> Option<usize>
     {
-	bytes.decast(val_ptr)
+	bytes.decast::<Self>(val_ptr)
     }
 
     fn decastf(bytes: &mut [u8], val_ptr: &T, endian: Endian) -> Option<usize>
     where
 	Self: Flip
     {
-	bytes.decastf(val_ptr, endian)
+	bytes.decastf::<Self>(val_ptr, endian)
     }
 
     fn decasts(bytes: &mut [u8], slice: &[Self]) -> Option<usize>
     {
-	bytes.decasts(slice)
+	bytes.decasts::<Self>(slice)
     }
 
     fn decastsf(bytes: &mut [u8], slice: &[Self], endian: Endian)
@@ -150,13 +150,13 @@ where
     where
 	Self: Flip
     {
-	bytes.decastsf(slice, endian)
+	bytes.decastsf::<Self>(slice, endian)
     }
 
     #[cfg(feature = "alloc")]
     fn decastv(bytes: &mut [u8], slice: &[T]) -> Option<usize>
     {
-	bytes.decastv(slice)
+	bytes.decastv::<Self>(slice)
     }
 
     #[cfg(feature = "alloc")]
@@ -164,6 +164,6 @@ where
     where
 	Self: Flip
     {
-	bytes.decastvf(slice, endian)
+	bytes.decastvf::<Self>(slice, endian)
     }
 }

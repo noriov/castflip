@@ -156,9 +156,9 @@ impl DecastMem for [u8]
 	T: Cast + Flip
     {
 	if !endian.need_swap() {
-	    self.decast(val_ptr)
+	    self.decast::<T>(val_ptr)
 	} else {
-	    self.decast(&val_ptr.flip_val_swapped())
+	    self.decast::<T>(&val_ptr.flip_val_swapped())
 	}
     }
 
@@ -182,12 +182,12 @@ impl DecastMem for [u8]
 	T: Cast + Flip
     {
 	if !endian.need_swap() {
-	    self.decasts(slice)
+	    self.decasts::<T>(slice)
 	} else {
 	    let bytes = self.get_mut(0 .. mem::size_of::<T>() * slice.len())?;
 	    let mut off = 0;
 	    for elem in slice {
-		bytes[off ..].decast(&elem.flip_val_swapped())?;
+		bytes[off ..].decast::<T>(&elem.flip_val_swapped())?;
 		off += mem::size_of::<T>();
 	    }
 	    Some(off)
@@ -199,7 +199,7 @@ impl DecastMem for [u8]
     where
 	T: Cast
     {
-	self.decasts(slice)
+	self.decasts::<T>(slice)
     }
 
     #[cfg(feature = "alloc")]
@@ -207,6 +207,6 @@ impl DecastMem for [u8]
     where
 	T: Cast + Flip
     {
-	self.decastsf(slice, endian)
+	self.decastsf::<T>(slice, endian)
     }
 }

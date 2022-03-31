@@ -197,7 +197,7 @@ where
     where
 	T: Cast + Flip
     {
-	let mut val: T = self.encast()?;
+	let mut val = self.encast::<T>()?;
 	val.flip_var(endian);
 	Ok(val)
     }
@@ -216,7 +216,7 @@ where
     where
 	T: Cast + Flip
     {
-	let size = self.encasts(slice)?;
+	let size = self.encasts::<T>(slice)?;
 	for elem in slice {
 	    elem.flip_var(endian);
 	}
