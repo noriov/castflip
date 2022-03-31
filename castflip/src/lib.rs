@@ -282,21 +282,31 @@ and `decast` to file, network and memory.
 
 ## Notes on `#![no_std]`
 
-This crate has a feature `std` that is enabled by default.  To build
-this crate for no_std environments, add the following dependencies in
-`Cargo.toml`.  With the current version of this crate, [`EncastMem`]
-and [`DecastMem`] except methods `encastv` and `encastvf` are
-available.
+This crate has a feature `std` that is enabled by default.
 
-However, because we do not have good no_std environments nor good
-experiences, we are not sure that the current version of this crate
-provides sufficient features for no_std environments.  Feedbacks are
-welcome!
+To build this crate for a no_std environment without an allocator, add
+the following dependencies in `Cargo.toml`.  With the current version
+of this crate, [`EncastMem`] and [`DecastMem`] except methods
+`encastv` and `encastvf` are available.
 
 ```toml
 [dependencies]
 castflip = { version = "0.1", default-features = false }
 ```
+
+To build this crate for a no_std environment with an allocator, add
+the following dependencies in `Cargo.toml`.  With the current version
+of this crate, [`EncastMem`] and [`DecastMem`] including methods
+`encastv` and `encastvf` are available.
+
+```toml
+[dependencies]
+castflip = { version = "0.1", default-features = false, features = ["alloc"] }
+```
+
+Because we do not have good no_std environments nor good experiences,
+we are not sure that the current version of this crate provides
+sufficient features for no_std environments.  Feedbacks are welcome!
 
 For more information, please see the description of each trait and
 enum listed below.

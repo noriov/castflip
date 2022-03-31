@@ -107,7 +107,7 @@ pub trait DecastArg: Cast {
     /// to bytes and stores them at the head of `bytes`.  The
     /// endianness of the resulting bytes is not flipped.
     /// (This method is replaced by `decasts`)
-    #[cfg(feature = "std")]
+    #[cfg(feature = "alloc")]
     fn decastv(bytes: &mut [u8], slice: &[Self]) -> Option<usize>;
 
     /// Encodes the slice of value(s) of type `T` pointed by `slice`
@@ -116,7 +116,7 @@ pub trait DecastArg: Cast {
     /// The endianness of the resulting bytes is specified in
     /// `endian`.
     /// (This method is replaced by `decastsf`)
-    #[cfg(feature = "std")]
+    #[cfg(feature = "alloc")]
     fn decastvf(bytes: &mut [u8], slice: &[Self], endian: Endian)
 		-> Option<usize>
     where
@@ -153,13 +153,13 @@ where
 	bytes.decastsf(slice, endian)
     }
 
-    #[cfg(feature = "std")]
+    #[cfg(feature = "alloc")]
     fn decastv(bytes: &mut [u8], slice: &[T]) -> Option<usize>
     {
 	bytes.decastv(slice)
     }
 
-    #[cfg(feature = "std")]
+    #[cfg(feature = "alloc")]
     fn decastvf(bytes: &mut [u8], slice: &[T], endian: Endian) -> Option<usize>
     where
 	Self: Flip

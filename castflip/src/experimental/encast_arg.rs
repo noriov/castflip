@@ -1,4 +1,6 @@
 use core::option::Option;
+#[cfg(feature = "alloc")] extern crate alloc;
+#[cfg(feature = "alloc")] use alloc::vec::Vec;
 
 use crate::{Cast, EncastMem, Endian, Flip};
 #[cfg(doc)] use crate::BE;
@@ -106,7 +108,7 @@ pub trait EncastArg: Cast {
     /// value(s) of type `T` and returns the vector.  The endianness
     /// of the resulting value(s) is not flipped.  The number of
     /// elements in the resulting vecotr is specified in `nelem`.
-    #[cfg(feature = "std")]
+    #[cfg(feature = "alloc")]
     fn encastv(bytes: &[u8], nelem: usize) -> Option<Vec<Self>>;
 
     /// Decodes the bytes at the head of `bytes` to a vector of
@@ -114,7 +116,7 @@ pub trait EncastArg: Cast {
     /// of the resulting value(s) is flipped if necessary.  The
     /// endianness of the bytes is specified in `endian`.  The number
     /// of elements in the resulting vecotr is specified in `nelem`.
-    #[cfg(feature = "std")]
+    #[cfg(feature = "alloc")]
     fn encastvf(bytes: &[u8], nelem: usize, endian: Endian)
 		-> Option<Vec<Self>>
     where
@@ -151,13 +153,13 @@ where
 	bytes.encastsf(slice, endian)
     }
 
-    #[cfg(feature = "std")]
+    #[cfg(feature = "alloc")]
     fn encastv(bytes: &[u8], nelem: usize) -> Option<Vec<Self>>
     {
 	bytes.encastv(nelem)
     }
 
-    #[cfg(feature = "std")]
+    #[cfg(feature = "alloc")]
     fn encastvf(bytes: &[u8], nelem: usize, endian: Endian)
 		-> Option<Vec<Self>>
     where

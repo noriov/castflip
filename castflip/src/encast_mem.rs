@@ -1,4 +1,7 @@
 use core::option::Option::{self, Some};
+#[cfg(feature = "alloc")] extern crate alloc;
+#[cfg(feature = "alloc")] use alloc::vec::Vec;
+
 use core::mem::MaybeUninit;
 use core::{mem, ptr};
 
@@ -111,7 +114,7 @@ pub trait EncastMem {
     /// value(s) of type `T` and returns the vector.  The endianness
     /// of the resulting value(s) is not flipped.  The number of
     /// elements in the resulting vecotr is specified in `nelem`.
-    #[cfg(feature = "std")]
+    #[cfg(feature = "alloc")]
     fn encastv<T>(&self, nelem: usize) -> Option<Vec<T>>
     where
 	T: Cast;
@@ -121,7 +124,7 @@ pub trait EncastMem {
     /// of the resulting value(s) is flipped if necessary.  The
     /// endianness of the bytes is specified in `endian`.  The number
     /// of elements in the resulting vecotr is specified in `nelem`.
-    #[cfg(feature = "std")]
+    #[cfg(feature = "alloc")]
     fn encastvf<T>(&self, nelem: usize, endian: Endian) -> Option<Vec<T>>
     where
 	T: Cast + Flip;
@@ -184,7 +187,7 @@ impl EncastMem for [u8]
 	Some(size)
     }
 
-    #[cfg(feature = "std")]
+    #[cfg(feature = "alloc")]
     fn encastv<T>(&self, nelem: usize) -> Option<Vec<T>>
     where
 	T: Cast
@@ -195,7 +198,7 @@ impl EncastMem for [u8]
 	}
     }
 
-    #[cfg(feature = "std")]
+    #[cfg(feature = "alloc")]
     fn encastvf<T>(&self, nelem: usize, endian: Endian) -> Option<Vec<T>>
     where
 	T: Cast + Flip
@@ -217,7 +220,7 @@ impl EncastMem for [u8]
 // https://doc.rust-lang.org/stable/std/mem/fn.forget.html#relationship-with-manuallydrop
 //
 #[inline]
-#[cfg(feature = "std")]
+#[cfg(feature = "alloc")]
 unsafe fn new_vec<T, F>(nelem: usize, fill_new_slice: F) -> Option<Vec<T>>
 where
     T: Cast,
