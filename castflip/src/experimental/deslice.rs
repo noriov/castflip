@@ -1,4 +1,5 @@
-use core::option::Option::{self, Some, None};
+#[cfg(not(feature = "std"))] use core::option::Option::{self, Some, None};
+
 use core::mem;
 
 use crate::Cast;

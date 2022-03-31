@@ -1,4 +1,5 @@
-use core::option::Option;
+#[cfg(not(feature = "std"))] use core::option::Option;
+
 use core::slice;
 
 use crate::Cast;

@@ -1,4 +1,4 @@
-use core::option::Option::{self, Some};
+#[cfg(not(feature = "std"))] use core::option::Option::{self, Some};
 #[cfg(feature = "alloc")] extern crate alloc;
 #[cfg(feature = "alloc")] use alloc::vec::Vec;
 
