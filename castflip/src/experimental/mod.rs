@@ -1,23 +1,19 @@
 //!
 //! Defines experimental traits and historical traits.
 //!
-//! Experimental traits.  They are used internally in this crate.
+//! Experimental trait.  It is used internally in this crate.
 //!
 //! - [`AsifBytes`] converts a reference to a variable or a slice into
 //!   a phantom reference to a slice of bytes without copying data.
 //!
-//! - [`FlipUnsized`] provides method `flip_var` for a slice and
-//!   a tuple.
-//!
 //! Historical traits.  Because they are not used now, they may be
 //! removed in a future release.
 //!
-//! - [`AsBytes`] is an older version of [`AsifBytes`].  It is
-//!   deprecated because one of its method names is conflicted with
-//!   the one of `mem::MaybeUninit`.  In order to support method
-//!   `as_bytes_mut` for `mem::MaybeUninit`, and to avoid possible
-//!   other name conflict, [`AsBytes`] is renamed to [`AsifBytes`].
-//!   It will be removed in a future release.
+//! - [`EncastArg`] and [`DecastArg`] provide some older versions of
+//!   APIs of this crate.
+//!
+//! - [`FlipUnsized`] provides method `flip_var` for a slice and
+//!   a tuple.
 //!
 //! - [`Deslice`], [`Enslice`] and [`Reslice`] are general-purpose
 //!   ancestors of [`AsifBytes`].  They convert a reference to a
@@ -26,8 +22,12 @@
 //!   it is useful in certain situations, its use cases will be
 //!   limited because its methods are considered unsafe.
 //!
-//! - [`EncastArg`] and [`DecastArg`] provide some older versions of
-//!   APIs of this crate.
+//! - [`AsBytes`] is an older version of [`AsifBytes`].  It is
+//!   deprecated because one of its method names is conflicted with
+//!   the one of `mem::MaybeUninit`.  In order to support method
+//!   `as_bytes_mut` for `mem::MaybeUninit`, and to avoid possible
+//!   other name conflict, [`AsBytes`] is renamed to [`AsifBytes`].
+//!   It will be removed in a future release.
 //!
 
 

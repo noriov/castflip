@@ -3,7 +3,7 @@ use core::mem;
 use std::io::{Read, Result};
 
 use crate::{Cast, Endian, Flip};
-use crate::experimental::{AsifBytes, FlipUnsized};
+use crate::experimental::AsifBytes;
 #[cfg(doc)] use crate::BE;
 
 
@@ -217,7 +217,9 @@ where
 	T: Cast + Flip
     {
 	let size = self.encasts(slice)?;
-	slice.flip_var(endian);
+	for elem in slice {
+	    elem.flip_var(endian);
+	}
 	Ok(size)
     }
 
@@ -235,8 +237,10 @@ where
     where
 	T: Cast + Flip
     {
-	let mut vec = self.encastv(nelem)?;
-	vec.flip_var(endian);
+	let mut vec = self.encastv::<T>(nelem)?;
+	for elem in &mut vec {
+	    elem.flip_var(endian);
+	}
 	Ok(vec)
     }
 }

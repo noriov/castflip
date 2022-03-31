@@ -6,7 +6,6 @@ use core::mem::MaybeUninit;
 use core::{mem, ptr};
 
 use crate::{Cast, Endian, Flip};
-use crate::experimental::FlipUnsized;
 #[cfg(doc)] use crate::BE;
 
 
@@ -183,7 +182,9 @@ impl EncastMem for [u8]
 	T: Cast + Flip
     {
 	let size = self.encasts(slice)?;
-	slice.flip_var(endian);
+	for elem in slice {
+	    elem.flip_var(endian);
+	}
 	Some(size)
     }
 
@@ -203,8 +204,10 @@ impl EncastMem for [u8]
     where
 	T: Cast + Flip
     {
-	let mut vec = self.encastv(nelem)?;
-	vec.flip_var(endian);
+	let mut vec = self.encastv::<T>(nelem)?;
+	for elem in &mut vec {
+	    elem.flip_var(endian);
+	}
 	Some(vec)
     }
 }
