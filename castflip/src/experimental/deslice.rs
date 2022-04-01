@@ -66,6 +66,18 @@ use crate::experimental::Reslice;
 ///
 /// [ELF]: https://en.wikipedia.org/wiki/Executable_and_Linkable_Format
 ///
+/// # Description
+///
+/// All methods in trait `Deslice` convert a reference to a slice into
+/// a phantom reference to a variable of the specified type without
+/// copying data.
+///
+/// The size of the original slice and the size of the phantom
+/// variable must be the same.  And the address of the original slice
+/// must satisfy the requirement of the alignment of the phantom
+/// variable.  If these requirements are satisfied, resulting
+/// reference is returned in `Some`().  Otherwise, None is returned.
+///
 /// # Safety
 ///
 /// We do not understand clearly what kind of problems could occur

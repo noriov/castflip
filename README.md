@@ -2,6 +2,7 @@
 
 Castflip is a Rust library for encoding and decoding numeric
 variables, arrays and structures in little-endian and big-endian.
+They can be nested and arranged in a series.
 
 * Documentation: <https://docs.rs/castflip/>
 * License: <https://spdx.org/licenses/MIT-0.html>
@@ -15,9 +16,9 @@ castflip = { version = "0.1" }
 Here we show an example below.  For more examples and documentation,
 please see <https://docs.rs/castflip/>.
 
-In this crate, the term `encast` means decoding a number of bytes to
-one or more values, the term `decast` means encoding one or more
-variables to a number of bytes, and the term `endian-flip` means
+Note: In this crate, the term `encast` means decoding a number of
+bytes to one or more values, the term `decast` means encoding one or
+more variables to a number of bytes, and the term `endian-flip` means
 flipping the endianness of value(s).
 
 # Example 1
@@ -73,8 +74,8 @@ in their argument.  [`BE`] is an alias of [`Endian`]`::Big`, which
 means Big-Endian.
 
 In addition to these traits, this crate has trait [`EncastIO`]
-providing methods to `encast` from I/O, and trait [`DecastIO`]
-providing methods to `decast` to I/O.
+providing methods to `encast` from [`io::Read`], and trait
+[`DecastIO`] providing methods to `decast` to [`io::Write`].
 
 Note: [UDP] is one of the fundamental protocols in the internet
 protocol suite.
@@ -99,3 +100,6 @@ For more examples and documentation, please see
 [`DecastMem`]: https://docs.rs/castflip/latest/castflip/trait.DecastMem.html
 [`EncastIO`]: https://docs.rs/castflip/latest/castflip/trait.EncastIO.html
 [`DecastIO`]: https://docs.rs/castflip/latest/castflip/trait.DecastIO.html
+
+[`io::Read`]: https://doc.rust-lang.org/std/io/trait.Read.html
+[`io::Write`]: https://doc.rust-lang.org/std/io/trait.Write.html

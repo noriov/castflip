@@ -44,6 +44,8 @@ use crate::Endian;
 /// methods do nothing (Nop = No operation).  See the description of
 /// trait [`NopFlip`] for more information.
 ///
+/// Also note that trait `Flip` is not a subtrait of trait `Copy`.
+///
 /// # Example 1
 ///
 /// In the example below, `#[derive(Flip)]` makes the value of
@@ -100,8 +102,8 @@ use crate::Endian;
 /// # Example 2
 ///
 /// In typical cases, the methods defined in trait `Flip` are called
-/// automatically inside this crate.  However, users may need to call
-/// them explicitly in certain situations, e.g. to flip the endianness
+/// automatically inside this crate.  However, they may need to be
+/// called manually in certain situations, e.g. to flip the endianness
 /// of union types.  As the example below shows, trait `Flip` has two
 /// types of methods: `flip_val` and `flip_var`.
 ///

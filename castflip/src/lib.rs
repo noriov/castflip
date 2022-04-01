@@ -2,10 +2,11 @@
 
 This crate provides methods for encoding and decoding numeric
 variables, arrays and structures in little-endian and big-endian.
+They can be nested and arranged in a series.
 
-In this crate, the term `encast` means decoding a number of bytes to
-one or more values, the term `decast` means encoding one or more
-variables to a number of bytes, and the term `endian-flip` means
+Note: In this crate, the term `encast` means decoding a number of
+bytes to one or more values, the term `decast` means encoding one or
+more variables to a number of bytes, and the term `endian-flip` means
 flipping the endianness of value(s).
 
 # Example 1
@@ -205,8 +206,8 @@ Trait [`EncastMem`] provides methods to `encast` from memory, and
 trait [`DecastMem`] provides methods to `decast` to memory.  The type
 of the value(s) can be explicitly specified as the generic type
 parameter of their methods or implicitly specified so that the Rust
-compiler can infer.  The methods whose name contain 'v' (= vector) or
-'s' (= slice) `encast` / `decast` a series of structured binary data,
+compiler can infer.  The methods whose name contain 's' (= slice) or
+'v' (= vector) `encast` / `decast` a series of structured binary data,
 and the methods whose names end with 'f' flip the endianness of the
 results.  The number of elements is specified in the argument of
 method `encastvf`.  The endianness of bytes is specified in their
@@ -250,11 +251,11 @@ required conditions are met.
 
 The methods defined in trait [`EncastMem`] returns [`Option`] and the
 methods defined in trait [`EncastIO`] returns [`io::Result`].  If
-successful, they return the resulting value(s) or size.  The
-endianness of the bytes in `self` is specified in the arguments of
-`encastf`, `encastsf` and `encastvf`.  The number of elements in the
-resulting vector is specified in the arguments of `encastv` and
-`encastvf`.
+successful, they return resulting value(s) for a value or a vector, or
+they return the number of bytes for a slice.  The endianness of the
+bytes in `self` is specified in the arguments of `encastf`, `encastsf`
+and `encastvf`.  The number of elements in the resulting vector is
+specified in the arguments of `encastv` and `encastvf`.
 
 ## List of methods defined in trait [`DecastMem`] and trait [`DecastIO`]
 
@@ -268,7 +269,8 @@ The methods defined in trait [`DecastMem`] returns [`Option`] and the
 methods defined in trait [`DecastIO`] returns [`io::Result`].  If
 successful, they return the number of resulting bytes.  The endianness
 of resulting bytes is specified in the arguments of `decastf` and
-`decastsf`.  (FYI: `decastv` and `decastvf` will be deprecated)
+`decastsf`.  (FYI: `decastv` and `decastvf` is renamed to `decasts`
+and `decastsf`, respectively)
 
 ## Notes on trait `EncastIO` and trait `DecastIO`
 
@@ -282,7 +284,7 @@ and `decast` to file, network and memory.
 
 ## Notes on `#![no_std]`
 
-This crate has a feature `std` that is enabled by default.
+This crate has features `std` and `alloc` that are enabled by default.
 
 To build this crate for a no_std environment without an allocator, add
 the following dependencies in `Cargo.toml`.  With the current version
@@ -303,6 +305,9 @@ of this crate, [`EncastMem`] and [`DecastMem`] including methods
 [dependencies]
 castflip = { version = "0.1", default-features = false, features = ["alloc"] }
 ```
+
+In both cases above, [`EncastIO`] and [`DecastIO`] cannot be used
+since they require `std::io`.
 
 Because we do not have good no_std environments nor good experiences,
 we are not sure that the current version of this crate provides

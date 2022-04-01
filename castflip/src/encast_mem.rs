@@ -10,7 +10,7 @@ use crate::{Cast, Endian, Flip};
 
 
 ///
-/// Defines methods to `encast` and `Flip` on memory.
+/// Defines methods to `encast` and `endian-flip` on memory.
 ///
 /// Note: In this crate, the term `encast` means decoding a number of
 /// bytes to one or more values, the term `decast` means encoding one
@@ -63,8 +63,7 @@ use crate::{Cast, Endian, Flip};
 /// compiler can infer it.  The methods whose name contain 's' (=
 /// slice) or 'v' (= vector) `encast` a series of structured binary
 /// data.  The methods whose names end with 'f' flip the endianness of
-/// the results.  Currently, only an implementation for `[u8]` is
-/// provided.
+/// the results.  Currently, an implementation for `[u8]` is provided.
 ///
 /// The size of `self` should be larger than or equal to the specified
 /// number of value(s) of the specified type `T`.  If there are enough

@@ -1,5 +1,6 @@
 use core::mem;
 use std::io::{Write, Result};
+#[cfg(doc)] use std::io;
 
 use crate::{Cast, Endian, Flip};
 use crate::experimental::AsifBytes;
@@ -7,7 +8,7 @@ use crate::experimental::AsifBytes;
 
 
 ///
-/// Defines methods to `decast` and `Flip` through `io::Write`
+/// Defines methods to `decast` and `endian-flip` through [`io::Write`].
 ///
 /// Note: In this crate, the term `encast` means decoding a number of
 /// bytes to one or more values, the term `decast` means encoding one
@@ -67,15 +68,16 @@ use crate::experimental::AsifBytes;
 /// the argument.  The methods whose name contain 's' (= slice) or 'v'
 /// (= vector) `decast` to a series of structured binary data.  The
 /// methods whose names end with 'f' flip the endianness of the
-/// results.  Currently, only an implementation for trait
-/// `std::io::Write` is provided.
+/// results.  Currently, an implementation for trait [`io::Write`] is
+/// provided.
 ///
 /// The output `self` should have enough room to encode to the
 /// specified number of value(s) of the specified type `T`.  If there
 /// is enough room, the specified variable(s) is/are encoded to bytes
 /// and written to output `self`.  If successful, the size of written
-/// bytes are returned in `Ok`().  If I/O error is detected,
-/// `Err`(`std::io::Error`) is returned.
+/// bytes is returned in `Ok`().  If I/O error is detected,
+/// `Err`([`io::Error`]) is returned.  The type of the return value is
+/// [`io::Result`].
 ///
 /// When argument `endian` is specified, the endianness of resulting
 /// bytes is flipped if necessary.

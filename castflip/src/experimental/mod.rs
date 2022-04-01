@@ -1,13 +1,13 @@
 //!
 //! Defines experimental traits and historical traits.
 //!
-//! Experimental trait.  It is used internally in this crate.
+//! An experimental trait.  It is used internally in this crate.
 //!
 //! - [`AsifBytes`] converts a reference to a variable or a slice into
 //!   a phantom reference to a slice of bytes without copying data.
 //!
-//! Historical traits.  Because they are not used now, they may be
-//! removed in a future release.
+//! Historical traits.  Because they are not used in recent releases,
+//! they may be removed in a future release.
 //!
 //! - [`EncastArg`] and [`DecastArg`] provide some older versions of
 //!   APIs of this crate.

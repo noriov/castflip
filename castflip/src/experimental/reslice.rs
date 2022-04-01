@@ -84,6 +84,18 @@ use crate::Cast;
 /// # }
 /// ```
 ///
+/// # Description
+///
+/// All methods in trait `Reslice` convert a reference to a slice into
+/// a phantom reference to a slice of the specified type without
+/// copying data.
+///
+/// The size of the original slice and the size of the phantom slice
+/// must be the same.  And the address of the original slice must
+/// satisfy the requirement of the alignment of the phantom slice.  If
+/// these requirements are satisfied, resulting reference is returned
+/// in `Some`().  Otherwise, None is returned.
+///
 /// # Safety
 ///
 /// We do not understand clearly what kind of problems could occur

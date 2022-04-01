@@ -1,6 +1,7 @@
 use core::mem::MaybeUninit;
 use core::mem;
 use std::io::{Read, Result};
+#[cfg(doc)] use std::io;
 
 use crate::{Cast, Endian, Flip};
 use crate::experimental::AsifBytes;
@@ -8,7 +9,7 @@ use crate::experimental::AsifBytes;
 
 
 ///
-/// Defines methods to `encast` and `Flip` through `io::Read`.
+/// Defines methods to `encast` and `endian-flip` through [`io::Read`].
 ///
 /// Note: In this crate, the term `encast` means decoding a number of
 /// bytes to one or more values, the term `decast` means encoding one
@@ -66,16 +67,16 @@ use crate::experimental::AsifBytes;
 /// compiler can infer it.  The methods whose name contain 's' (=
 /// slice) or 'v' (= vector) `encast` a series of structured binary
 /// data.  The methods whose names end with 'f' flip the endianness of
-/// the results.  Currently, only an implementation for trait
-/// `std::io::Read` is provided.
+/// the results.  Currently, an implementation for trait [`io::Read`]
+/// is provided.
 ///
 /// The input `self` should have enough bytes to decode to the
 /// specified number of value(s) of the specified type `T`.  If there
 /// are enough bytes, the required number of bytes are read from I/O
 /// and decoded to the specified type of value(s).  The remaining
 /// bytes in input `self` are untouched.  If successful, return value
-/// is enclosed in `Ok`().  If failed, `Err`(`std::io::Error`) is
-/// returned.
+/// is enclosed in `Ok`().  If failed, `Err`([`io::Error`]) is
+/// returned.  The type of the return value is [`io::Result`].
 ///
 /// When argument `endian` is specified, the endianness of value(s) is
 /// flipped if necessary.

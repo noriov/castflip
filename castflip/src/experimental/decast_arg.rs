@@ -59,8 +59,7 @@ use crate::{Cast, DecastMem, Endian, Flip};
 /// to a number of bytes on memory.  The methods whose name contain
 /// 's' (= slice) or 'v' (= vector) `decast` to a series of structured
 /// binary data.  The methods whose names end with 'f' flip the
-/// endianness of the results.  Currently, only an implementation for
-/// `[u8]` is provided.
+/// endianness of the results.
 ///
 /// The size of argument `bytes` should be larger than or equal to the
 /// specified number of value(s) of the specified type `T`.  If there

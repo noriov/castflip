@@ -119,10 +119,10 @@ use crate::Flip;
 /// # Example 2
 ///
 /// `#[derive(NopFlip)]` can be declared for a struct type in order to
-/// keep the original value.
-/// In the example below, a struct type containing a magic number
-/// which indicates whether native-endian or swapped-endian is
-/// declared as `NopFlip` to help debugging.
+/// keep the original value.  In the example below, `FatMagic` is a
+/// struct type.  It contains a magic number which indicates whether
+/// native-endian or swapped-endian.  Keeping the orignal value may be
+/// a help in certain situations.
 ///
 /// ```
 /// # fn main() { test(); }
@@ -187,13 +187,12 @@ use crate::Flip;
 /// fields: magic number (4 bytes) and the number of architectures in
 /// the file (4 bytes).
 ///
-/// In the example above, at first, method `encast` decodes the first
-/// 4 bytes in `bytes1` without endian-flipping to determine the
-/// endianness of `FatHeader`.  Then, method `encastf` decodes the
-/// first 8 bytes in `bytes1` to variable `fat_hdr2` of `FatHeader` by
-/// using the determined endianness.  Note that the first 4 bytes
-/// (i.e., magic number) are read twice in this example for
-/// simplicity.
+/// At first, method `encast` decodes the first 4 bytes in `bytes1`
+/// without endian-flipping to determine the endianness of
+/// `FatHeader`.  Then, method `encastf` decodes the first 8 bytes in
+/// `bytes1` to variable `fat_hdr2` of `FatHeader` by using the
+/// determined endianness.  Note that the first 4 bytes (i.e., magic
+/// number) are read twice in this example for simplicity.
 ///
 /// Note: [Mach-o] is a file format for executable files.
 /// It is used by most systems based on the Mach kernel.

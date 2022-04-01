@@ -69,6 +69,18 @@ use crate::experimental::Reslice;
 ///
 /// [ELF]: https://en.wikipedia.org/wiki/Executable_and_Linkable_Format
 ///
+/// # Description
+///
+/// All methods in trait `Enslice` convert a reference to a variable
+/// into a phantom reference to a slice of the specified type without
+/// copying data.
+///
+/// The size of the original variable and the size of the phantom
+/// slice must be the same.  And the address of the original variable
+/// must satisfy the requirement of the alignment of the phantom
+/// slice.  If these requirements are satisfied, resulting reference
+/// is returned in `Some`().  Otherwise, None is returned.
+///
 /// # Safety
 ///
 /// We do not understand clearly what kind of problems could occur
