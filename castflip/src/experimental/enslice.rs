@@ -1,4 +1,4 @@
-#[cfg(not(feature = "std"))] use core::option::Option;
+#[cfg(not(feature = "std"))] use core::prelude::rust_2021::*;
 
 use core::slice;
 
