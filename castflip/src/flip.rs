@@ -204,8 +204,8 @@ macro_rules! impl_flip_for_float {
     }
 }
 
-impl_flip_for_int!(u8, u16, u32, u64, u128, usize,
-		   i8, i16, i32, i64, i128, isize);
+impl_flip_for_int!(i8, i16, i32, i64, i128, isize,
+		   u8, u16, u32, u64, u128, usize);
 impl_flip_for_float!(f32, f64);
 
 
