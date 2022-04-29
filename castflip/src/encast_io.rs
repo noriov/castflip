@@ -4,7 +4,7 @@ use std::io::{Read, Result};
 #[cfg(doc)] use std::io;
 
 use crate::{Cast, Endian, Flip};
-use crate::experimental::AsifBytes;
+use crate::experimental::{AsifBytes, PushBulk};
 #[cfg(doc)] use crate::BE;
 
 
@@ -228,10 +228,13 @@ where
     where
 	T: Cast
     {
-	// Create a vector of type `T` filled with values decoded from `self`.
+	let mut vec: Vec<T> = Vec::new();
+
 	unsafe {
-	    new_vec(nelem, | new_slice | { self.encasts(new_slice) })
+	    vec.push_bulk(nelem, | new_slice | { self.encasts(new_slice) })?;
 	}
+
+	Ok(vec)
     }
 
     fn encastvf<T>(&mut self, nelem: usize, endian: Endian) -> Result<Vec<T>>
@@ -244,42 +247,4 @@ where
 	}
 	Ok(vec)
     }
-}
-
-
-//
-// References to understand the function below:
-//
-// (1) The description and the example of Vec::from_raw_parts at
-// https://doc.rust-lang.org/std/vec/struct.Vec.html#method.from_raw_parts
-//
-// (2) Section "Relationship with ManuallyDrop" of mem::forget at
-// https://doc.rust-lang.org/stable/std/mem/fn.forget.html#relationship-with-manuallydrop
-//
-#[inline]
-unsafe fn new_vec<T, F>(nelem: usize, mut fill_new_slice: F) -> Result<Vec<T>>
-where
-    T: Cast,
-    F: FnMut(&mut [T]) -> Result<usize>
-{
-    use core::mem::ManuallyDrop;
-    use core::slice;
-
-    // Create a vector with enough size of hidden area.
-    let mut vec1: Vec<T> = Vec::with_capacity(nelem);
-
-    // Fill hidden area with caller-supplied data.
-    // The hidden area is passed as an ephemeral slice (soon dropped).
-    fill_new_slice(
-	slice::from_raw_parts_mut(vec1.as_mut_ptr(),
-				  nelem))?;
-
-    // Prevent running vec1's destructor.
-    let mut vec1 = ManuallyDrop::new(vec1);
-
-    // Expose the hidden area by reassembling a new vector.
-    let (mut_ptr, capacity) = (vec1.as_mut_ptr(), vec1.capacity());
-    let vec2 = Vec::from_raw_parts(mut_ptr, nelem, capacity);
-
-    Ok(vec2)
 }
