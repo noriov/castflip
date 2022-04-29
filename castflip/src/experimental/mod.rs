@@ -6,8 +6,11 @@
 //! - [`AsifBytes`] converts a reference to a variable or a slice into
 //!   a phantom reference to a slice of bytes without copying data.
 //!
+//! - [`PushBulk`] defines a method to extend a vector, with
+//!   additional slots filled by the specified closure.
+//!
 //! Historical traits.  Because they are not used in recent releases,
-//! they may be removed in a future release.
+//! they will be removed when the version number is bumped up to 0.2.
 //!
 //! - [`EncastArg`] and [`DecastArg`] provide some older versions of
 //!   APIs of this crate.
@@ -41,16 +44,19 @@
 #[doc(hidden)] pub mod flip_unsized;
 #[doc(hidden)] pub mod reslice;
 
-// Experimental but internally used trait.
-#[allow(deprecated)] #[doc(inline)] pub use self::as_bytes::AsBytes;
-#[doc(inline)] pub use self::asif_bytes::AsifBytes;
+#[doc(hidden)] #[cfg(feature = "alloc")] pub mod push_bulk;
 
-// Experimental but historical traits.
+// Experimental but internally used trait.
+#[doc(inline)] pub use self::asif_bytes::AsifBytes;
+#[doc(inline)] #[cfg(feature = "alloc")] pub use self::push_bulk::PushBulk;
+
+// Historical traits.
 #[doc(inline)] pub use self::deslice::Deslice;
 #[doc(inline)] pub use self::enslice::Enslice;
 #[doc(inline)] pub use self::reslice::Reslice;
 
-// Historical traits.
 #[doc(inline)] pub use self::decast_arg::DecastArg;
 #[doc(inline)] pub use self::encast_arg::EncastArg;
 #[doc(inline)] pub use self::flip_unsized::FlipUnsized;
+
+#[allow(deprecated)] #[doc(inline)] pub use self::as_bytes::AsBytes;
