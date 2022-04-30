@@ -7,8 +7,8 @@ use crate::Cast;
 
 ///
 /// Defines methods to convert a reference to a slice of a type to a
-/// phantom reference to a slice of the specified type without copying
-/// data.
+/// transmuted reference to a slice of the specified type without
+/// copying data.
 ///
 /// # Example
 ///
@@ -46,36 +46,36 @@ use crate::Cast;
 ///               Trio { x: 400, y: 500, z: 600 } ];
 ///
 /// unsafe {
-///     // Convert the original reference to `duo1` into a phantom
+///     // Convert the original reference to `duo1` into a transmuted
 ///     // reference to &[u16] without copying data.
 ///     let duo_to_solo = duo1.reslice::<u16>()?;
 ///     assert_eq!(duo_to_solo, &solo1[..]);
 ///
-///     // Convert the original reference to `solo1` into a phantom
+///     // Convert the original reference to `solo1` into a transmuted
 ///     // reference to &Duo without copying data.
 ///     let solo_to_duo = solo1.reslice::<Duo>()?;
 ///     assert_eq!(solo_to_duo, &duo1[..]);
 /// }
 ///
 /// unsafe {
-///     // Convert the original reference to `trio1` into a phantom
+///     // Convert the original reference to `trio1` into a transmuted
 ///     // reference to &[u16] without copying data.
 ///     let trio_to_solo = trio1.reslice::<u16>()?;
 ///     assert_eq!(trio_to_solo, &solo1[..]);
 ///
-///     // Convert the original reference to `solo1` into a phantom
+///     // Convert the original reference to `solo1` into a transmuted
 ///     // reference to &Trio without copying data.
 ///     let solo_to_trio = solo1.reslice::<Trio>()?;
 ///     assert_eq!(solo_to_trio, &trio1[..]);
 /// }
 ///
 /// unsafe {
-///     // Convert the original reference to `duo1` into a phantom
+///     // Convert the original reference to `duo1` into a transmuted
 ///     // reference to &Trio without copying data.
 ///     let duo_to_trio = duo1.reslice::<Trio>()?;
 ///     assert_eq!(duo_to_trio, &trio1[..]);
 ///
-///     // Convert the original reference to `trio1` into a phantom
+///     // Convert the original reference to `trio1` into a transmuted
 ///     // reference to &Duo without copying data.
 ///     let trio_to_duo = trio1.reslice::<Duo>()?;
 ///     assert_eq!(trio_to_duo, &duo1[..]);
@@ -87,14 +87,14 @@ use crate::Cast;
 /// # Description
 ///
 /// All methods in trait `Reslice` convert a reference to a slice into
-/// a phantom reference to a slice of the specified type without
+/// a transmuted reference to a slice of the specified type without
 /// copying data.
 ///
-/// The size of the original slice and the size of the phantom slice
-/// must be the same.  And the address of the original slice must
-/// satisfy the requirement of the alignment of the phantom slice.  If
-/// these requirements are satisfied, resulting reference is returned
-/// in `Some`().  Otherwise, None is returned.
+/// The size of the original slice and the size of the transmuted
+/// slice must be the same.  And the address of the original slice
+/// must satisfy the requirement of the alignment of the transmuted
+/// slice.  If these requirements are satisfied, resulting reference
+/// is returned in `Some`().  Otherwise, None is returned.
 ///
 /// # Safety
 ///
@@ -102,23 +102,23 @@ use crate::Cast;
 /// with this trait.
 ///
 /// Because the Rust compiler would not recognize what is happening,
-/// it may reorder instructions unexpectedly.  When a phantom
+/// it may reorder instructions unexpectedly.  When a transmuted
 /// reference is created by this trait, it would be better not to use
-/// the original reference until the phantom reference is dropped,
+/// the original reference until the transmuted reference is dropped,
 /// expecially when the original reference is mutable.
 ///
-/// When creating a phantom reference with this trait, take care with
-/// the alignment issues.
+/// When creating a transmuted reference with this trait, take care
+/// with the alignment issues.
 ///
 pub trait Reslice {
     /// Converts a reference to slice `self` of a type
-    /// into a phantom reference to a slice of type `U`.
+    /// into a transmuted reference to a slice of type `U`.
     unsafe fn reslice<U>(&self) -> Option<&[U]>
     where
 	U: Cast;
 
     /// Converts a mutable reference to slice `self` of a type
-    /// into a mutable phantom reference to a slice of type `U`.
+    /// into a mutable transmuted reference to a slice of type `U`.
     unsafe fn reslice_mut<U>(&mut self) -> Option<&mut [U]>
     where
 	U: Cast;

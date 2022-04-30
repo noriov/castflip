@@ -8,8 +8,8 @@ use crate::experimental::Reslice;
 
 ///
 /// Defines methods to convert a reference to a variable into a
-/// phantom reference to a slice of the specified type without copying
-/// data.
+/// transmuted reference to a slice of the specified type without
+/// copying data.
 ///
 /// The antonym of [`Enslice`] is [`Deslice`].
 ///
@@ -18,7 +18,7 @@ use crate::experimental::Reslice;
 /// # Example
 ///
 /// In the example below, method `enslice` converts the original
-/// reference to type `ElfIdHdr` into a phantom reference to
+/// reference to type `ElfIdHdr` into a transmuted reference to
 /// slice `bytes2` without copying data.
 ///
 /// ```
@@ -72,12 +72,12 @@ use crate::experimental::Reslice;
 /// # Description
 ///
 /// All methods in trait `Enslice` convert a reference to a variable
-/// into a phantom reference to a slice of the specified type without
-/// copying data.
+/// into a transmuted reference to a slice of the specified type
+/// without copying data.
 ///
-/// The size of the original variable and the size of the phantom
+/// The size of the original variable and the size of the transmuted
 /// slice must be the same.  And the address of the original variable
-/// must satisfy the requirement of the alignment of the phantom
+/// must satisfy the requirement of the alignment of the transmuted
 /// slice.  If these requirements are satisfied, resulting reference
 /// is returned in `Some`().  Otherwise, None is returned.
 ///
@@ -87,20 +87,20 @@ use crate::experimental::Reslice;
 /// with this trait.
 ///
 /// Because the Rust compiler would not recognize what is happening,
-/// it may reorder instructions unexpectedly.  When a phantom
+/// it may reorder instructions unexpectedly.  When a transmuted
 /// reference is created by this trait, it would be better not to use
-/// the original reference until the phantom reference is dropped,
+/// the original reference until the transmuted reference is dropped,
 /// expecially when the original reference is mutable.
 ///
 pub trait Enslice {
     /// Converts a reference to `self` of a type
-    /// into a phantom reference to a slice of type `U`.
+    /// into a transmuted reference to a slice of type `U`.
     unsafe fn enslice<U>(&self) -> Option<&[U]>
     where
 	U: Cast;
 
     /// Converts a mutable reference to `self` of a type
-    /// into a mutable phantom reference to a slice of type `U`.
+    /// into a mutable transmuted reference to a slice of type `U`.
     unsafe fn enslice_mut<U>(&mut self) -> Option<&mut [U]>
     where
 	U: Cast;

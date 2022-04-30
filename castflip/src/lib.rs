@@ -286,20 +286,21 @@ and `decast` to file, network and memory.
 
 This crate has features `std` and `alloc` that are enabled by default.
 
-To build this crate for a no_std environment without an allocator, add
-the following dependencies in `Cargo.toml`.  With the current version
-of this crate, [`EncastMem`] and [`DecastMem`] except methods
-`encastv` and `encastvf` are available.
+To build this crate for a `no_std` environment without a global
+allocator, add the following dependencies in `Cargo.toml`.  With the
+current version of this crate, [`EncastMem`] and [`DecastMem`] except
+methods `encastv` and `encastvf` are available.
 
 ```toml
 [dependencies]
 castflip = { version = "0.1", default-features = false }
 ```
 
-To build this crate for a no_std environment with an allocator, add
-the following dependencies in `Cargo.toml`.  With the current version
-of this crate, [`EncastMem`] and [`DecastMem`] including methods
-`encastv` and `encastvf` are available.
+To build this crate for a `no_std` environment with a global allocator,
+add the following dependencies in `Cargo.toml`.  With the current
+version of this crate, [`EncastMem`] and [`DecastMem`] including
+methods `encastv` and `encastvf` are available.  (`allocator_api` is
+not supported because it cannot be used on the stable release channel.)
 
 ```toml
 [dependencies]
@@ -309,9 +310,9 @@ castflip = { version = "0.1", default-features = false, features = ["alloc"] }
 In both cases above, [`EncastIO`] and [`DecastIO`] cannot be used
 since they require `std::io`.
 
-Because we do not have good no_std environments nor good experiences,
+Because we do not have good `no_std` environments nor good experiences,
 we are not sure that the current version of this crate provides
-sufficient features for no_std environments.  Feedbacks are welcome!
+sufficient features for `no_std` environments.  Feedbacks are welcome!
 
 For more information, please see the description of each trait and
 enum listed below.

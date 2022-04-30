@@ -7,9 +7,9 @@ use crate::experimental::Reslice;
 
 
 ///
-/// Defines methods to convert a reference to a slice into a phantom
-/// reference to a variable of the specified type without copying
-/// data.
+/// Defines methods to convert a reference to a slice into a
+/// transmuted reference to a variable of the specified type without
+/// copying data.
 ///
 /// The antonym of [`Deslice`] is [`Enslice`].
 ///
@@ -18,7 +18,7 @@ use crate::experimental::Reslice;
 /// # Example
 ///
 /// In the example below, method `deslice` converts the original
-/// reference to bytes `bytes1` into a phantom reference to type
+/// reference to bytes `bytes1` into a transmuted reference to type
 /// `ElfIdHdr` without copying data.
 ///
 /// ```
@@ -69,12 +69,12 @@ use crate::experimental::Reslice;
 /// # Description
 ///
 /// All methods in trait `Deslice` convert a reference to a slice into
-/// a phantom reference to a variable of the specified type without
+/// a transmuted reference to a variable of the specified type without
 /// copying data.
 ///
-/// The size of the original slice and the size of the phantom
+/// The size of the original slice and the size of the transmuted
 /// variable must be the same.  And the address of the original slice
-/// must satisfy the requirement of the alignment of the phantom
+/// must satisfy the requirement of the alignment of the transmuted
 /// variable.  If these requirements are satisfied, resulting
 /// reference is returned in `Some`().  Otherwise, None is returned.
 ///
@@ -84,23 +84,23 @@ use crate::experimental::Reslice;
 /// with this trait.
 ///
 /// Because the Rust compiler would not recognize what is happening,
-/// it may reorder instructions unexpectedly.  When a phantom
+/// it may reorder instructions unexpectedly.  When a transmuted
 /// reference is created by this trait, it would be better not to use
-/// the original reference until the phantom reference is dropped,
+/// the original reference until the transmuted reference is dropped,
 /// expecially when the original reference is mutable.
 ///
-/// When creating a phantom reference with this trait, take care with
+/// When creating a transmuted reference with this trait, take care with
 /// the alignment issues.
 ///
 pub trait Deslice {
     /// Converts a reference to the slice `self` of a type
-    /// into a phantom reference to a variable of type `U`.
+    /// into a transmuted reference to a variable of type `U`.
     unsafe fn deslice<U>(&self) -> Option<&U>
     where
 	U: Cast;
 
     /// Converts a mutable reference to the slice `self` of a type
-    /// into a mutable phantom reference to a variable of type `U`.
+    /// into a mutable transmuted reference to a variable of type `U`.
     unsafe fn deslice_mut<U>(&mut self) -> Option<&mut U>
     where
 	U: Cast;

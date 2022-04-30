@@ -6,7 +6,7 @@ use crate::Cast;
 
 ///
 /// Defines methods to convert a reference to a variable or a slice
-/// into a phantom reference to a lice of bytes without copying data.
+/// into a transmuted reference to a slice of bytes without copying data.
 /// (Deprecated because it is renamed to [`AsifBytes`])
 ///
 /// It is deprecated because one of its method names is conflicted
@@ -18,7 +18,7 @@ use crate::Cast;
 /// # Example 1
 ///
 /// In the example below, method `as_bytes_ref` converts the original
-/// reference to type `ElfIdHdr` into a phantom reference to slice
+/// reference to type `ElfIdHdr` into a transmuted reference to slice
 /// `bytes2` without copying data.
 ///
 /// ```
@@ -67,8 +67,8 @@ use crate::Cast;
 /// # Example 2
 ///
 /// In the example below, method `as_bytes_ref` converts the original
-/// reference to an array of type `Pair` into a phantom reference to
-/// slice `bytes2` without copying data.
+/// reference to an array of type `Pair` into a transmuted reference
+/// to slice `bytes2` without copying data.
 ///
 /// ```
 /// use castflip::experimental::AsBytes;
@@ -106,21 +106,21 @@ use crate::Cast;
 /// with this trait.
 ///
 /// Because the Rust compiler would not recognize what is happening,
-/// it may reorder instructions unexpectedly.  When a phantom
+/// it may reorder instructions unexpectedly.  When a transmuted
 /// reference is created by this trait, it would be better not to use
-/// the original reference until the phantom reference is dropped,
+/// the original reference until the transmuted reference is dropped,
 /// expecially when the original reference is mutable.
 ///
 #[deprecated(since = "0.1.5", note = "Trait AsBytes is renamed to AsifBytes")]
 pub trait AsBytes {
-    /// Converts a reference to `self` into a phantom reference to a
+    /// Converts a reference to `self` into a transmuted reference to a
     /// slice of u8 without copying data.  `self` can be a variable or
     /// a slice.
     unsafe fn as_bytes_ref(&self) -> &[u8];
 
-    /// Converts a mutable reference to `self` into a mutable phantom
-    /// reference to a slice of u8 without copying data.  `self` can
-    /// be a variable or a slice.
+    /// Converts a mutable reference to `self` into a mutable
+    /// transmuted reference to a slice of u8 without copying data.
+    /// `self` can be a variable or a slice.
     unsafe fn as_bytes_mut(&mut self) -> &mut [u8];
 }
 
