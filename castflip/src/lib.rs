@@ -325,7 +325,7 @@ enum listed below.
 #![cfg_attr(not(feature = "std"), no_std)]
 
 
-// Modules in files in the same directory.
+// Files in this directory.
 #[doc(hidden)] pub mod cast;
 #[doc(hidden)] pub mod decast_mem;
 #[doc(hidden)] pub mod encast_mem;
@@ -336,7 +336,7 @@ enum listed below.
 #[doc(hidden)] #[cfg(feature = "std")] pub mod decast_io;
 #[doc(hidden)] #[cfg(feature = "std")] pub mod encast_io;
 
-// A module in a subdirectory.
+// A subdirectory in this directory.
 pub mod experimental;
 
 
@@ -359,7 +359,7 @@ pub mod experimental;
 
 
 // A module used in document comment above.
-#[cfg(doc)] use std::io;
+#[cfg(doc)] #[cfg(feature = "std")] use std::io;
 
 // Make sure that this crate supports the endianness of the target system.
 #[cfg(not(any(target_endian = "little", target_endian = "big")))]
