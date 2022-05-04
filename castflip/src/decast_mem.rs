@@ -1,5 +1,3 @@
-#[cfg(not(feature = "std"))] use core::prelude::rust_2021::*;
-
 use core::{mem, ptr};
 
 use crate::{Cast, Endian, Flip};

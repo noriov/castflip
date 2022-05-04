@@ -1,5 +1,3 @@
-#[cfg(not(feature = "std"))] use core::prelude::rust_2021::*;
-
 use core::slice;
 
 use crate::Cast;

@@ -1,4 +1,3 @@
-#[cfg(not(feature = "std"))] use core::prelude::rust_2021::*;
 #[cfg(feature = "alloc")] extern crate alloc;
 #[cfg(feature = "alloc")] use alloc::vec::Vec;
 #[cfg(feature = "alloc")] use crate::experimental::PushBulk;
