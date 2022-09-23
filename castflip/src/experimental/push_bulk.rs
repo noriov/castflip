@@ -93,7 +93,7 @@ impl<T, R, E> PushBulk<T, R, E> for Vec<T>
 	// The hidden area is passed as an ephemeral slice (soon dropped).
 	let result = fill_new_slice(
 	    slice::from_raw_parts_mut(
-		self.as_mut_ptr().offset(self.len() as isize),
+		self.as_mut_ptr().add(self.len()),
 		additional)
 	);
 
