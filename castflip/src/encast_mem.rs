@@ -130,6 +130,7 @@ pub trait EncastMem {
 
 impl EncastMem for [u8]
 {
+    #[inline]
     fn encast<T>(&self) -> Option<T>
     where
 	T: Cast
@@ -151,6 +152,7 @@ impl EncastMem for [u8]
 	// }
     }
 
+    #[inline]
     fn encastf<T>(&self, endian: Endian) -> Option<T>
     where
 	T: Cast + Flip
@@ -160,6 +162,7 @@ impl EncastMem for [u8]
 	Some(val)
     }
 
+    #[inline]
     fn encasts<T>(&self, slice: &mut [T]) -> Option<usize>
     where
 	T: Cast
@@ -175,6 +178,7 @@ impl EncastMem for [u8]
 	Some(bytes.len())
     }
 
+    #[inline]
     fn encastsf<T>(&self, slice: &mut [T], endian: Endian) -> Option<usize>
     where
 	T: Cast + Flip
@@ -187,6 +191,7 @@ impl EncastMem for [u8]
     }
 
     #[cfg(feature = "alloc")]
+    #[inline]
     fn encastv<T>(&self, nelem: usize) -> Option<Vec<T>>
     where
 	T: Cast
@@ -203,6 +208,7 @@ impl EncastMem for [u8]
     }
 
     #[cfg(feature = "alloc")]
+    #[inline]
     fn encastvf<T>(&self, nelem: usize, endian: Endian) -> Option<Vec<T>>
     where
 	T: Cast + Flip

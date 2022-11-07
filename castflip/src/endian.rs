@@ -190,6 +190,7 @@ impl Endian {
     /// }
     /// ```
     ///
+    #[inline]
     pub fn need_swap(self) -> bool {
 	#[cfg(target_endian = "little")]
 	return self == Self::Swapped || self == Self::Big;

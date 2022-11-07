@@ -127,6 +127,7 @@ pub trait DecastMem {
 
 impl DecastMem for [u8]
 {
+    #[inline]
     fn decast<T>(&mut self, val_ptr: &T) -> Option<usize>
     where
 	T: Cast
@@ -148,6 +149,7 @@ impl DecastMem for [u8]
 	// }
     }
 
+    #[inline]
     fn decastf<T>(&mut self, val_ptr: &T, endian: Endian) -> Option<usize>
     where
 	T: Cast + Flip
@@ -159,6 +161,7 @@ impl DecastMem for [u8]
 	}
     }
 
+    #[inline]
     fn decasts<T>(&mut self, slice: &[T]) -> Option<usize>
     where
 	T: Cast
@@ -174,6 +177,7 @@ impl DecastMem for [u8]
 	Some(bytes.len())
     }
 
+    #[inline]
     fn decastsf<T>(&mut self, slice: &[T], endian: Endian) -> Option<usize>
     where
 	T: Cast + Flip
@@ -192,6 +196,7 @@ impl DecastMem for [u8]
     }
 
     #[cfg(feature = "alloc")]
+    #[inline]
     fn decastv<T>(&mut self, slice: &[T]) -> Option<usize>
     where
 	T: Cast
@@ -200,6 +205,7 @@ impl DecastMem for [u8]
     }
 
     #[cfg(feature = "alloc")]
+    #[inline]
     fn decastvf<T>(&mut self, slice: &[T], endian: Endian) -> Option<usize>
     where
 	T: Cast + Flip

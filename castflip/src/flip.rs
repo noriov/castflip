@@ -155,6 +155,7 @@ pub trait Flip: Sized {
     /// Returns the endian-flipped value of `self` if `endian` is
     /// different from the endianness of the target system.
     /// Otherwise, returns exactly the same value as `self`.
+    #[inline]
     fn flip_val(&self, endian: Endian) -> Self {
 	if !endian.need_swap() {
 	    unsafe {
@@ -166,12 +167,14 @@ pub trait Flip: Sized {
     }
 
     /// Flips the endianness of the variable (`self`).
+    #[inline]
     fn flip_var_swapped(&mut self) {
 	*self = self.flip_val_swapped();
     }
 
     /// Flips the endianness of the variable (`self`) if `endian` is
     /// different from the endianness of the target system.
+    #[inline]
     fn flip_var(&mut self, endian: Endian) {
 	if endian.need_swap() {
 	    self.flip_var_swapped();
@@ -184,6 +187,7 @@ macro_rules! impl_flip_for_int {
     ( $( $ty:ty ),* ) => {
 	$(
 	    impl Flip for $ty {
+		#[inline]
 		fn flip_val_swapped(&self) -> Self {
 		    self.swap_bytes()
 		}
@@ -196,6 +200,7 @@ macro_rules! impl_flip_for_float {
     ( $( $ty:ty ),* ) => {
 	$(
 	    impl Flip for $ty {
+		#[inline]
 		fn flip_val_swapped(&self) -> Self {
 		    <$ty>::from_bits(self.to_bits().swap_bytes())
 		}
@@ -210,6 +215,7 @@ impl_flip_for_float!(f32, f64);
 
 
 impl<T: Flip, const N: usize> Flip for [T; N] {
+    #[inline]
     fn flip_val_swapped(&self) -> Self
     {
 	unsafe {
@@ -246,6 +252,7 @@ impl<T: Flip, const N: usize> Flip for [T; N] {
 	}
     }
 
+    #[inline]
     fn flip_var_swapped(&mut self) {
 	for elem in self {
 	    elem.flip_var_swapped();

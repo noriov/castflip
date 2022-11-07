@@ -186,6 +186,7 @@ impl<W> DecastIO for W
 where
     W: ?Sized + Write
 {
+    #[inline]
     fn decast<T>(&mut self, val_ptr: &T) -> Result<usize>
     where
 	T: Cast
@@ -196,6 +197,7 @@ where
 	Ok(mem::size_of::<T>())
     }
 
+    #[inline]
     fn decastf<T>(&mut self, val_ptr: &T, endian: Endian) -> Result<usize>
     where
 	T: Cast + Flip
@@ -207,6 +209,7 @@ where
 	}
     }
 
+    #[inline]
     fn decasts<T>(&mut self, slice: &[T]) -> Result<usize>
     where
 	T: Cast
@@ -217,6 +220,7 @@ where
 	Ok(mem::size_of::<T>() * slice.len())
     }
 
+    #[inline]
     fn decastsf<T>(&mut self, slice: &[T], endian: Endian) -> Result<usize>
     where
 	T: Cast + Flip
@@ -232,6 +236,7 @@ where
     }
 
     #[cfg(feature = "std")]
+    #[inline]
     fn decastv<T>(&mut self, slice: &[T]) -> Result<usize>
     where
 	T: Cast
@@ -240,6 +245,7 @@ where
     }
 
     #[cfg(feature = "std")]
+    #[inline]
     fn decastvf<T>(&mut self, slice: &[T], endian: Endian) -> Result<usize>
     where
 	T: Cast + Flip

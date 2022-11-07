@@ -182,6 +182,7 @@ impl<R> EncastIO for R
 where
     R: ?Sized + Read
 {
+    #[inline]
     fn encast<T>(&mut self) -> Result<T>
     where
 	T: Cast
@@ -194,6 +195,7 @@ where
 	}
     }
 
+    #[inline]
     fn encastf<T>(&mut self, endian: Endian) -> Result<T>
     where
 	T: Cast + Flip
@@ -203,6 +205,7 @@ where
 	Ok(val)
     }
 
+    #[inline]
     fn encasts<T>(&mut self, slice: &mut [T]) -> Result<usize>
     where
 	T: Cast
@@ -213,6 +216,7 @@ where
 	Ok(mem::size_of::<T>() * slice.len())
     }
 
+    #[inline]
     fn encastsf<T>(&mut self, slice: &mut [T], endian: Endian) -> Result<usize>
     where
 	T: Cast + Flip
@@ -224,6 +228,7 @@ where
 	Ok(size)
     }
 
+    #[inline]
     fn encastv<T>(&mut self, nelem: usize) -> Result<Vec<T>>
     where
 	T: Cast
@@ -237,6 +242,7 @@ where
 	Ok(vec)
     }
 
+    #[inline]
     fn encastvf<T>(&mut self, nelem: usize, endian: Endian) -> Result<Vec<T>>
     where
 	T: Cast + Flip
