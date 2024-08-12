@@ -148,9 +148,6 @@ fn test_flip() {
 	u16,
     );
 
-    #[derive(Flip)]
-    struct UnitTest;
-
     let named1 = NamedTest { val1: 0x1234, val2: 0x5678 };
     let named2 = named1.flip_val(SE);
     let mut named3 = named1;
@@ -183,9 +180,6 @@ fn test_nopflip() {
 	u16,
 	u16,
     );
-
-    #[derive(NopFlip)]
-    struct UnitTest;
 
     #[derive(NopFlip)]
     union UnionTest {
