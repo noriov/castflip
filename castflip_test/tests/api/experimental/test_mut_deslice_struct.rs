@@ -6,15 +6,39 @@ use crate::{FData1, FVals1, IData1, IVals1, UData1, UVals1,
 macro_rules! test {
     ( $data:expr, $ty:ty ) => {{
 	unsafe {
+	    // Test1: &mut [u8] -> &mut $ty
+
 	    let data = $data;
 
-	    let mut ne_bytes = data.ne_bytes;
+	    let mut cloned_data = data.clone();
+	    let ne_slice_u8 = &mut cloned_data.ne_bytes[..];
 
-	    let ne_slice_u8 = &mut ne_bytes[..];
+	    let ne_desliced = ne_slice_u8.deslice_mut::<$ty>().unwrap();
 
-	    let ne_vals_ptr = ne_slice_u8.deslice_mut::<$ty>().unwrap();
+	    assert_eq!(*ne_desliced, data.ne_vals);
+	}
+	unsafe {
+	    // Test2: mut Vec<u8> -> &mut $ty
 
-	    assert_eq!(*ne_vals_ptr, data.ne_vals);
+	    let data = $data;
+
+	    let mut ne_vec_u8 = data.ne_bytes.to_vec();
+
+	    let ne_desliced = ne_vec_u8.deslice_mut::<$ty>().unwrap();
+
+	    assert_eq!(*ne_desliced, data.ne_vals);
+	}
+	unsafe {
+	    // Test3: mut [u8; N] -> &mut $ty
+
+	    let data = $data;
+
+	    let mut cloned_data = data.clone();
+
+	    let ne_desliced = cloned_data.ne_bytes
+		.deslice_mut::<$ty>().unwrap();
+
+	    assert_eq!(*ne_desliced, data.ne_vals);
 	}
     }}
 }

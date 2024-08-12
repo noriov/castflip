@@ -8,11 +8,46 @@ macro_rules! test {
 	unsafe {
 	    let data = $data;
 
-	    let ne_slice_u8 = &data.ne_bytes[..];
+	    let cloned_data = data.clone();
+	    let ne_slice_u8 = &cloned_data.ne_bytes[..];
 
-	    let ne_vals_ptr = ne_slice_u8.deslice::<$ty>().unwrap();
+	    let ne_desliced = ne_slice_u8.deslice::<$ty>().unwrap();
 
-	    assert_eq!(*ne_vals_ptr, data.ne_vals);
+	    assert_eq!(*ne_desliced, data.ne_vals);
+	}
+	unsafe {
+	    // Test1: &[u8] -> &$ty
+
+	    let data = $data;
+
+	    let cloned_data = data.clone();
+	    let ne_slice_u8 = &cloned_data.ne_bytes[..];
+
+	    let ne_desliced = ne_slice_u8.deslice::<$ty>().unwrap();
+
+	    assert_eq!(*ne_desliced, data.ne_vals);
+	}
+	unsafe {
+	    // Test2: Vec<u8> -> &$ty
+
+	    let data = $data;
+
+	    let ne_vec_u8 = data.ne_bytes.to_vec();
+
+	    let ne_desliced = ne_vec_u8.deslice::<$ty>().unwrap();
+
+	    assert_eq!(*ne_desliced, data.ne_vals);
+	}
+	unsafe {
+	    // Test3: [u8; N] -> &$ty
+
+	    let data = $data;
+
+	    let cloned_data = data.clone();
+
+	    let ne_desliced = cloned_data.ne_bytes.deslice::<$ty>().unwrap();
+
+	    assert_eq!(*ne_desliced, data.ne_vals);
 	}
     }}
 }

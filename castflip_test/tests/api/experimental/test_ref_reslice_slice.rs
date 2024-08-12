@@ -10,11 +10,12 @@ macro_rules! test {
 
 	    let data = $data;
 
-	    let ne_slice_u8 = &data.ne_bytes[..];
+	    let cloned_data = data.clone();
+	    let ne_slice_u8 = &cloned_data.ne_bytes[..];
 
-	    let ne_slice_vals = ne_slice_u8.reslice::<$ty>().unwrap();
+	    let ne_resliced = ne_slice_u8.reslice::<$ty>().unwrap();
 
-	    assert_eq!(ne_slice_vals[0], data.ne_vals);
+	    assert_eq!(ne_resliced[0], data.ne_vals);
 	}
 	unsafe {
 	    // Test2: Vec<u8> -> &[$ty]
@@ -23,20 +24,20 @@ macro_rules! test {
 
 	    let ne_vec_u8 = data.ne_bytes.to_vec();
 
-	    let ne_slice_vals = ne_vec_u8.reslice::<$ty>().unwrap();
+	    let ne_resliced = ne_vec_u8.reslice::<$ty>().unwrap();
 
-	    assert_eq!(ne_slice_vals[0], data.ne_vals);
+	    assert_eq!(ne_resliced[0], data.ne_vals);
 	}
 	unsafe {
 	    // Test3: [u8; N] -> &[$ty]
 
 	    let data = $data;
 
-	    let ne_array_u8 = data.ne_bytes;
+	    let cloned_data = data.clone();
 
-	    let ne_slice_vals = ne_array_u8.reslice::<$ty>().unwrap();
+	    let ne_resliced = cloned_data.ne_bytes.reslice::<$ty>().unwrap();
 
-	    assert_eq!(ne_slice_vals[0], data.ne_vals);
+	    assert_eq!(ne_resliced[0], data.ne_vals);
 	}
 	unsafe {
 	    // Test4: &[$ty] -> &[u8]

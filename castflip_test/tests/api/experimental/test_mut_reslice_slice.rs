@@ -6,48 +6,48 @@ use crate::{FData1, FVals1, IData1, IVals1, UData1, UVals1,
 macro_rules! test {
     ( $data:expr, $ty:ty ) => {{
 	unsafe {
-	    // Test1: &[u8] -> &[$ty]
+	    // Test1: &mut [u8] -> &mut [$ty]
 
 	    let data = $data;
 
-	    let mut ne_bytes = data.ne_bytes;
+	    let mut cloned_data = data.clone();
+	    let ne_slice_u8 = &mut cloned_data.ne_bytes[..];
 
-	    let ne_slice_u8 = &mut ne_bytes[..];
+	    let ne_resliced = ne_slice_u8.reslice_mut::<$ty>().unwrap();
 
-	    let ne_slice_vals = ne_slice_u8.reslice_mut::<$ty>().unwrap();
-
-	    assert_eq!(ne_slice_vals[0], data.ne_vals);
+	    assert_eq!(ne_resliced[0], data.ne_vals);
 	}
 	unsafe {
-	    // Test2: Vec<u8> -> &[$ty]
+	    // Test2: mut Vec<u8> -> &mut [$ty]
 
 	    let data = $data;
 
 	    let mut ne_vec_u8 = data.ne_bytes.to_vec();
 
-	    let ne_slice_vals = ne_vec_u8.reslice_mut::<$ty>().unwrap();
+	    let ne_resliced = ne_vec_u8.reslice_mut::<$ty>().unwrap();
 
-	    assert_eq!(ne_slice_vals[0], data.ne_vals);
+	    assert_eq!(ne_resliced[0], data.ne_vals);
 	}
 	unsafe {
-	    // Test3: [u8; N] -> &[$ty]
+	    // Test3: mut [u8; N] -> &mut [$ty]
 
 	    let data = $data;
 
-	    let mut ne_array_u8 = data.ne_bytes;
+	    let mut cloned_data = data.clone();
 
-	    let ne_slice_vals = ne_array_u8.reslice_mut::<$ty>().unwrap();
+	    let ne_resliced = cloned_data.ne_bytes
+		.reslice_mut::<$ty>().unwrap();
 
-	    assert_eq!(ne_slice_vals[0], data.ne_vals);
+	    assert_eq!(ne_resliced[0], data.ne_vals);
 	}
 	unsafe {
-	    // Test4: &[$ty] -> &[u8]
+	    // Test4: &mut [$ty] -> &mut [u8]
 
 	    let data = $data;
 
-	    let ne_slice_vals = &mut [data.ne_vals];
+	    let ne_resliced = &mut [data.ne_vals];
 
-	    let ne_slice_u8 = ne_slice_vals.reslice_mut::<u8>().unwrap();
+	    let ne_slice_u8 = ne_resliced.reslice_mut::<u8>().unwrap();
 
 	    assert_eq!(ne_slice_u8, &data.ne_bytes[..]);
 	}

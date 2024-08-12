@@ -5,13 +5,15 @@ use crate::{FData1, IData1, UData1, UData2, UData3, UData4};
 macro_rules! test {
     ( $data:expr ) => {{
 	unsafe {
+	    // Test: &$ty -> &[u8]
+
 	    let data = $data;
 
 	    let ne_vals = data.ne_vals;
 
-	    let ne_bytes_ptr = ne_vals.enslice::<u8>().unwrap();
+	    let ne_ensliced = ne_vals.enslice::<u8>().unwrap();
 
-	    assert_eq!(*ne_bytes_ptr, data.ne_bytes);
+	    assert_eq!(*ne_ensliced, data.ne_bytes);
 	}
     }}
 }
