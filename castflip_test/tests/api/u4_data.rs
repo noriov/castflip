@@ -4,7 +4,8 @@ use castflip::{Cast, Flip};
 use crate::{UData1, UVals1, UData2, UVals2, UData3, UVals3};
 
 
-#[derive(Debug)]
+#[repr(C)]
+#[derive(Clone, Debug)]
 pub struct UData4 {
     pub ne_vals:	UVals4,
     pub se_vals:	UVals4,
@@ -22,7 +23,12 @@ pub struct UVals4 {
     pub vals1:		UVals1,
     pub vals2:		UVals2,
     pub vals3:		UVals3,
+    pub vals4:		[u8; NELEM4],
 }
+
+pub const NELEM4: usize = 8;
+
+const _: () = assert!(size_of::<UVals4>() == 0x40);
 
 
 impl UData4 {
@@ -30,18 +36,21 @@ impl UData4 {
 	let udata1 = UData1::gen();
 	let udata2 = UData2::gen();
 	let udata3 = UData3::gen();
+	let uvals4 = [0; NELEM4];
 
 	// Construct a vector in native-endian.
 	let mut ne_vec: Vec<u8> = Vec::new();
 	ne_vec.extend_from_slice(&udata1.ne_bytes);
 	ne_vec.extend_from_slice(&udata2.ne_bytes);
 	ne_vec.extend_from_slice(&udata3.ne_bytes);
+	ne_vec.extend_from_slice(&uvals4);
 
 	// Construct a vector in swappede-endian.
 	let mut se_vec: Vec<u8> = Vec::new();
 	se_vec.extend_from_slice(&udata1.se_bytes);
 	se_vec.extend_from_slice(&udata2.se_bytes);
 	se_vec.extend_from_slice(&udata3.se_bytes);
+	se_vec.extend_from_slice(&uvals4);
 
 	// Convert vectors into arrays.
 	let ne_bytes: [u8; size_of::<UVals4>()] = ne_vec.try_into().unwrap();
@@ -52,6 +61,7 @@ impl UData4 {
 	    vals1:	udata1.ne_vals,
 	    vals2:	udata2.ne_vals,
 	    vals3:	udata3.ne_vals,
+	    vals4:	uvals4,
 	};
 
 	// Construct swapped endian values.
@@ -59,6 +69,7 @@ impl UData4 {
 	    vals1:	udata1.se_vals,
 	    vals2:	udata2.se_vals,
 	    vals3:	udata3.se_vals,
+	    vals4:	uvals4,
 	};
 
 	// Prepare LE and BE data.
@@ -77,8 +88,8 @@ impl UData4 {
 	    panic!();
 	}
 
-	// Construct UData1.
-	return UData4 { ne_bytes, se_bytes, le_bytes, be_bytes,
-			ne_vals, se_vals, le_vals, be_vals, };
+	// Construct UData4.
+	return UData4 { ne_vals, se_vals, le_vals, be_vals,
+			ne_bytes, se_bytes, le_bytes, be_bytes, };
     }
 }

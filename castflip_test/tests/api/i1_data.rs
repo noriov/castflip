@@ -2,16 +2,17 @@ use core::mem::size_of;
 use castflip::{Cast, Flip};
 
 
-#[derive(Clone, Copy, Debug)]
+#[repr(C)]
+#[derive(Clone, Debug)]
 pub struct IData1 {
-    pub ne_bytes:	[u8; size_of::<IVals1>()],
-    pub se_bytes:	[u8; size_of::<IVals1>()],
-    pub le_bytes:	[u8; size_of::<IVals1>()],
-    pub be_bytes:	[u8; size_of::<IVals1>()],
     pub ne_vals:	IVals1,
     pub se_vals:	IVals1,
     pub le_vals:	IVals1,
     pub be_vals:	IVals1,
+    pub ne_bytes:	[u8; size_of::<IVals1>()],
+    pub se_bytes:	[u8; size_of::<IVals1>()],
+    pub le_bytes:	[u8; size_of::<IVals1>()],
+    pub be_bytes:	[u8; size_of::<IVals1>()],
 }
 
 #[repr(C)]
@@ -24,6 +25,8 @@ pub struct IVals1 {
     pub val_i64:	i64,
     pub val_i128:	i128,
 }
+
+const _: () = assert!(size_of::<IVals1>() == 0x20);
 
 
 impl IData1 {
@@ -144,7 +147,7 @@ impl IData1 {
 	}
 
 	// Construct IData1.
-	return IData1 { ne_bytes, se_bytes, le_bytes, be_bytes,
-			ne_vals, se_vals, le_vals, be_vals, };
+	return IData1 { ne_vals, se_vals, le_vals, be_vals,
+			ne_bytes, se_bytes, le_bytes, be_bytes, };
     }
 }

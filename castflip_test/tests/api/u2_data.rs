@@ -3,7 +3,8 @@ use core::mem::size_of;
 use castflip::{Cast, Flip};
 
 
-#[derive(Debug)]
+#[repr(C)]
+#[derive(Clone, Debug)]
 pub struct UData2 {
     pub ne_vals:	UVals2,
     pub se_vals:	UVals2,
@@ -22,6 +23,8 @@ pub struct UVals2 {
 }
 
 pub const NELEM2: usize = 4;
+
+const _: () = assert!(size_of::<UVals2>() == 0x10);
 
 
 impl UData2 {
@@ -108,7 +111,7 @@ impl UData2 {
 	}
 
 	// Construct UData2.
-	return UData2 { ne_bytes, se_bytes, le_bytes, be_bytes,
-			ne_vals, se_vals, le_vals, be_vals, };
+	return UData2 { ne_vals, se_vals, le_vals, be_vals,
+			ne_bytes, se_bytes, le_bytes, be_bytes, };
     }
 }

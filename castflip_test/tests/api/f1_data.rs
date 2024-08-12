@@ -3,16 +3,17 @@ use core::mem::size_of;
 use castflip::{Cast, Flip};
 
 
-#[derive(Clone, Copy, Debug)]
+#[repr(C)]
+#[derive(Clone, Debug)]
 pub struct FData1 {
-    pub ne_bytes:	[u8; size_of::<FVals1>()],
-    pub se_bytes:	[u8; size_of::<FVals1>()],
-    pub le_bytes:	[u8; size_of::<FVals1>()],
-    pub be_bytes:	[u8; size_of::<FVals1>()],
     pub ne_vals:	FVals1,
     pub se_vals:	FVals1,
     pub le_vals:	FVals1,
     pub be_vals:	FVals1,
+    pub ne_bytes:	[u8; size_of::<FVals1>()],
+    pub se_bytes:	[u8; size_of::<FVals1>()],
+    pub le_bytes:	[u8; size_of::<FVals1>()],
+    pub be_bytes:	[u8; size_of::<FVals1>()],
 }
 
 #[repr(C)]
@@ -24,15 +25,17 @@ pub struct FVals1 {
     pub val2_f64:	f64,
 }
 
+const _: () = assert!(size_of::<FVals1>() == 0x18);
+
 
 impl FData1 {
     pub fn gen() -> FData1 {
 	// Construct FVals1 from native-endian values.
 	let ne_vals = FVals1 {
-	    val1_f32:	::core::f32::consts::E,
-	    val2_f32:	::core::f32::consts::PI,
-	    val1_f64:	::core::f64::consts::E,
-	    val2_f64:	::core::f64::consts::PI,
+	    val1_f32:	core::f32::consts::E,
+	    val2_f32:	core::f32::consts::PI,
+	    val1_f64:	core::f64::consts::E,
+	    val2_f64:	core::f64::consts::PI,
 	};
 
 	// Construct FVals1 from swapped-endian values.
@@ -78,7 +81,7 @@ impl FData1 {
 	}
 
 	// Construct FData1.
-	return FData1 { ne_bytes, se_bytes, le_bytes, be_bytes,
-			ne_vals, se_vals, le_vals, be_vals, };
+	return FData1 { ne_vals, se_vals, le_vals, be_vals,
+			ne_bytes, se_bytes, le_bytes, be_bytes, };
     }
 }
