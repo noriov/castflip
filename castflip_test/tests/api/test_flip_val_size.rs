@@ -36,12 +36,10 @@ macro_rules! test {
 
 #[test]
 fn idata1() {
-    let idata1 = IData1::gen();
-
     match ISIZE_SIZE {
-	I32_SIZE  => test!(idata1, val_i32,  isize),
-	I64_SIZE  => test!(idata1, val_i64,  isize),
-	I128_SIZE => test!(idata1, val_i128, isize),
+	I32_SIZE  => test!(IData1::gen(), val_i32,  isize),
+	I64_SIZE  => test!(IData1::gen(), val_i64,  isize),
+	I128_SIZE => test!(IData1::gen(), val_i128, isize),
 	_ => panic!(),
     }
 
@@ -53,12 +51,10 @@ fn idata1() {
 
 #[test]
 fn udata1() {
-    let udata1 = UData1::gen();
-
     match USIZE_SIZE {
-	U32_SIZE  => test!(udata1, val_u32,  usize),
-	U64_SIZE  => test!(udata1, val_u64,  usize),
-	U128_SIZE => test!(udata1, val_u128, usize),
+	U32_SIZE  => test!(UData1::gen(), val_u32,  usize),
+	U64_SIZE  => test!(UData1::gen(), val_u64,  usize),
+	U128_SIZE => test!(UData1::gen(), val_u128, usize),
 	_ => panic!(),
     }
 
