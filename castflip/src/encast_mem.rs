@@ -1,11 +1,9 @@
-#[cfg(feature = "alloc")] use alloc::vec::Vec;
-#[cfg(feature = "alloc")] use crate::experimental::PushBulk;
-
-use core::mem::MaybeUninit;
 use core::{mem, ptr};
+#[cfg(feature = "alloc")] use alloc::vec::Vec;
 
 use crate::{Cast, Endian, Flip};
 #[cfg(doc)] use crate::BE;
+#[cfg(feature = "alloc")] use crate::experimental::PushBulk;
 
 
 ///
@@ -75,52 +73,89 @@ use crate::{Cast, Endian, Flip};
 /// flipped if necessary.
 ///
 pub trait EncastMem {
-    /// Decodes the bytes at the head of `self` to a value of type `T`
-    /// and returns the value.  The endianness of the resulting value
-    /// is not flipped.
+    /// Creates a value of type `T` from a memory representation of
+    /// the type at the head of a byte slice `self` and returns the
+    /// resulting value in `Some(T)`.
+    ///
+    /// The endianness of the resulting value is the same as the
+    /// endianness of the source bytes.  In typical cases, both are
+    /// native.
+    ///
+    /// If `self` does not have enough bytes, `None` is returned.
     fn encast<T>(&self) -> Option<T>
     where
 	T: Cast;
 
-    /// Decodes the bytes at the head of `self` to a value of type `T`
-    /// and returns the value.  The endianness of the resulting value
-    /// is flipped if necessary.  The endianness of the bytes is
-    /// specified in `endian`.
+    /// Creates a value of type `T` from a memory representation of
+    /// the type at the head of a byte slice `self` and returns the
+    /// resulting value in `Some(T)`.
+    ///
+    /// The endianness of the resulting value is flipped to native
+    /// endian.  The endianness of the source bytes must be correctly
+    /// specified by `endian`.
+    ///
+    /// If `self` does not have enough bytes, `None` is returned.
     fn encastf<T>(&self, endian: Endian) -> Option<T>
     where
 	T: Cast + Flip;
 
-    /// Decodes the bytes at the head of `self` to value(s) of type
-    /// `T` and fill `slice` with the value(s).  It returns the number
-    /// of decoded bytes.  The endianness of the resulting value(s) is
-    /// not flipped.
+    /// Creates values of type `T` from memory representations of the
+    /// type at the head of a byte slice `self`, saves the values in
+    /// `slice`, and returns the number of the source bytes in
+    /// `Some(usize)`.
+    ///
+    /// The endianness of each resulting value is the same as the
+    /// endianness of the corresponding source bytes.  In typical
+    /// cases, all are native.
+    ///
+    /// If `self` does not have enough bytes, `None` is returned.
     fn encasts<T>(&self, slice: &mut [T]) -> Option<usize>
     where
 	T: Cast;
 
-    /// Decodes the bytes at the head of `self` to value(s) of type
-    /// `T` and fill `slice` with the value(s).  It returns the number
-    /// of decoded bytes.  The endianness of the resulting value(s) is
-    /// flipped if necessary.  The endianness of the bytes is
-    /// specified in `endian`.
+    /// Creates values of type `T` from memory representations of the
+    /// type at the head of a byte slice `self`, saves the values in
+    /// `slice`, and returns the number of the source bytes in
+    /// `Some(usize)`.
+    ///
+    /// The endianness of each resulting value is flipped to native
+    /// endian.  The endianness of the source bytes must be correctly
+    /// specified by `endian`.
+    ///
+    /// If `self` does not have enough bytes, `None` is returned.
     fn encastsf<T>(&self, slice: &mut [T], endian: Endian) -> Option<usize>
     where
 	T: Cast + Flip;
 
-    /// Decodes the bytes at the head of `self` to a vector of
-    /// value(s) of type `T` and returns the vector.  The endianness
-    /// of the resulting value(s) is not flipped.  The number of
-    /// elements in the resulting vecotr is specified in `nelem`.
+    /// Creates a vector of values of type `T` from memory
+    /// representations of the type at the head of a byte slice `self`
+    /// and returns the vector in `Some(Vec<T>)`.
+    ///
+    /// The number of elements in the resulting vector is specified by
+    /// `nelem`.
+    ///
+    /// The endianness of each resulting value is the same as the
+    /// endianness of the corresponding source bytes.  In typical
+    /// cases, all are native.
+    ///
+    /// If `self` does not have enough bytes, `None` is returned.
     #[cfg(feature = "alloc")]
     fn encastv<T>(&self, nelem: usize) -> Option<Vec<T>>
     where
 	T: Cast;
 
-    /// Decodes the bytes at the head of `self` to a vector of
-    /// value(s) of type `T` and returns the vector.  The endianness
-    /// of the resulting value(s) is flipped if necessary.  The
-    /// endianness of the bytes is specified in `endian`.  The number
-    /// of elements in the resulting vecotr is specified in `nelem`.
+    /// Creates a vector of values of type `T` from memory
+    /// representations of the type at the head of a byte slice `self`
+    /// and returns the vector in `Some(Vec<T>)`.
+    ///
+    /// The number of elements in the resulting vector is specified by
+    /// `nelem`.
+    ///
+    /// The endianness of each resulting value is flipped to native
+    /// endian.  The endianness of the source bytes must be correctly
+    /// specified by `endian`.
+    ///
+    /// If `self` does not have enough bytes, `None` is returned.
     #[cfg(feature = "alloc")]
     fn encastvf<T>(&self, nelem: usize, endian: Endian) -> Option<Vec<T>>
     where
@@ -133,8 +168,22 @@ impl EncastMem for [u8]
     #[inline]
     fn encast<T>(&self) -> Option<T>
     where
-	T: Cast
+	T: Cast,
     {
+	if self.len() >= mem::size_of::<T>() {
+	    unsafe {
+		// ptr::read_unaligned copies the byte slice at the
+		// head of `self` into its internal variable of type T
+		// and returns the value.
+		Some(ptr::read_unaligned(self.as_ptr() as *const T))
+	    }
+	} else {
+	    None
+	}
+
+/*
+	// The previous version was:
+
 	let bytes = self.get(0 .. mem::size_of::<T>())?;
 
 	// Decode a value of type T from `bytes`.
@@ -150,23 +199,42 @@ impl EncastMem for [u8]
 	// unsafe {
 	//     Some(ptr::read_unaligned(bytes.as_ptr() as *const T))
 	// }
+*/
     }
 
     #[inline]
     fn encastf<T>(&self, endian: Endian) -> Option<T>
     where
-	T: Cast + Flip
+	T: Cast + Flip,
     {
 	let mut val = self.encast::<T>()?;
-	val.flip_var(endian);
+	val.flip_var(endian); // Flip the endianness if necessary.
 	Some(val)
     }
 
     #[inline]
     fn encasts<T>(&self, slice: &mut [T]) -> Option<usize>
     where
-	T: Cast
+	T: Cast,
     {
+	let nbytes = mem::size_of::<T>() * slice.len();
+
+	if self.len() >= nbytes {
+	    unsafe {
+		// Copy the byte slice at the head of `self` into
+		// `slice`.
+		ptr::copy_nonoverlapping(self.as_ptr() as *const u8,
+					 slice.as_mut_ptr() as *mut u8,
+					 nbytes);
+	    }
+	    Some(nbytes)
+	} else {
+	    None
+	}
+
+/*
+	// The previous version was:
+
 	let bytes = self.get(0 .. mem::size_of::<T>() * slice.len())?;
 
 	unsafe {
@@ -176,29 +244,46 @@ impl EncastMem for [u8]
 	}
 
 	Some(bytes.len())
+*/
     }
 
     #[inline]
     fn encastsf<T>(&self, slice: &mut [T], endian: Endian) -> Option<usize>
     where
-	T: Cast + Flip
+	T: Cast + Flip,
     {
+	if !endian.need_swap() {
+	    // The endianness is kept untouched.
+	    self.encasts::<T>(slice)
+	} else {
+	    if self.len() >= mem::size_of::<T>() * slice.len() {
+		// The endianness is flipped to swapped endian.
+		self.encastsf_swapped(slice)
+	    } else {
+		None
+	    }
+	}
+
+/*
+	// The previous version was:
+
 	let size = self.encasts::<T>(slice)?;
 	for elem in slice {
 	    elem.flip_var(endian);
 	}
 	Some(size)
+*/
     }
 
     #[cfg(feature = "alloc")]
-    #[inline]
     fn encastv<T>(&self, nelem: usize) -> Option<Vec<T>>
     where
-	T: Cast
+	T: Cast,
     {
 	let mut vec: Vec<T> = Vec::new();
 
 	unsafe {
+	    // Append values created from `self` to `vec`.
 	    vec.push_bulk(nelem, | new_slice | {
 		self.encasts(new_slice).ok_or(())
 	    }).ok()?;
@@ -211,12 +296,97 @@ impl EncastMem for [u8]
     #[inline]
     fn encastvf<T>(&self, nelem: usize, endian: Endian) -> Option<Vec<T>>
     where
-	T: Cast + Flip
+	T: Cast + Flip,
     {
+	if !endian.need_swap() {
+	    // The endianness is kept untouched.
+	    self.encastv::<T>(nelem)
+	} else {
+	    // The endianness is flipped to swapped endian.
+	    self.encastvf_swapped(nelem)
+	}
+
+/*
+	// The previous version was:
+
 	let mut vec = self.encastv::<T>(nelem)?;
 	for elem in &mut vec {
 	    elem.flip_var(endian);
 	}
+	Some(vec)
+*/
+    }
+}
+
+
+///
+/// Defines internal methods to `encast` and `endian-flip` on memory.
+///
+trait EncastMemInternal {
+    /// Creates values of type `T` from memory representations of the
+    /// type at the head of a byte slice `self`, saves the values in
+    /// `slice`, and returns the number of the source bytes in
+    /// `Some(usize)`.
+    ///
+    /// The endianness of each resulting value is the swapped one of
+    /// the endianness of the corresponding source bytes.
+    ///
+    /// If `self` does not have enough bytes, `None` is returned.
+    fn encastsf_swapped<T>(&self, slice: &mut [T]) -> Option<usize>
+    where
+	T: Cast + Flip;
+
+    /// Creates a vector of values of type `T` from memory
+    /// representations of the type at the head of a byte slice
+    /// `self`, and returns the vector in `Some(Vec<T>)`.
+    ///
+    /// The number of elements in the resulting vector is specified by
+    /// `nelem`.
+    ///
+    /// The endianness of each resulting value is the swapped one of
+    /// the endianness of the corresponding source bytes.
+    ///
+    /// If `self` does not have enough bytes, `None` is returned.
+    fn encastvf_swapped<T>(&self, nelem: usize) -> Option<Vec<T>>
+    where
+	T: Cast + Flip;
+}
+
+impl EncastMemInternal for [u8]
+{
+    fn encastsf_swapped<T>(&self, slice: &mut [T]) -> Option<usize>
+    where
+	T: Cast + Flip,
+    {
+	debug_assert!(self.len() >= mem::size_of::<T>() * slice.len());
+
+	let mut off = 0;
+
+	// Save endian-flipped values created from `self` to `slice`.
+	for elem in slice {
+	    *elem = self[off ..].encast::<T>()?.flip_val_swapped();
+	    off += mem::size_of::<T>();
+	}
+
+	Some(off)
+    }
+
+    fn encastvf_swapped<T>(&self, nelem: usize) -> Option<Vec<T>>
+    where
+	T: Cast + Flip,
+    {
+	let mut vec: Vec<T> = Vec::new();
+
+	unsafe {
+	    // Append endian-flipped values created from `self` to `vec`.
+	    vec.push_bulk(nelem, | new_slice | {
+		match self.encastsf_swapped(new_slice) {
+		    Some(nbytes) => Ok(nbytes),
+		    None => Err(()),
+		}
+	    }).ok()?;
+	}
+
 	Some(vec)
     }
 }

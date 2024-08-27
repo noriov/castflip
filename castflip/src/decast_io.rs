@@ -1,6 +1,5 @@
 use core::mem;
-use std::io::{Write, Result};
-#[cfg(doc)] use std::io;
+use std::io;
 
 use crate::{Cast, Endian, Flip};
 use crate::experimental::AsifBytes;
@@ -131,52 +130,67 @@ use crate::experimental::AsifBytes;
 /// ```
 ///
 pub trait DecastIO {
-    /// Encodes the value pointed by `val_ptr` of type `T` to bytes
-    /// and writes them to output `self`.  The endianness of the
-    /// resulting bytes is not flipped.
-    fn decast<T>(&mut self, val_ptr: &T) -> Result<usize>
+    /// Writes the memory representation of a value `val` to a writer
+    /// `self` and returns the number of the output bytes in
+    /// `Ok(usize)`.
+    ///
+    /// The endianness of the output bytes is the same as the
+    /// endianness of `val`.  In typical cases, both are native.
+    ///
+    /// If an error is detected, `Err(io::Error)` is returned.
+    fn decast<T>(&mut self, val: &T) -> io::Result<usize>
     where
 	T: Cast;
 
-    /// Encodes the value pointed by `val_ptr` of type `T` to bytes
-    /// and writes them to output `self`.  The endianness of the
-    /// resulting bytes is flipped if necessary.  The endianness of
-    /// the resulting bytes is specified in `endian`.
-    fn decastf<T>(&mut self, val_ptr: &T, endian: Endian) -> Result<usize>
+    /// Writes the memory representation of a value `val` to a writer
+    /// `self` and returns the number of the output bytes is
+    /// `Ok(usize)`.
+    ///
+    /// The endianness of the output bytes is flipped as specified by
+    /// `endian` on the assumption that the endianness of `val` is
+    /// native endian.
+    ///
+    /// If an error is detected, `Err(io::Error)` is returned.
+    fn decastf<T>(&mut self, val: &T, endian: Endian) -> io::Result<usize>
     where
 	T: Cast + Flip;
 
-    /// Encodes value(s) in `slice` of type `T` to bytes and writes
-    /// them to output `self`.  The endianness of the resulting bytes
-    /// is not flipped.
-    fn decasts<T>(&mut self, slice: &[T]) -> Result<usize>
+    /// Writes the memory representation of the values in `slice` to a
+    /// writer `self` and returns the number of the output bytes is
+    /// `Ok(usize)`.
+    ///
+    /// The endianness of the output bytes is the same as the
+    /// endianness of `slice`.  In typical cases, both are native.
+    ///
+    /// If an error is detected, `Err(io::Error)` is returned.
+    fn decasts<T>(&mut self, slice: &[T]) -> io::Result<usize>
     where
 	T: Cast;
 
-    /// Encodes value(s) in `slice` of type `T` to bytes and writes
-    /// them to output `self`.  The endianness of the resulting bytes
-    /// is flipped if necessary.  The endianness of the resulting
-    /// bytes is specified in `endian`.
-    fn decastsf<T>(&mut self, slice: &[T], endian: Endian) -> Result<usize>
+    /// Writes the memory representation of the values `slice` to a
+    /// writer `self` and returns the number of the output bytes is
+    /// `Ok(usize)`.
+    ///
+    /// The endianness of the output bytes is flipped as specified by
+    /// `endian` on the assumption that the endianness of `slice` is
+    /// native endian.
+    ///
+    /// If an error is detected, `Err(io::Error)` is returned.
+    fn decastsf<T>(&mut self, slice: &[T], endian: Endian) -> io::Result<usize>
     where
 	T: Cast + Flip;
 
-    /// Encodes value(s) in `slice` of type `T` to bytes and writes
-    /// them to output `self`.  The endianness of the resulting bytes
-    /// is not flipped.
-    /// (This method is replaced by `decasts`)
-    #[cfg(feature = "std")]
-    fn decastv<T>(&mut self, slice: &[T]) -> Result<usize>
+    /// Is equivalent to `decasts`.
+    ///
+    /// This method will be deprecated in a future release.
+    fn decastv<T>(&mut self, slice: &[T]) -> io::Result<usize>
     where
 	T: Cast;
 
-    /// Encodes value(s) in `slice` of type `T` to bytes and writes
-    /// them to output `self`.  The endianness of the resulting bytes
-    /// is flipped if necessary.  The endianness of the resulting
-    /// bytes is specified in `endian`.
-    /// (This method is replaced by `decastsf`)
-    #[cfg(feature = "std")]
-    fn decastvf<T>(&mut self, slice: &[T], endian: Endian) -> Result<usize>
+    /// Is equivalent to `decastsf`.
+    ///
+    /// This method will be deprecated in a future release.
+    fn decastvf<T>(&mut self, slice: &[T], endian: Endian) -> io::Result<usize>
     where
 	T: Cast + Flip;
 }
@@ -184,72 +198,116 @@ pub trait DecastIO {
 
 impl<W> DecastIO for W
 where
-    W: ?Sized + Write
+    W: ?Sized + io::Write,
 {
     #[inline]
-    fn decast<T>(&mut self, val_ptr: &T) -> Result<usize>
+    fn decast<T>(&mut self, val: &T) -> io::Result<usize>
     where
-	T: Cast
+	T: Cast,
     {
 	unsafe {
-	    self.write_all(val_ptr.asif_bytes_ref())?;
+	    // Write the memory representation of `val` to a writer
+	    // `self`.
+	    self.write_all(val.asif_bytes_ref())?;
 	}
+
 	Ok(mem::size_of::<T>())
     }
 
     #[inline]
-    fn decastf<T>(&mut self, val_ptr: &T, endian: Endian) -> Result<usize>
+    fn decastf<T>(&mut self, val: &T, endian: Endian) -> io::Result<usize>
     where
-	T: Cast + Flip
+	T: Cast + Flip,
     {
 	if !endian.need_swap() {
-	    self.decast::<T>(val_ptr)
+	    // The endianness is kept untouched.
+	    self.decast::<T>(val)
 	} else {
-	    self.decast::<T>(&val_ptr.flip_val_swapped())
+	    // The endianness is flipped to swapped endian.
+	    self.decast::<T>(&val.flip_val_swapped())
 	}
     }
 
     #[inline]
-    fn decasts<T>(&mut self, slice: &[T]) -> Result<usize>
+    fn decasts<T>(&mut self, slice: &[T]) -> io::Result<usize>
     where
-	T: Cast
+	T: Cast,
     {
 	unsafe {
+	    // Write the memory representations of the values in
+	    // `slice` to a writer `self`.
 	    self.write_all(slice.asif_bytes_ref())?;
 	}
+
 	Ok(mem::size_of::<T>() * slice.len())
     }
 
     #[inline]
-    fn decastsf<T>(&mut self, slice: &[T], endian: Endian) -> Result<usize>
+    fn decastsf<T>(&mut self, slice: &[T], endian: Endian) -> io::Result<usize>
     where
-	T: Cast + Flip
+	T: Cast + Flip,
     {
 	if !endian.need_swap() {
+	    // The endianness is kept untouched.
 	    self.decasts::<T>(slice)
 	} else {
-	    for elem in slice {
-		self.decast::<T>(&elem.flip_val_swapped())?;
-	    }
-	    Ok(mem::size_of::<T>() * slice.len())
+	    // The endianness is flipped to swapped endian.
+	    self.decastsf_swapped(slice)
 	}
     }
 
-    #[cfg(feature = "std")]
     #[inline]
-    fn decastv<T>(&mut self, slice: &[T]) -> Result<usize>
+    fn decastv<T>(&mut self, slice: &[T]) -> io::Result<usize>
     where
-	T: Cast
+	T: Cast,
     {
+	// `decastv` is equivalent to `decasts`.
 	self.decasts(slice)
     }
 
-    #[cfg(feature = "std")]
     #[inline]
-    fn decastvf<T>(&mut self, slice: &[T], endian: Endian) -> Result<usize>
+    fn decastvf<T>(&mut self, slice: &[T], endian: Endian) -> io::Result<usize>
     where
-	T: Cast + Flip
+	T: Cast + Flip,
     {
+	// `decastvf` is equivalent to `decastsf`.
 	self.decastsf(slice, endian)
+    }
+}
+
+
+///
+/// Defines an internal method to `decast` and `endian-flip` through
+/// [`io::Write`].
+///
+trait DecastIOInternal {
+    /// Writes the memory representation of the values in `slice` to a
+    /// writer `self` and returns the number of output bytes in
+    /// `Ok(usize)`.
+    ///
+    /// The endianness of the output bytes is the swapped one of the
+    /// endianness of `slice`.
+    ///
+    /// If an error is detected, `Err(io::Error)` is returned.
+    fn decastsf_swapped<T>(&mut self, slice: &[T]) -> io::Result<usize>
+    where
+	T: Cast + Flip;
+}
+
+impl<W> DecastIOInternal for W
+where
+    W: ?Sized + io::Write
+{
+    fn decastsf_swapped<T>(&mut self, slice: &[T]) -> io::Result<usize>
+    where
+	T: Cast + Flip,
+    {
+	for elem in slice {
+	    // Flip the endianness of the value in `elem` to swapped
+	    // endian and write the memory representation to `self`.
+	    self.decast::<T>(&elem.flip_val_swapped())?;
+	}
+
+	Ok(mem::size_of::<T>() * slice.len())
     }
 }

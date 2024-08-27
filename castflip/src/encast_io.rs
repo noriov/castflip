@@ -1,11 +1,10 @@
 use core::mem::MaybeUninit;
 use core::mem;
-use std::io::{Read, Result};
-#[cfg(doc)] use std::io;
+use std::io;
 
 use crate::{Cast, Endian, Flip};
-use crate::experimental::{AsifBytes, PushBulk};
 #[cfg(doc)] use crate::BE;
+use crate::experimental::{AsifBytes, PushBulk};
 
 
 ///
@@ -127,52 +126,89 @@ use crate::experimental::{AsifBytes, PushBulk};
 /// ```
 ///
 pub trait EncastIO {
-    /// Decodes the bytes read from input `self` to a value of type
-    /// `T` and returns the value.  The endianness of the resulting
-    /// value is not flipped.
-    fn encast<T>(&mut self) -> Result<T>
+    /// Creates a value of type `T` from a binary representation of
+    /// the type read from a reader `self` and returns the resulting
+    /// value in `Ok(T)`.
+    ///
+    /// The endianness of the resulting value is the same as the
+    /// endianness of the source bytes.  In typical cases, both are
+    /// native.
+    ///
+    /// If an error is detected, `Err(io::Error)` is returned.
+    fn encast<T>(&mut self) -> io::Result<T>
     where
 	T: Cast;
 
-    /// Decodes the bytes read from input `self` to a value of type
-    /// `T` and returns the value.  The endianness of the resulting
-    /// value is flipped if necessary.  The endianness of the bytes is
-    /// specified in `endian`.
-    fn encastf<T>(&mut self, endian: Endian) -> Result<T>
+    /// Creates a value of type `T` from a binary representation of
+    /// the type read from a reader `self` and returns the resulting
+    /// value in `Ok(T)`.
+    ///
+    /// The endianness of the resulting value is flipped to native
+    /// endian.  The endianness of the source bytes must be correctly
+    /// specified by `endian`.
+    ///
+    /// If an error is detected, `Err(io::Error)` is returned.
+    fn encastf<T>(&mut self, endian: Endian) -> io::Result<T>
     where
 	T: Cast + Flip;
 
-    /// Decodes the bytes read from input `self` to value(s) of type
-    /// `T` and fill `slice` with the value(s).  It returns the number
-    /// of decoded bytes.  The endianness of the resulting value(s) is
-    /// not flipped.
-    fn encasts<T>(&mut self, slice: &mut [T]) -> Result<usize>
+    /// Creates values of type `T` from binary representations of the
+    /// type read from a reader `self`, saves the values in `slice`,
+    /// and returns the number of the source bytes in `Ok(usize)`.
+    ///
+    /// The endianness of each resulting value is the same as the
+    /// endianness of the corresponding source bytes.  In typical
+    /// cases, all are native.
+    ///
+    /// If an error is detected, `Err(io::Error)` is returned.
+    fn encasts<T>(&mut self, slice: &mut [T]) -> io::Result<usize>
     where
 	T: Cast;
 
-    /// Decodes the bytes read from input `self` to value(s) of type
-    /// `T` and fill `slice` with the value(s).  It returns the number
-    /// of decoded bytes.  The endianness of the resulting value(s) is
-    /// flipped if necessary.  The endianness of the bytes is
-    /// specified in `endian`.
-    fn encastsf<T>(&mut self, slice: &mut [T], endian: Endian) -> Result<usize>
+    /// Creates values of type `T` from binary representations of the
+    /// type read from a reader `self`, saves the values in `slice`,
+    /// and returns the number of the source bytes in `Ok(usize)`.
+    ///
+    /// The endianness of each resulting value is flipped to native
+    /// endian.  The endianness of the source bytes must be correctly
+    /// specified by `endian`.
+    ///
+    /// If an error is detected, `Err(io::Error)` is returned.
+    fn encastsf<T>(&mut self, slice: &mut [T], endian: Endian)
+		   -> io::Result<usize>
     where
 	T: Cast + Flip;
 
-    /// Decodes the bytes read from input `self` to a vector of
-    /// value(s) of type `T` and returns the vector.  The endianness
-    /// of the resulting value(s) is not flipped.  The number of
-    /// elements in the resulting vecotr is specified in `nelem`.
-    fn encastv<T>(&mut self, nelem: usize) -> Result<Vec<T>>
+    /// Creates a vector of values of type `T` from binary
+    /// representations of the type read from a reader `self` and
+    /// returns the vector in `Ok(Vec<T>)`.
+    ///
+    /// The number of elements in the resulting vector is specified by
+    /// `nelem`.
+    ///
+    /// The endianness of each resulting value is the same as the
+    /// endianness of the corresponding source bytes.  In typical
+    /// cases, all are native.
+    ///
+    /// If an error is detected, `Err(io::Error)` is returned.
+    fn encastv<T>(&mut self, nelem: usize) -> io::Result<Vec<T>>
     where
 	T: Cast;
 
-    /// Decodes the bytes read from input `self` to a vector of
-    /// value(s) of type `T` and returns the vector.  The endianness
-    /// of the resulting value(s) is flipped if necessary.  The
-    /// endianness of the bytes is specified in `endian`.  The number
-    /// of elements in the resulting vecotr is specified in `nelem`.
-    fn encastvf<T>(&mut self, nelem: usize, endian: Endian) -> Result<Vec<T>>
+    /// Creates a vector of values of type `T` from binary
+    /// representations of the type read from a reader `self` and
+    /// returns the vector in `Ok(Vec<T>)`.
+    ///
+    /// The number of elements in the resulting vector is specified by
+    /// `nelem`.
+    ///
+    /// The endianness of each resulting value is flipped to native
+    /// endian.  The endianness of the source bytes must be correctly
+    /// specified by `endian`.
+    ///
+    /// If an error is detected, `Err(io::Error)` is returned.
+    fn encastvf<T>(&mut self, nelem: usize, endian: Endian)
+		   -> io::Result<Vec<T>>
     where
 	T: Cast + Flip;
 }
@@ -180,77 +216,182 @@ pub trait EncastIO {
 
 impl<R> EncastIO for R
 where
-    R: ?Sized + Read
+    R: ?Sized + io::Read,
 {
     #[inline]
-    fn encast<T>(&mut self) -> Result<T>
+    fn encast<T>(&mut self) -> io::Result<T>
     where
-	T: Cast
+	T: Cast,
     {
-	// Decode a value of type T from from `self`.
 	unsafe {
 	    let mut val = MaybeUninit::<T>::uninit();
+
+	    // Read raw bytes from `self` and save them in `val`.
 	    self.read_exact(val.asif_bytes_mut())?;
+
 	    Ok(val.assume_init())
 	}
     }
 
     #[inline]
-    fn encastf<T>(&mut self, endian: Endian) -> Result<T>
+    fn encastf<T>(&mut self, endian: Endian) -> io::Result<T>
     where
-	T: Cast + Flip
+	T: Cast + Flip,
     {
 	let mut val = self.encast::<T>()?;
-	val.flip_var(endian);
+	val.flip_var(endian); // Flip the endianness if necessary.
 	Ok(val)
     }
 
     #[inline]
-    fn encasts<T>(&mut self, slice: &mut [T]) -> Result<usize>
+    fn encasts<T>(&mut self, slice: &mut [T]) -> io::Result<usize>
     where
-	T: Cast
+	T: Cast,
     {
 	unsafe {
+	    // Read raw bytes from `self` and save them in `slice`.
 	    self.read_exact(slice.asif_bytes_mut())?;
 	}
+
 	Ok(mem::size_of::<T>() * slice.len())
     }
 
     #[inline]
-    fn encastsf<T>(&mut self, slice: &mut [T], endian: Endian) -> Result<usize>
+    fn encastsf<T>(&mut self, slice: &mut [T], endian: Endian)
+		   -> io::Result<usize>
     where
-	T: Cast + Flip
+	T: Cast + Flip,
     {
+	if !endian.need_swap() {
+	    // The endianness is kept untouched.
+	    self.encasts::<T>(slice)
+	} else {
+	    // The endianness is flipped to swapped endian.
+	    self.encastsf_swapped(slice)
+	}
+
+/*
+	// The previous version was:
+
 	let size = self.encasts::<T>(slice)?;
 	for elem in slice {
 	    elem.flip_var(endian);
 	}
 	Ok(size)
+*/
     }
 
-    #[inline]
-    fn encastv<T>(&mut self, nelem: usize) -> Result<Vec<T>>
+    fn encastv<T>(&mut self, nelem: usize) -> io::Result<Vec<T>>
     where
-	T: Cast
+	T: Cast,
     {
 	let mut vec: Vec<T> = Vec::new();
 
 	unsafe {
-	    vec.push_bulk(nelem, | new_slice | { self.encasts(new_slice) })?;
+	    // Append values created from `self` to `vec`.
+	    vec.push_bulk(nelem, | new_slice | {
+		self.encasts(new_slice)
+	    })?;
 	}
 
 	Ok(vec)
     }
 
     #[inline]
-    fn encastvf<T>(&mut self, nelem: usize, endian: Endian) -> Result<Vec<T>>
+    fn encastvf<T>(&mut self, nelem: usize, endian: Endian)
+		   -> io::Result<Vec<T>>
     where
-	T: Cast + Flip
+	T: Cast + Flip,
     {
+	if !endian.need_swap() {
+	    // The endianness is kept untouched.
+	    self.encastv::<T>(nelem)
+	} else {
+	    // The endianness is flipped to swapped endian.
+	    self.encastvf_swapped(nelem)
+	}
+
+/*
+	// The previous version was:
+
 	let mut vec = self.encastv::<T>(nelem)?;
 	for elem in &mut vec {
 	    elem.flip_var(endian);
 	}
+	Ok(vec)
+*/
+    }
+}
+
+
+///
+/// Defines internal methods to `encast` and `endian-flip` through
+/// [`io::Read`].
+///
+trait EncastIOInternal {
+    /// Creates values of type `T` from binary representations of the
+    /// type read from a reader `self`, saves the values in `slice`,
+    /// and returns the number of the source bytes in `Ok(usize)`.
+    ///
+    /// The endianness of each resulting value is the swapped one of
+    /// the endianness of the corresponding source bytes.
+    ///
+    /// If an error is detected, `Err(io::Error)` is returned.
+    fn encastsf_swapped<T>(&mut self, slice: &mut [T]) -> io::Result<usize>
+    where
+	T: Cast + Flip;
+
+    /// Creates a vector of values of type `T` from binary
+    /// representations of the type read from a reader `self`, and
+    /// returns the vector in `Ok(Vec<T>)`.
+    ///
+    /// The number of elements in the resulting vector is specified by
+    /// `nelem`.
+    ///
+    /// The endianness of each resulting value is the swapped one of
+    /// the endianness of the corresponding source bytes.
+    ///
+    /// If an error is detected, `Err(io::Error)` is returned.
+    fn encastvf_swapped<T>(&mut self, nelem: usize) -> io::Result<Vec<T>>
+    where
+	T: Cast + Flip;
+}
+
+impl<R> EncastIOInternal for R
+where
+    R: ?Sized + io::Read,
+{
+    fn encastsf_swapped<T>(&mut self, slice: &mut [T]) -> io::Result<usize>
+    where
+	T: Cast + Flip,
+    {
+	let nbytes = mem::size_of::<T>() * slice.len();
+
+	// Save endian-flipped values created from `self` to `slice`.
+	for elem in slice {
+	    *elem = self.encast::<T>()?.flip_val_swapped();
+	}
+
+	Ok(nbytes)
+    }
+
+    fn encastvf_swapped<T>(&mut self, nelem: usize) -> io::Result<Vec<T>>
+    where
+	T: Cast + Flip,
+    {
+	let mut vec: Vec<T> = Vec::new();
+
+	unsafe {
+	    // Append endian-flipped values created from `self` to `vec`.
+	    vec.push_bulk(nelem, | new_slice | {
+		let nbytes = mem::size_of::<T>() * new_slice.len();
+		for elem in new_slice {
+		    *elem = self.encast::<T>()?.flip_val_swapped();
+		}
+		Ok::<usize, io::Error>(nbytes)
+	    })?;
+	}
+
 	Ok(vec)
     }
 }

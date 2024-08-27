@@ -74,50 +74,67 @@ use crate::{Cast, Endian, Flip};
 /// bytes is flipped if necessary.
 ///
 pub trait DecastMem {
-    /// Encodes the value pointed by `val_ptr` of type `T` to bytes
-    /// and stores them at the head of `self`.  The endianness of the
-    /// resulting bytes is not flipped.
-    fn decast<T>(&mut self, val_ptr: &T) -> Option<usize>
+    /// Copies the memory representation of a value `val` onto the
+    /// head of a byte slice `self` and returns the number of the
+    /// resulting bytes in `Some(usize)`.
+    ///
+    /// The endianness of the resulting bytes is the same as the
+    /// endianness of `val`.  In typical cases, both are native.
+    ///
+    /// If `self` does not have enough room, `None` is returned.
+    fn decast<T>(&mut self, val: &T) -> Option<usize>
     where
 	T: Cast;
 
-    /// Encodes the value pointed by `val_ptr` of type `T` to bytes
-    /// and stores them at the head of `self`.  The endianness of the
-    /// resulting bytes is flipped if necessary.  The endianness of
-    /// the bytes is specified in `endian`.
-    fn decastf<T>(&mut self, val_ptr: &T, endian: Endian) -> Option<usize>
+    /// Copies the memory representation of a value `val` onto the
+    /// head of a byte slice `self` and returns the number of the
+    /// resulting bytes in `Some(usize)`.
+    ///
+    /// The endianness of the resulting bytes is flipped as specified by
+    /// `endian` on the assumption that the endianness of `val` is
+    /// native endian.
+    ///
+    /// If `self` does not have enough room, `None` is returned.
+    fn decastf<T>(&mut self, val: &T, endian: Endian) -> Option<usize>
     where
 	T: Cast + Flip;
 
-    /// Encodes value(s) in `slice` of type `T` to bytes and stores
-    /// them at the head of `self`.  The endianness of the resulting
-    /// bytes is not flipped.
+    /// Copies the memory representation of the values in `slice` onto
+    /// the head of a byte slice `self` and returns the number of the
+    /// resulting bytes in `Some(usize)`.
+    ///
+    /// The endianness of the resulting bytes is the same as the
+    /// endianness of `slice`.  In typical cases, both are native.
+    ///
+    /// If `self` does not have enough room, `None` is returned.
     fn decasts<T>(&mut self, slice: &[T]) -> Option<usize>
     where
 	T: Cast;
 
-    /// Encodes value(s) in `slice` of type `T` to bytes and stores
-    /// them at the head of `self`.  The endianness of the resulting
-    /// bytes is flipped if necessary.  The endianness of the
-    /// resulting bytes is specified in `endian`.
+    /// Copies the memory representation of the values in `slice` onto
+    /// the head of a byte slice `self` and returns the number of the
+    /// resulting bytes in `Some(usize)`.
+    ///
+    /// The endianness of the resulting bytes is flipped as specified by
+    /// `endian` on the assumption that the endianness of `slice` is
+    /// native endian.
+    ///
+    /// If `self` does not have enough room, `None` is returned.
     fn decastsf<T>(&mut self, slice: &[T], endian: Endian) -> Option<usize>
     where
 	T: Cast + Flip;
 
-    /// Encodes value(s) in `slice` of type `T` to bytes and stores
-    /// them at the head of `self`.  The endianness of the resulting
-    /// bytes is not flipped.
-    /// (This method is replaced by `decasts`)
+    /// Is equivalent to `decasts`.
+    ///
+    /// This method will be deprecated in a future release.
     #[cfg(feature = "alloc")]
     fn decastv<T>(&mut self, slice: &[T]) -> Option<usize>
     where
 	T: Cast;
 
-    /// Encodes value(s) in `slice` of type `T` to bytes and stores
-    /// them at the head of `self`.  The endianness of the resulting
-    /// bytes is flipped if necessary.  The endianness of the
-    /// resulting bytes is specified in `endian`.
-    /// (This method is replaced by `decastsf`)
+    /// Is equivalent to `decastsf`.
+    ///
+    /// This method will be deprecated in a future release.
     #[cfg(feature = "alloc")]
     fn decastvf<T>(&mut self, slice: &[T], endian: Endian) -> Option<usize>
     where
@@ -128,10 +145,28 @@ pub trait DecastMem {
 impl DecastMem for [u8]
 {
     #[inline]
-    fn decast<T>(&mut self, val_ptr: &T) -> Option<usize>
+    fn decast<T>(&mut self, val: &T) -> Option<usize>
     where
-	T: Cast
+	T: Cast,
     {
+	let nbytes = mem::size_of::<T>();
+
+	if self.len() >= nbytes {
+	    unsafe {
+		// Copy the memory representation of `val` onto the
+		// head of `self`.
+		ptr::copy_nonoverlapping(val as *const T as *const u8,
+					 self.as_mut_ptr() as *mut u8,
+					 nbytes);
+	    }
+	    Some(nbytes)
+	} else {
+	    None
+	}
+
+/*
+	// The previous version was:
+
 	let bytes = self.get_mut(0 .. mem::size_of::<T>())?;
 
 	unsafe {
@@ -147,25 +182,46 @@ impl DecastMem for [u8]
 	//    ptr::write_unaligned(bytes.as_mut_ptr() as *mut T,
 	//                         ptr::read(val_ptr))
 	// }
+*/
     }
 
     #[inline]
-    fn decastf<T>(&mut self, val_ptr: &T, endian: Endian) -> Option<usize>
+    fn decastf<T>(&mut self, val: &T, endian: Endian) -> Option<usize>
     where
-	T: Cast + Flip
+	T: Cast + Flip,
     {
 	if !endian.need_swap() {
-	    self.decast::<T>(val_ptr)
+	    // The endianness is kept untouched.
+	    self.decast::<T>(val)
 	} else {
-	    self.decast::<T>(&val_ptr.flip_val_swapped())
+	    // The endianness is flipped to swapped endian.
+	    self.decast::<T>(&val.flip_val_swapped())
 	}
     }
 
     #[inline]
     fn decasts<T>(&mut self, slice: &[T]) -> Option<usize>
     where
-	T: Cast
+	T: Cast,
     {
+	let nbytes = mem::size_of::<T>() * slice.len();
+
+	if self.len() >= nbytes {
+	    // Copy the memory representations of the values in
+	    // `slice` onto the head of `self`.
+	    unsafe {
+		ptr::copy_nonoverlapping(slice.as_ptr() as *const u8,
+					 self.as_mut_ptr() as *mut u8,
+					 nbytes);
+	    }
+	    Some(nbytes)
+	} else {
+	    None
+	}
+
+/*
+	// The previous version was:
+
 	let bytes = self.get_mut(0 .. mem::size_of::<T>() * slice.len())?;
 
 	unsafe {
@@ -175,13 +231,29 @@ impl DecastMem for [u8]
 	}
 
 	Some(bytes.len())
+*/
     }
 
     #[inline]
     fn decastsf<T>(&mut self, slice: &[T], endian: Endian) -> Option<usize>
     where
-	T: Cast + Flip
+	T: Cast + Flip,
     {
+	if !endian.need_swap() {
+	    // The endianness is kept untouched.
+	    self.decasts::<T>(slice)
+	} else {
+	    if self.len() >= mem::size_of::<T>() * slice.len() {
+		// The endianness is flipped to swapped endian.
+		self.decastsf_swapped(slice)
+	    } else {
+		None
+	    }
+	}
+
+/*
+	// The previous version was:
+
 	if !endian.need_swap() {
 	    self.decasts::<T>(slice)
 	} else {
@@ -193,14 +265,16 @@ impl DecastMem for [u8]
 	    }
 	    Some(off)
 	}
+*/
     }
 
     #[cfg(feature = "alloc")]
     #[inline]
     fn decastv<T>(&mut self, slice: &[T]) -> Option<usize>
     where
-	T: Cast
+	T: Cast,
     {
+	// `decastv` is equivalent to `decasts`.
 	self.decasts::<T>(slice)
     }
 
@@ -208,8 +282,48 @@ impl DecastMem for [u8]
     #[inline]
     fn decastvf<T>(&mut self, slice: &[T], endian: Endian) -> Option<usize>
     where
-	T: Cast + Flip
+	T: Cast + Flip,
     {
+	// `decastvf` is equivalent to `decastsf`.
 	self.decastsf::<T>(slice, endian)
+    }
+}
+
+
+///
+/// Defines an internal method to `decast` and `endian-flip` on memory.
+///
+trait DecastMemInternal {
+    /// Copies the memory representation of the values in `slice` onto
+    /// the head of a byte slice `self` and returns the number of the
+    /// resulting bytes in `Some(usize)`.
+    ///
+    /// The endianness of the resulting bytes is the swapped one of the
+    /// endianness of `slice`.
+    ///
+    /// If `self` does not have enough room, `None` is returned.
+    fn decastsf_swapped<T>(&mut self, slice: &[T]) -> Option<usize>
+    where
+	T: Cast + Flip;
+}
+
+impl DecastMemInternal for [u8]
+{
+    fn decastsf_swapped<T>(&mut self, slice: &[T]) -> Option<usize>
+    where
+	T: Cast + Flip,
+    {
+	debug_assert!(self.len() >= mem::size_of::<T>() * slice.len());
+
+	let mut off = 0;
+
+	for elem in slice {
+	    // Flip the endianness of the value in `elem` to swapped
+	    // endian and copy the memory representation onto `self`.
+	    self[off ..].decast::<T>(&elem.flip_val_swapped())?;
+	    off += mem::size_of::<T>();
+	}
+
+	Some(off)
     }
 }
