@@ -18,9 +18,9 @@ pub fn proc_tokens(input: TokenStream) -> TokenStream {
 		    proc_unit_struct(&ast.ident),
 	    },
 	Data::Enum(_data_enum) =>
-	    panic!("Trait Flip cannot be implemented for enum."),
+	    panic!("The derive macro Flip does not support enum."),
 	Data::Union(_data_union) =>
-	    panic!("Trait Flip cannot be implemented for union."),
+	    panic!("The derive macro Flip does not support union."),
     }
 }
 
