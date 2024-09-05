@@ -1,6 +1,7 @@
 use proc_macro::TokenStream;
 use quote::quote;
-use syn::{Data, DeriveInput, Fields, FieldsNamed, FieldsUnnamed, Ident};
+use syn::{Data, DeriveInput, Field, Fields, Ident,
+	  punctuated::Punctuated, token::Comma};
 
 
 pub fn proc_tokens(input: TokenStream) -> TokenStream {
@@ -11,22 +12,22 @@ pub fn proc_tokens(input: TokenStream) -> TokenStream {
 	Data::Struct(data_struct) =>
 	    match &data_struct.fields {
 		Fields::Named(fields_named) =>
-		    proc_named_struct(&ast.ident, fields_named),
+		    with_bounds(&ast.ident, &fields_named.named),
 		Fields::Unnamed(fields_unnamed) =>
-		    proc_unnamed_struct(&ast.ident, fields_unnamed),
+		    with_bounds(&ast.ident, &fields_unnamed.unnamed),
 		Fields::Unit =>
-		    proc_unit_struct(&ast.ident),
+		    without_bounds(&ast.ident),
 	    },
 	Data::Enum(_data_enum) =>
-	    panic!("Trait Cast cannot be implemented for enum."),
+	    panic!("The derive macro Cast does not support enum."),
 	Data::Union(data_union) =>
-	    proc_union(&ast.ident, &data_union.fields),
+	    with_bounds(&ast.ident, &data_union.fields.named),
     }
 }
 
-// e.g. struct Ident { field1: Type1, field2: Type2, ... }
-fn proc_named_struct(ident: &Ident, fields: &FieldsNamed) -> TokenStream {
-    let field_type = fields.named.iter().map(|field| &field.ty);
+fn with_bounds(ident: &Ident,
+	       punctuated: &Punctuated<Field, Comma>) -> TokenStream {
+    let field_type = punctuated.iter().map(|field| &field.ty);
 
     quote! {
 	impl castflip::Cast for #ident
@@ -36,33 +37,8 @@ fn proc_named_struct(ident: &Ident, fields: &FieldsNamed) -> TokenStream {
     }.into()
 }
 
-// e.g. struct Ident ( Type1, Type2, ... );
-fn proc_unnamed_struct(ident: &Ident, fields: &FieldsUnnamed) -> TokenStream {
-    let field_type = fields.unnamed.iter().map(|field| &field.ty);
-
-    quote! {
-	impl castflip::Cast for #ident
-	where
-	    #( #field_type: castflip::Cast, )*
-	{}
-    }.into()
-}
-
-// e.g. struct Ident;
-fn proc_unit_struct(ident: &Ident) -> TokenStream {
+fn without_bounds(ident: &Ident) -> TokenStream {
     quote! {
 	impl castflip::Cast for #ident {}
-    }.into()
-}
-
-// e.g. union Ident { field1: Type1, field2: Type2, ... }
-fn proc_union(ident: &Ident, fields: &FieldsNamed) -> TokenStream {
-    let field_type = fields.named.iter().map(|field| &field.ty);
-
-    quote! {
-	impl castflip::Cast for #ident
-	where
-	    #( #field_type: castflip::Cast, )*
-	{}
     }.into()
 }
