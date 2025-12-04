@@ -19,13 +19,13 @@ fn udata2() {
     let ne_slice_from_be = &mut ne_array_from_be[..];
 
     let ne_size = udata2.ne_bytes.encastsf::<u32>(ne_slice_from_ne, NE)
-	.unwrap();
+        .unwrap();
     let se_size = udata2.se_bytes.encastsf::<u32>(ne_slice_from_se, SE)
-	.unwrap();
+        .unwrap();
     let le_size = udata2.le_bytes.encastsf::<u32>(ne_slice_from_le, LE)
-	.unwrap();
+        .unwrap();
     let be_size = udata2.be_bytes.encastsf::<u32>(ne_slice_from_be, BE)
-	.unwrap();
+        .unwrap();
 
     assert_eq!(ne_size, size_of::<u32>() * NELEM2);
     assert_eq!(se_size, size_of::<u32>() * NELEM2);

@@ -7,26 +7,26 @@ use crate::{IData1, UData1};
 
 macro_rules! test {
     ( $data:expr, $field:ident, $ty:ty , $start:expr, $end:expr ) => {
-	{
-	    let data = $data;
+        {
+            let data = $data;
 
-	    let mut ne_bytes = [0_u8; size_of::<$ty>()];
-	    let mut se_bytes = [0_u8; size_of::<$ty>()];
-	    let mut le_bytes = [0_u8; size_of::<$ty>()];
-	    let mut be_bytes = [0_u8; size_of::<$ty>()];
+            let mut ne_bytes = [0_u8; size_of::<$ty>()];
+            let mut se_bytes = [0_u8; size_of::<$ty>()];
+            let mut le_bytes = [0_u8; size_of::<$ty>()];
+            let mut be_bytes = [0_u8; size_of::<$ty>()];
 
-	    let ne_size = data.ne_vals.$field as $ty;
+            let ne_size = data.ne_vals.$field as $ty;
 
-	    <$ty>::decastf(&mut ne_bytes, &ne_size, NE).unwrap();
-	    <$ty>::decastf(&mut se_bytes, &ne_size, SE).unwrap();
-	    <$ty>::decastf(&mut le_bytes, &ne_size, LE).unwrap();
-	    <$ty>::decastf(&mut be_bytes, &ne_size, BE).unwrap();
+            <$ty>::decastf(&mut ne_bytes, &ne_size, NE).unwrap();
+            <$ty>::decastf(&mut se_bytes, &ne_size, SE).unwrap();
+            <$ty>::decastf(&mut le_bytes, &ne_size, LE).unwrap();
+            <$ty>::decastf(&mut be_bytes, &ne_size, BE).unwrap();
 
-	    assert_eq!(ne_bytes, data.ne_bytes[$start .. $end]);
-	    assert_eq!(se_bytes, data.se_bytes[$start .. $end]);
-	    assert_eq!(le_bytes, data.le_bytes[$start .. $end]);
-	    assert_eq!(be_bytes, data.be_bytes[$start .. $end]);
-	}
+            assert_eq!(ne_bytes, data.ne_bytes[$start .. $end]);
+            assert_eq!(se_bytes, data.se_bytes[$start .. $end]);
+            assert_eq!(le_bytes, data.le_bytes[$start .. $end]);
+            assert_eq!(be_bytes, data.be_bytes[$start .. $end]);
+        }
     }
 }
 
@@ -36,10 +36,10 @@ fn idata1() {
     let idata1 = IData1::gen();
 
     match ISIZE_SIZE {
-	I32_SIZE  => test!(idata1, val_i32,  isize,  4,  8),
-	I64_SIZE  => test!(idata1, val_i64,  isize,  8, 16),
-	I128_SIZE => test!(idata1, val_i128, isize, 16, 32),
-	_ => panic!(),
+        I32_SIZE  => test!(idata1, val_i32,  isize,  4,  8),
+        I64_SIZE  => test!(idata1, val_i64,  isize,  8, 16),
+        I128_SIZE => test!(idata1, val_i128, isize, 16, 32),
+        _ => panic!(),
     }
 
     const I32_SIZE: usize = size_of::<i32>();
@@ -53,10 +53,10 @@ fn udata1() {
     let udata1 = UData1::gen();
 
     match USIZE_SIZE {
-	U32_SIZE  => test!(udata1, val_u32,  usize,  4,  8),
-	U64_SIZE  => test!(udata1, val_u64,  usize,  8, 16),
-	U128_SIZE => test!(udata1, val_u128, usize, 16, 32),
-	_ => panic!(),
+        U32_SIZE  => test!(udata1, val_u32,  usize,  4,  8),
+        U64_SIZE  => test!(udata1, val_u64,  usize,  8, 16),
+        U128_SIZE => test!(udata1, val_u128, usize, 16, 32),
+        _ => panic!(),
     }
 
     const U32_SIZE: usize = size_of::<u32>();

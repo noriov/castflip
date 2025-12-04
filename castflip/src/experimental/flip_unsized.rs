@@ -47,9 +47,9 @@ pub trait FlipUnsized {
     /// Flips the endianness of the variable (`self`) if `endian` is
     /// different from the one on the target system.
     fn flip_var(&mut self, endian: Endian) {
-	if endian.need_swap() {
-	    self.flip_var_swapped();
-	}
+        if endian.need_swap() {
+            self.flip_var_swapped();
+        }
     }
 }
 
@@ -59,9 +59,9 @@ where
     T: Flip
 {
     fn flip_var_swapped(&mut self) {
-	for elem in self {
-	    elem.flip_var_swapped();
-	}
+        for elem in self {
+            elem.flip_var_swapped();
+        }
     }
 }
 
@@ -77,7 +77,7 @@ where
     T0: Flip,
 {
     fn flip_var_swapped(&mut self) {
-	self.0.flip_var_swapped();
+        self.0.flip_var_swapped();
     }
 }
 
@@ -87,8 +87,8 @@ where
     T1: Flip,
 {
     fn flip_var_swapped(&mut self) {
-	self.0.flip_var_swapped();
-	self.1.flip_var_swapped();
+        self.0.flip_var_swapped();
+        self.1.flip_var_swapped();
     }
 }
 
@@ -99,9 +99,9 @@ where
     T2: Flip,
 {
     fn flip_var_swapped(&mut self) {
-	self.0.flip_var_swapped();
-	self.1.flip_var_swapped();
-	self.2.flip_var_swapped();
+        self.0.flip_var_swapped();
+        self.1.flip_var_swapped();
+        self.2.flip_var_swapped();
     }
 }
 
@@ -113,10 +113,10 @@ where
     T3: Flip,
 {
     fn flip_var_swapped(&mut self) {
-	self.0.flip_var_swapped();
-	self.1.flip_var_swapped();
-	self.2.flip_var_swapped();
-	self.3.flip_var_swapped();
+        self.0.flip_var_swapped();
+        self.1.flip_var_swapped();
+        self.2.flip_var_swapped();
+        self.3.flip_var_swapped();
     }
 }
 
@@ -129,11 +129,11 @@ where
     T4: Flip,
 {
     fn flip_var_swapped(&mut self) {
-	self.0.flip_var_swapped();
-	self.1.flip_var_swapped();
-	self.2.flip_var_swapped();
-	self.3.flip_var_swapped();
-	self.4.flip_var_swapped();
+        self.0.flip_var_swapped();
+        self.1.flip_var_swapped();
+        self.2.flip_var_swapped();
+        self.3.flip_var_swapped();
+        self.4.flip_var_swapped();
     }
 }
 
@@ -147,12 +147,12 @@ where
     T5: Flip,
 {
     fn flip_var_swapped(&mut self) {
-	self.0.flip_var_swapped();
-	self.1.flip_var_swapped();
-	self.2.flip_var_swapped();
-	self.3.flip_var_swapped();
-	self.4.flip_var_swapped();
-	self.5.flip_var_swapped();
+        self.0.flip_var_swapped();
+        self.1.flip_var_swapped();
+        self.2.flip_var_swapped();
+        self.3.flip_var_swapped();
+        self.4.flip_var_swapped();
+        self.5.flip_var_swapped();
     }
 }
 
@@ -167,13 +167,13 @@ where
     T6: Flip,
 {
     fn flip_var_swapped(&mut self) {
-	self.0.flip_var_swapped();
-	self.1.flip_var_swapped();
-	self.2.flip_var_swapped();
-	self.3.flip_var_swapped();
-	self.4.flip_var_swapped();
-	self.5.flip_var_swapped();
-	self.6.flip_var_swapped();
+        self.0.flip_var_swapped();
+        self.1.flip_var_swapped();
+        self.2.flip_var_swapped();
+        self.3.flip_var_swapped();
+        self.4.flip_var_swapped();
+        self.5.flip_var_swapped();
+        self.6.flip_var_swapped();
     }
 }
 
@@ -190,13 +190,13 @@ where
     T7: Flip,
 {
     fn flip_var_swapped(&mut self) {
-	self.0.flip_var_swapped();
-	self.1.flip_var_swapped();
-	self.2.flip_var_swapped();
-	self.3.flip_var_swapped();
-	self.4.flip_var_swapped();
-	self.5.flip_var_swapped();
-	self.6.flip_var_swapped();
-	self.7.flip_var_swapped();
+        self.0.flip_var_swapped();
+        self.1.flip_var_swapped();
+        self.2.flip_var_swapped();
+        self.3.flip_var_swapped();
+        self.4.flip_var_swapped();
+        self.5.flip_var_swapped();
+        self.6.flip_var_swapped();
+        self.7.flip_var_swapped();
     }
 }

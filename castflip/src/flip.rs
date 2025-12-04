@@ -157,60 +157,60 @@ pub trait Flip: Sized {
     /// Otherwise, returns exactly the same value as `self`.
     #[inline]
     fn flip_val(&self, endian: Endian) -> Self {
-	if !endian.need_swap() {
-	    unsafe {
-		ptr::read(self)  // Note: Flip is not a subtrait of Copy.
-	    }
-	} else {
-	    self.flip_val_swapped()
-	}
+        if !endian.need_swap() {
+            unsafe {
+                ptr::read(self)  // Note: Flip is not a subtrait of Copy.
+            }
+        } else {
+            self.flip_val_swapped()
+        }
     }
 
     /// Flips the endianness of the variable (`self`).
     #[inline]
     fn flip_var_swapped(&mut self) {
-	*self = self.flip_val_swapped();
+        *self = self.flip_val_swapped();
     }
 
     /// Flips the endianness of the variable (`self`) if `endian` is
     /// different from the endianness of the target system.
     #[inline]
     fn flip_var(&mut self, endian: Endian) {
-	if endian.need_swap() {
-	    self.flip_var_swapped();
-	}
+        if endian.need_swap() {
+            self.flip_var_swapped();
+        }
     }
 }
 
 
 macro_rules! impl_flip_for_int {
     ( $( $ty:ty ),* ) => {
-	$(
-	    impl Flip for $ty {
-		#[inline]
-		fn flip_val_swapped(&self) -> Self {
-		    self.swap_bytes()
-		}
-	    }
-	)*
+        $(
+            impl Flip for $ty {
+                #[inline]
+                fn flip_val_swapped(&self) -> Self {
+                    self.swap_bytes()
+                }
+            }
+        )*
     }
 }
 
 macro_rules! impl_flip_for_float {
     ( $( $ty:ty ),* ) => {
-	$(
-	    impl Flip for $ty {
-		#[inline]
-		fn flip_val_swapped(&self) -> Self {
-		    <$ty>::from_bits(self.to_bits().swap_bytes())
-		}
-	    }
-	)*
+        $(
+            impl Flip for $ty {
+                #[inline]
+                fn flip_val_swapped(&self) -> Self {
+                    <$ty>::from_bits(self.to_bits().swap_bytes())
+                }
+            }
+        )*
     }
 }
 
 impl_flip_for_int!(i8, i16, i32, i64, i128, isize,
-		   u8, u16, u32, u64, u128, usize);
+                   u8, u16, u32, u64, u128, usize);
 impl_flip_for_float!(f32, f64);
 
 
@@ -218,44 +218,44 @@ impl<T: Flip, const N: usize> Flip for [T; N] {
     #[inline]
     fn flip_val_swapped(&self) -> Self
     {
-	unsafe {
-	    let mut array: [MaybeUninit<T>; N] =
-		MaybeUninit::uninit().assume_init();
+        unsafe {
+            let mut array: [MaybeUninit<T>; N] =
+                MaybeUninit::uninit().assume_init();
 
-	    for i in 0 .. N {
-		array[i] = MaybeUninit::new(self[i].flip_val_swapped());
-	    }
+            for i in 0 .. N {
+                array[i] = MaybeUninit::new(self[i].flip_val_swapped());
+            }
 
-	    ptr::read(array.as_ptr() as *const [T; N])
+            ptr::read(array.as_ptr() as *const [T; N])
 
-	    // (1) The reason why we use `as` to cast between types is:
-	    //
-	    // The Rust compiler does not allow the following expression
-	    //
-	    //     core::mem::transmute::<_, [T; N]>(array)
-	    //
-	    // because [T; N] is considered as dependently-sized type in
-	    // this context.  It seems that const N is not a real const.
+            // (1) The reason why we use `as` to cast between types is:
+            //
+            // The Rust compiler does not allow the following expression
+            //
+            //     core::mem::transmute::<_, [T; N]>(array)
+            //
+            // because [T; N] is considered as dependently-sized type in
+            // this context.  It seems that const N is not a real const.
 
-	    // (2) The reason why we use ptr::read() to return the
-	    //     resulting value is:
-	    //
-	    // The Rust compiler does not allow the following expression
-	    //
-	    //     *(array.as_ptr() as *const [T; N])
-	    //
-	    // because Flip is not a subtrait of Copy.
-	    //
-	    // BTW: ptr::read() calls copy_nonoverlapping() inside it.
-	    // We expect the number of copying will be reduced by
-	    // the Rust optimizer.
-	}
+            // (2) The reason why we use ptr::read() to return the
+            //     resulting value is:
+            //
+            // The Rust compiler does not allow the following expression
+            //
+            //     *(array.as_ptr() as *const [T; N])
+            //
+            // because Flip is not a subtrait of Copy.
+            //
+            // BTW: ptr::read() calls copy_nonoverlapping() inside it.
+            // We expect the number of copying will be reduced by
+            // the Rust optimizer.
+        }
     }
 
     #[inline]
     fn flip_var_swapped(&mut self) {
-	for elem in self {
-	    elem.flip_var_swapped();
-	}
+        for elem in self {
+            elem.flip_var_swapped();
+        }
     }
 }

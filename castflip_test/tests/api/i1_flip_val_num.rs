@@ -5,61 +5,61 @@ use crate::{IData1, IVals1};
 #[test]
 fn idata1() {
     {
-	let idata1 = IData1::gen();
+        let idata1 = IData1::gen();
 
-	let se_vals = IVals1 {
-	    val1_i8:  idata1.ne_vals.val1_i8  .flip_val_swapped(),
-	    val2_i8:  idata1.ne_vals.val2_i8  .flip_val_swapped(),
-	    val_i16:  idata1.ne_vals.val_i16  .flip_val_swapped(),
-	    val_i32:  idata1.ne_vals.val_i32  .flip_val_swapped(),
-	    val_i64:  idata1.ne_vals.val_i64  .flip_val_swapped(),
-	    val_i128: idata1.ne_vals.val_i128 .flip_val_swapped(),
-	};
+        let se_vals = IVals1 {
+            val1_i8:  idata1.ne_vals.val1_i8  .flip_val_swapped(),
+            val2_i8:  idata1.ne_vals.val2_i8  .flip_val_swapped(),
+            val_i16:  idata1.ne_vals.val_i16  .flip_val_swapped(),
+            val_i32:  idata1.ne_vals.val_i32  .flip_val_swapped(),
+            val_i64:  idata1.ne_vals.val_i64  .flip_val_swapped(),
+            val_i128: idata1.ne_vals.val_i128 .flip_val_swapped(),
+        };
 
-	assert_eq!(se_vals, idata1.se_vals);
+        assert_eq!(se_vals, idata1.se_vals);
     }
     {
-	let idata1 = IData1::gen();
+        let idata1 = IData1::gen();
 
-	let ne_vals = IVals1 {
-	    val1_i8:  idata1.ne_vals.val1_i8  .flip_val(NE),
-	    val2_i8:  idata1.ne_vals.val2_i8  .flip_val(NE),
-	    val_i16:  idata1.ne_vals.val_i16  .flip_val(NE),
-	    val_i32:  idata1.ne_vals.val_i32  .flip_val(NE),
-	    val_i64:  idata1.ne_vals.val_i64  .flip_val(NE),
-	    val_i128: idata1.ne_vals.val_i128 .flip_val(NE),
-	};
+        let ne_vals = IVals1 {
+            val1_i8:  idata1.ne_vals.val1_i8  .flip_val(NE),
+            val2_i8:  idata1.ne_vals.val2_i8  .flip_val(NE),
+            val_i16:  idata1.ne_vals.val_i16  .flip_val(NE),
+            val_i32:  idata1.ne_vals.val_i32  .flip_val(NE),
+            val_i64:  idata1.ne_vals.val_i64  .flip_val(NE),
+            val_i128: idata1.ne_vals.val_i128 .flip_val(NE),
+        };
 
-	let se_vals = IVals1 {
-	    val1_i8:  idata1.ne_vals.val1_i8  .flip_val(SE),
-	    val2_i8:  idata1.ne_vals.val2_i8  .flip_val(SE),
-	    val_i16:  idata1.ne_vals.val_i16  .flip_val(SE),
-	    val_i32:  idata1.ne_vals.val_i32  .flip_val(SE),
-	    val_i64:  idata1.ne_vals.val_i64  .flip_val(SE),
-	    val_i128: idata1.ne_vals.val_i128 .flip_val(SE),
-	};
+        let se_vals = IVals1 {
+            val1_i8:  idata1.ne_vals.val1_i8  .flip_val(SE),
+            val2_i8:  idata1.ne_vals.val2_i8  .flip_val(SE),
+            val_i16:  idata1.ne_vals.val_i16  .flip_val(SE),
+            val_i32:  idata1.ne_vals.val_i32  .flip_val(SE),
+            val_i64:  idata1.ne_vals.val_i64  .flip_val(SE),
+            val_i128: idata1.ne_vals.val_i128 .flip_val(SE),
+        };
 
-	let le_vals = IVals1 {
-	    val1_i8:  idata1.ne_vals.val1_i8  .flip_val(LE),
-	    val2_i8:  idata1.ne_vals.val2_i8  .flip_val(LE),
-	    val_i16:  idata1.ne_vals.val_i16  .flip_val(LE),
-	    val_i32:  idata1.ne_vals.val_i32  .flip_val(LE),
-	    val_i64:  idata1.ne_vals.val_i64  .flip_val(LE),
-	    val_i128: idata1.ne_vals.val_i128 .flip_val(LE),
-	};
+        let le_vals = IVals1 {
+            val1_i8:  idata1.ne_vals.val1_i8  .flip_val(LE),
+            val2_i8:  idata1.ne_vals.val2_i8  .flip_val(LE),
+            val_i16:  idata1.ne_vals.val_i16  .flip_val(LE),
+            val_i32:  idata1.ne_vals.val_i32  .flip_val(LE),
+            val_i64:  idata1.ne_vals.val_i64  .flip_val(LE),
+            val_i128: idata1.ne_vals.val_i128 .flip_val(LE),
+        };
 
-	let be_vals = IVals1 {
-	    val1_i8:  idata1.ne_vals.val1_i8  .flip_val(BE),
-	    val2_i8:  idata1.ne_vals.val2_i8  .flip_val(BE),
-	    val_i16:  idata1.ne_vals.val_i16  .flip_val(BE),
-	    val_i32:  idata1.ne_vals.val_i32  .flip_val(BE),
-	    val_i64:  idata1.ne_vals.val_i64  .flip_val(BE),
-	    val_i128: idata1.ne_vals.val_i128 .flip_val(BE),
-	};
+        let be_vals = IVals1 {
+            val1_i8:  idata1.ne_vals.val1_i8  .flip_val(BE),
+            val2_i8:  idata1.ne_vals.val2_i8  .flip_val(BE),
+            val_i16:  idata1.ne_vals.val_i16  .flip_val(BE),
+            val_i32:  idata1.ne_vals.val_i32  .flip_val(BE),
+            val_i64:  idata1.ne_vals.val_i64  .flip_val(BE),
+            val_i128: idata1.ne_vals.val_i128 .flip_val(BE),
+        };
 
-	assert_eq!(ne_vals, idata1.ne_vals);
-	assert_eq!(se_vals, idata1.se_vals);
-	assert_eq!(le_vals, idata1.le_vals);
-	assert_eq!(be_vals, idata1.be_vals);
+        assert_eq!(ne_vals, idata1.ne_vals);
+        assert_eq!(se_vals, idata1.se_vals);
+        assert_eq!(le_vals, idata1.le_vals);
+        assert_eq!(be_vals, idata1.be_vals);
     }
 }

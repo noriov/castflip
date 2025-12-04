@@ -82,9 +82,9 @@ pub trait DecastArg: Cast {
     /// resulting bytes is flipped if necessary.  The endianness of
     /// the bytes is specified in `endian`.
     fn decastf(bytes: &mut [u8], val_ptr: &Self, endian: Endian)
-	       -> Option<usize>
+               -> Option<usize>
     where
-	Self: Flip;
+        Self: Flip;
 
     /// Encodes value(s) in `slice` of type `T` to bytes and stores
     /// them at the head of `self`.  The endianness of the resulting
@@ -96,9 +96,9 @@ pub trait DecastArg: Cast {
     /// bytes is flipped if necessary.  The endianness of the
     /// resulting bytes is specified in `endian`.
     fn decastsf(bytes: &mut [u8], slice: &[Self], endian: Endian)
-		-> Option<usize>
+                -> Option<usize>
     where
-	Self: Flip;
+        Self: Flip;
 
     /// Encodes the slice of value(s) of type `T` pointed by `slice`
     /// to bytes and stores them at the head of `bytes`.  The
@@ -115,9 +115,9 @@ pub trait DecastArg: Cast {
     /// (This method is replaced by `decastsf`)
     #[cfg(feature = "alloc")]
     fn decastvf(bytes: &mut [u8], slice: &[Self], endian: Endian)
-		-> Option<usize>
+                -> Option<usize>
     where
-	Self: Flip;
+        Self: Flip;
 }
 
 
@@ -127,40 +127,40 @@ where
 {
     fn decast(bytes: &mut [u8], val_ptr: &T) -> Option<usize>
     {
-	bytes.decast::<Self>(val_ptr)
+        bytes.decast::<Self>(val_ptr)
     }
 
     fn decastf(bytes: &mut [u8], val_ptr: &T, endian: Endian) -> Option<usize>
     where
-	Self: Flip
+        Self: Flip
     {
-	bytes.decastf::<Self>(val_ptr, endian)
+        bytes.decastf::<Self>(val_ptr, endian)
     }
 
     fn decasts(bytes: &mut [u8], slice: &[Self]) -> Option<usize>
     {
-	bytes.decasts::<Self>(slice)
+        bytes.decasts::<Self>(slice)
     }
 
     fn decastsf(bytes: &mut [u8], slice: &[Self], endian: Endian)
-		-> Option<usize>
+                -> Option<usize>
     where
-	Self: Flip
+        Self: Flip
     {
-	bytes.decastsf::<Self>(slice, endian)
+        bytes.decastsf::<Self>(slice, endian)
     }
 
     #[cfg(feature = "alloc")]
     fn decastv(bytes: &mut [u8], slice: &[T]) -> Option<usize>
     {
-	bytes.decastv::<Self>(slice)
+        bytes.decastv::<Self>(slice)
     }
 
     #[cfg(feature = "alloc")]
     fn decastvf(bytes: &mut [u8], slice: &[T], endian: Endian) -> Option<usize>
     where
-	Self: Flip
+        Self: Flip
     {
-	bytes.decastvf::<Self>(slice, endian)
+        bytes.decastvf::<Self>(slice, endian)
     }
 }

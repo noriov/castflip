@@ -16,59 +16,59 @@ fn idata1() {
 
     let mut ne_off = 0;
     ne_off += ne_bytes[ne_off..].decastf::<i8>(&idata1.ne_vals.val1_i8, NE)
-	.unwrap();
+        .unwrap();
     ne_off += ne_bytes[ne_off..].decastf::<i8>(&idata1.ne_vals.val2_i8, NE)
-	.unwrap();
+        .unwrap();
     ne_off += ne_bytes[ne_off..].decastf::<i16>(&idata1.ne_vals.val_i16, NE)
-	.unwrap();
+        .unwrap();
     ne_off += ne_bytes[ne_off..].decastf::<i32>(&idata1.ne_vals.val_i32, NE)
-	.unwrap();
+        .unwrap();
     ne_off += ne_bytes[ne_off..].decastf::<i64>(&idata1.ne_vals.val_i64, NE)
-	.unwrap();
+        .unwrap();
     ne_off += ne_bytes[ne_off..].decastf::<i128>(&idata1.ne_vals.val_i128, NE)
-	.unwrap();
+        .unwrap();
 
     let mut se_off = 0;
     se_off += se_bytes[se_off..].decastf::<i8>(&idata1.ne_vals.val1_i8, SE)
-	.unwrap();
+        .unwrap();
     se_off += se_bytes[se_off..].decastf::<i8>(&idata1.ne_vals.val2_i8, SE)
-	.unwrap();
+        .unwrap();
     se_off += se_bytes[se_off..].decastf::<i16>(&idata1.ne_vals.val_i16, SE)
-	.unwrap();
+        .unwrap();
     se_off += se_bytes[se_off..].decastf::<i32>(&idata1.ne_vals.val_i32, SE)
-	.unwrap();
+        .unwrap();
     se_off += se_bytes[se_off..].decastf::<i64>(&idata1.ne_vals.val_i64, SE)
-	.unwrap();
+        .unwrap();
     se_off += se_bytes[se_off..].decastf::<i128>(&idata1.ne_vals.val_i128, SE)
-	.unwrap();
+        .unwrap();
 
     let mut le_off = 0;
     le_off += le_bytes[le_off..].decastf::<i8>(&idata1.ne_vals.val1_i8, LE)
-	.unwrap();
+        .unwrap();
     le_off += le_bytes[le_off..].decastf::<i8>(&idata1.ne_vals.val2_i8, LE)
-	.unwrap();
+        .unwrap();
     le_off += le_bytes[le_off..].decastf::<i16>(&idata1.ne_vals.val_i16, LE)
-	.unwrap();
+        .unwrap();
     le_off += le_bytes[le_off..].decastf::<i32>(&idata1.ne_vals.val_i32, LE)
-	.unwrap();
+        .unwrap();
     le_off += le_bytes[le_off..].decastf::<i64>(&idata1.ne_vals.val_i64, LE)
-	.unwrap();
+        .unwrap();
     le_off += le_bytes[le_off..].decastf::<i128>(&idata1.ne_vals.val_i128, LE)
-	.unwrap();
+        .unwrap();
 
     let mut be_off = 0;
     be_off += be_bytes[be_off..].decastf::<i8>(&idata1.ne_vals.val1_i8, BE)
-	.unwrap();
+        .unwrap();
     be_off += be_bytes[be_off..].decastf::<i8>(&idata1.ne_vals.val2_i8, BE)
-	.unwrap();
+        .unwrap();
     be_off += be_bytes[be_off..].decastf::<i16>(&idata1.ne_vals.val_i16, BE)
-	.unwrap();
+        .unwrap();
     be_off += be_bytes[be_off..].decastf::<i32>(&idata1.ne_vals.val_i32, BE)
-	.unwrap();
+        .unwrap();
     be_off += be_bytes[be_off..].decastf::<i64>(&idata1.ne_vals.val_i64, BE)
-	.unwrap();
+        .unwrap();
     be_off += be_bytes[be_off..].decastf::<i128>(&idata1.ne_vals.val_i128, BE)
-	.unwrap();
+        .unwrap();
 
     assert_eq!(ne_off, size_of::<IVals1>());
     assert_eq!(se_off, size_of::<IVals1>());

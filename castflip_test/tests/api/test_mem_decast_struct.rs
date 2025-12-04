@@ -2,20 +2,20 @@ use core::mem::size_of;
 
 use castflip::DecastMem;
 use crate::{FData1, FVals1, IData1, IVals1, UData1, UVals1,
-	    UData2, UVals2, UData3, UVals3, UData4, UVals4};
+            UData2, UVals2, UData3, UVals3, UData4, UVals4};
 
 
 macro_rules! test {
     ( $data:expr, $ty:ty ) => {
-	{
-	    let data = $data;
+        {
+            let data = $data;
 
-	    let mut ne_bytes_from_ne = [0_u8; size_of::<$ty>()];
+            let mut ne_bytes_from_ne = [0_u8; size_of::<$ty>()];
 
-	    ne_bytes_from_ne.decast::<$ty>(&data.ne_vals).unwrap();
+            ne_bytes_from_ne.decast::<$ty>(&data.ne_vals).unwrap();
 
-	    assert_eq!(ne_bytes_from_ne, data.ne_bytes);
-	}
+            assert_eq!(ne_bytes_from_ne, data.ne_bytes);
+        }
     }
 }
 

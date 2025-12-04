@@ -1,17 +1,17 @@
 use castflip::EncastMem;
 use crate::{FData1, FVals1, IData1, IVals1, UData1, UVals1,
-	    UData2, UVals2, UData3, UVals3, UData4, UVals4};
+            UData2, UVals2, UData3, UVals3, UData4, UVals4};
 
 
 macro_rules! test {
     ( $data:expr, $ty:ty ) => {
-	{
-	    let data = $data;
+        {
+            let data = $data;
 
-	    let ne_vals_from_ne = data.ne_bytes.encast::<$ty>().unwrap();
+            let ne_vals_from_ne = data.ne_bytes.encast::<$ty>().unwrap();
 
-	    assert_eq!(ne_vals_from_ne, data.ne_vals);
-	}
+            assert_eq!(ne_vals_from_ne, data.ne_vals);
+        }
     }
 }
 

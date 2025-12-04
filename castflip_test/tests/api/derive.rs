@@ -4,15 +4,15 @@ fn test_cast() {
     #[repr(C)]
     #[derive(Cast)]
     struct NamedTest {
-	val1:	u16,
-	val2:	u16,
+        val1:   u16,
+        val2:   u16,
     }
 
     #[repr(C)]
     #[derive(Cast)]
     struct UnnamedTest (
-	u16,
-	u16,
+        u16,
+        u16,
     );
 
     #[repr(C)]
@@ -22,8 +22,8 @@ fn test_cast() {
     #[repr(C)]
     #[derive(Cast, NopFlip)]
     union UnionTest {
-	val1:	u16,
-	val2:	u16,
+        val1:   u16,
+        val2:   u16,
     }
 
     let bytes1: [u8; 4] = [0x12, 0x34, 0x56, 0x78];
@@ -34,21 +34,21 @@ fn test_cast() {
     let union: UnionTest = bytes1.encast().unwrap();
 
     if cfg!(target_endian = "little") {
-	assert_eq!(named.val1, 0x3412);
-	assert_eq!(named.val2, 0x7856);
-	assert_eq!(unnamed.0, 0x3412);
-	assert_eq!(unnamed.1, 0x7856);
-	unsafe {
-	    assert_eq!(union.val1, 0x3412);
-	}
+        assert_eq!(named.val1, 0x3412);
+        assert_eq!(named.val2, 0x7856);
+        assert_eq!(unnamed.0, 0x3412);
+        assert_eq!(unnamed.1, 0x7856);
+        unsafe {
+            assert_eq!(union.val1, 0x3412);
+        }
     } else if cfg!(target_endian = "big") {
-	assert_eq!(named.val1, 0x1234);
-	assert_eq!(named.val2, 0x5678);
-	assert_eq!(unnamed.0, 0x1234);
-	assert_eq!(unnamed.1, 0x5678);
-	unsafe {
-	    assert_eq!(union.val1, 0x1234);
-	}
+        assert_eq!(named.val1, 0x1234);
+        assert_eq!(named.val2, 0x5678);
+        assert_eq!(unnamed.0, 0x1234);
+        assert_eq!(unnamed.1, 0x5678);
+        unsafe {
+            assert_eq!(union.val1, 0x1234);
+        }
     }
 }
 
@@ -56,15 +56,15 @@ fn test_cast_flip() {
     #[repr(C)]
     #[derive(Cast, Flip)]
     struct NamedTest {
-	val1:	u16,
-	val2:	u16,
+        val1:   u16,
+        val2:   u16,
     }
 
     #[repr(C)]
     #[derive(Cast, Flip)]
     struct UnnamedTest (
-	u16,
-	u16,
+        u16,
+        u16,
     );
 
     #[repr(C)]
@@ -87,15 +87,15 @@ fn test_cast_nopflip() {
     #[repr(C)]
     #[derive(Cast, NopFlip)]
     struct NamedTest {
-	val1:	u16,
-	val2:	u16,
+        val1:   u16,
+        val2:   u16,
     }
 
     #[repr(C)]
     #[derive(Cast, NopFlip)]
     struct UnnamedTest (
-	u16,
-	u16,
+        u16,
+        u16,
     );
 
     #[repr(C)]
@@ -105,8 +105,8 @@ fn test_cast_nopflip() {
     #[repr(C)]
     #[derive(Cast, NopFlip)]
     union UnionTest {
-	val1:	u16,
-	val2:	u16,
+        val1:   u16,
+        val2:   u16,
     }
 
     let bytes1: [u8; 4] = [0x12, 0x34, 0x56, 0x78];
@@ -117,35 +117,35 @@ fn test_cast_nopflip() {
     let union: UnionTest = bytes1.encast().unwrap();
 
     if cfg!(target_endian = "little") {
-	assert_eq!(named.val1, 0x3412);
-	assert_eq!(named.val2, 0x7856);
-	assert_eq!(unnamed.0, 0x3412);
-	assert_eq!(unnamed.1, 0x7856);
-	unsafe {
-	    assert_eq!(union.val1, 0x3412);
-	}
+        assert_eq!(named.val1, 0x3412);
+        assert_eq!(named.val2, 0x7856);
+        assert_eq!(unnamed.0, 0x3412);
+        assert_eq!(unnamed.1, 0x7856);
+        unsafe {
+            assert_eq!(union.val1, 0x3412);
+        }
     } else if cfg!(target_endian = "big") {
-	assert_eq!(named.val1, 0x1234);
-	assert_eq!(named.val2, 0x5678);
-	assert_eq!(unnamed.0, 0x1234);
-	assert_eq!(unnamed.1, 0x5678);
-	unsafe {
-	    assert_eq!(union.val1, 0x1234);
-	}
+        assert_eq!(named.val1, 0x1234);
+        assert_eq!(named.val2, 0x5678);
+        assert_eq!(unnamed.0, 0x1234);
+        assert_eq!(unnamed.1, 0x5678);
+        unsafe {
+            assert_eq!(union.val1, 0x1234);
+        }
     }
 }
 
 fn test_flip() {
     #[derive(Flip)]
     struct NamedTest {
-	val1:	u16,
-	val2:	u16,
+        val1:   u16,
+        val2:   u16,
     }
 
     #[derive(Flip)]
     struct UnnamedTest (
-	u16,
-	u16,
+        u16,
+        u16,
     );
 
     let named1 = NamedTest { val1: 0x1234, val2: 0x5678 };
@@ -171,20 +171,20 @@ fn test_flip() {
 fn test_nopflip() {
     #[derive(NopFlip)]
     struct NamedTest {
-	val1:	u16,
-	val2:	u16,
+        val1:   u16,
+        val2:   u16,
     }
 
     #[derive(NopFlip)]
     struct UnnamedTest (
-	u16,
-	u16,
+        u16,
+        u16,
     );
 
     #[derive(NopFlip)]
     union UnionTest {
-	val1:	u16,
-	val2:	u16,
+        val1:   u16,
+        val2:   u16,
     }
 
     let named1 = NamedTest { val1: 0x1234, val2: 0x5678 };
@@ -213,9 +213,9 @@ fn test_nopflip() {
     assert_eq!(unnamed3.1, 0x5678);
 
     unsafe {
-	assert_eq!(union1.val1, 0x1234);
-	assert_eq!(union2.val1, 0x1234);
-	assert_eq!(union3.val2, 0x5678);
+        assert_eq!(union1.val1, 0x1234);
+        assert_eq!(union2.val1, 0x1234);
+        assert_eq!(union3.val2, 0x5678);
     }
 }
 

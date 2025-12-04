@@ -3,29 +3,29 @@ use core::mem::size_of;
 use castflip::experimental::DecastArg;
 use castflip::{NE, SE, LE, BE};
 use crate::{FData1, FVals1, IData1, IVals1, UData1, UVals1,
-	    UData2, UVals2, UData3, UVals3, UData4, UVals4};
+            UData2, UVals2, UData3, UVals3, UData4, UVals4};
 
 
 macro_rules! test {
     ( $data:expr, $ty:ty ) => {
-	{
-	    let data = $data;
+        {
+            let data = $data;
 
-	    let mut ne_bytes = [0_u8; size_of::<$ty>()];
-	    let mut se_bytes = [0_u8; size_of::<$ty>()];
-	    let mut le_bytes = [0_u8; size_of::<$ty>()];
-	    let mut be_bytes = [0_u8; size_of::<$ty>()];
+            let mut ne_bytes = [0_u8; size_of::<$ty>()];
+            let mut se_bytes = [0_u8; size_of::<$ty>()];
+            let mut le_bytes = [0_u8; size_of::<$ty>()];
+            let mut be_bytes = [0_u8; size_of::<$ty>()];
 
-	    <$ty>::decastf(&mut ne_bytes, &data.ne_vals, NE).unwrap();
-	    <$ty>::decastf(&mut se_bytes, &data.ne_vals, SE).unwrap();
-	    <$ty>::decastf(&mut le_bytes, &data.ne_vals, LE).unwrap();
-	    <$ty>::decastf(&mut be_bytes, &data.ne_vals, BE).unwrap();
+            <$ty>::decastf(&mut ne_bytes, &data.ne_vals, NE).unwrap();
+            <$ty>::decastf(&mut se_bytes, &data.ne_vals, SE).unwrap();
+            <$ty>::decastf(&mut le_bytes, &data.ne_vals, LE).unwrap();
+            <$ty>::decastf(&mut be_bytes, &data.ne_vals, BE).unwrap();
 
-	    assert_eq!(ne_bytes, data.ne_bytes);
-	    assert_eq!(se_bytes, data.se_bytes);
-	    assert_eq!(le_bytes, data.le_bytes);
-	    assert_eq!(be_bytes, data.be_bytes);
-	}
+            assert_eq!(ne_bytes, data.ne_bytes);
+            assert_eq!(se_bytes, data.se_bytes);
+            assert_eq!(le_bytes, data.le_bytes);
+            assert_eq!(be_bytes, data.be_bytes);
+        }
     }
 }
 

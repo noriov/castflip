@@ -15,43 +15,43 @@ fn fdata1() {
 
     let mut ne_off = 0;
     ne_off += ne_bytes[ne_off..].decastf::<f32>(&fdata1.ne_vals.val1_f32, NE)
-	.unwrap();
+        .unwrap();
     ne_off += ne_bytes[ne_off..].decastf::<f32>(&fdata1.ne_vals.val2_f32, NE)
-	.unwrap();
+        .unwrap();
     ne_off += ne_bytes[ne_off..].decastf::<f64>(&fdata1.ne_vals.val1_f64, NE)
-	.unwrap();
+        .unwrap();
     ne_off += ne_bytes[ne_off..].decastf::<f64>(&fdata1.ne_vals.val2_f64, NE)
-	.unwrap();
+        .unwrap();
 
     let mut se_off = 0;
     se_off += se_bytes[se_off..].decastf::<f32>(&fdata1.ne_vals.val1_f32, SE)
-	.unwrap();
+        .unwrap();
     se_off += se_bytes[se_off..].decastf::<f32>(&fdata1.ne_vals.val2_f32, SE)
-	.unwrap();
+        .unwrap();
     se_off += se_bytes[se_off..].decastf::<f64>(&fdata1.ne_vals.val1_f64, SE)
-	.unwrap();
+        .unwrap();
     se_off += se_bytes[se_off..].decastf::<f64>(&fdata1.ne_vals.val2_f64, SE)
-	.unwrap();
+        .unwrap();
 
     let mut le_off = 0;
     le_off += le_bytes[le_off..].decastf::<f32>(&fdata1.ne_vals.val1_f32, LE)
-	.unwrap();
+        .unwrap();
     le_off += le_bytes[le_off..].decastf::<f32>(&fdata1.ne_vals.val2_f32, LE)
-	.unwrap();
+        .unwrap();
     le_off += le_bytes[le_off..].decastf::<f64>(&fdata1.ne_vals.val1_f64, LE)
-	.unwrap();
+        .unwrap();
     le_off += le_bytes[le_off..].decastf::<f64>(&fdata1.ne_vals.val2_f64, LE)
-	.unwrap();
+        .unwrap();
 
     let mut be_off = 0;
     be_off += be_bytes[be_off..].decastf::<f32>(&fdata1.ne_vals.val1_f32, BE)
-	.unwrap();
+        .unwrap();
     be_off += be_bytes[be_off..].decastf::<f32>(&fdata1.ne_vals.val2_f32, BE)
-	.unwrap();
+        .unwrap();
     be_off += be_bytes[be_off..].decastf::<f64>(&fdata1.ne_vals.val1_f64, BE)
-	.unwrap();
+        .unwrap();
     be_off += be_bytes[be_off..].decastf::<f64>(&fdata1.ne_vals.val2_f64, BE)
-	.unwrap();
+        .unwrap();
 
     assert_eq!(ne_off, size_of::<FVals1>());
     assert_eq!(se_off, size_of::<FVals1>());

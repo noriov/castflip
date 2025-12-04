@@ -83,7 +83,7 @@ pub trait EncastArg: Cast {
     /// specified in `endian`.
     fn encastf(bytes: &[u8], endian: Endian) -> Option<Self>
     where
-	Self: Flip;
+        Self: Flip;
 
     /// Decodes the bytes at the head of `bytes` to value(s) of type
     /// `T` and fill `slice` with the value(s).  It returns the number
@@ -97,9 +97,9 @@ pub trait EncastArg: Cast {
     /// flipped if necessary.  The endianness of the bytes is
     /// specified in `endian`.
     fn encastsf(bytes: &[u8], slice: &mut [Self], endian: Endian)
-		-> Option<usize>
+                -> Option<usize>
     where
-	Self: Flip;
+        Self: Flip;
 
     /// Decodes the bytes at the head of `bytes` to a vector of
     /// value(s) of type `T` and returns the vector.  The endianness
@@ -115,9 +115,9 @@ pub trait EncastArg: Cast {
     /// of elements in the resulting vecotr is specified in `nelem`.
     #[cfg(feature = "alloc")]
     fn encastvf(bytes: &[u8], nelem: usize, endian: Endian)
-		-> Option<Vec<Self>>
+                -> Option<Vec<Self>>
     where
-	Self: Flip;
+        Self: Flip;
 }
 
 
@@ -127,41 +127,41 @@ where
 {
     fn encast(bytes: &[u8]) -> Option<Self>
     {
-	bytes.encast::<Self>()
+        bytes.encast::<Self>()
     }
 
     fn encastf(bytes: &[u8], endian: Endian) -> Option<Self>
     where
-	Self: Flip
+        Self: Flip
     {
-	bytes.encastf::<Self>(endian)
+        bytes.encastf::<Self>(endian)
     }
 
     fn encasts(bytes: &[u8], slice: &mut [Self]) -> Option<usize>
     {
-	bytes.encasts::<Self>(slice)
+        bytes.encasts::<Self>(slice)
     }
 
     fn encastsf(bytes: &[u8], slice: &mut [Self], endian: Endian)
-		-> Option<usize>
+                -> Option<usize>
     where
-	Self: Flip
+        Self: Flip
     {
-	bytes.encastsf::<Self>(slice, endian)
+        bytes.encastsf::<Self>(slice, endian)
     }
 
     #[cfg(feature = "alloc")]
     fn encastv(bytes: &[u8], nelem: usize) -> Option<Vec<Self>>
     {
-	bytes.encastv::<Self>(nelem)
+        bytes.encastv::<Self>(nelem)
     }
 
     #[cfg(feature = "alloc")]
     fn encastvf(bytes: &[u8], nelem: usize, endian: Endian)
-		-> Option<Vec<Self>>
+                -> Option<Vec<Self>>
     where
-	Self: Flip
+        Self: Flip
     {
-	bytes.encastvf::<Self>(nelem, endian)
+        bytes.encastvf::<Self>(nelem, endian)
     }
 }

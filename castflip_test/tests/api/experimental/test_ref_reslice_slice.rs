@@ -1,55 +1,55 @@
 use castflip::experimental::Reslice;
 use crate::{FData1, FVals1, IData1, IVals1, UData1, UVals1,
-	    UData2, UVals2, UData3, UVals3, UData4, UVals4};
+            UData2, UVals2, UData3, UVals3, UData4, UVals4};
 
 
 macro_rules! test {
     ( $data:expr, $ty:ty ) => {{
-	unsafe {
-	    // Test1: &[u8] -> &[$ty]
+        unsafe {
+            // Test1: &[u8] -> &[$ty]
 
-	    let data = $data;
+            let data = $data;
 
-	    let cloned_data = data.clone();
-	    let ne_slice_u8 = &cloned_data.ne_bytes[..];
+            let cloned_data = data.clone();
+            let ne_slice_u8 = &cloned_data.ne_bytes[..];
 
-	    let ne_resliced = ne_slice_u8.reslice::<$ty>().unwrap();
+            let ne_resliced = ne_slice_u8.reslice::<$ty>().unwrap();
 
-	    assert_eq!(ne_resliced[0], data.ne_vals);
-	}
-	unsafe {
-	    // Test2: Vec<u8> -> &[$ty]
+            assert_eq!(ne_resliced[0], data.ne_vals);
+        }
+        unsafe {
+            // Test2: Vec<u8> -> &[$ty]
 
-	    let data = $data;
+            let data = $data;
 
-	    let ne_vec_u8 = data.ne_bytes.to_vec();
+            let ne_vec_u8 = data.ne_bytes.to_vec();
 
-	    let ne_resliced = ne_vec_u8.reslice::<$ty>().unwrap();
+            let ne_resliced = ne_vec_u8.reslice::<$ty>().unwrap();
 
-	    assert_eq!(ne_resliced[0], data.ne_vals);
-	}
-	unsafe {
-	    // Test3: [u8; N] -> &[$ty]
+            assert_eq!(ne_resliced[0], data.ne_vals);
+        }
+        unsafe {
+            // Test3: [u8; N] -> &[$ty]
 
-	    let data = $data;
+            let data = $data;
 
-	    let cloned_data = data.clone();
+            let cloned_data = data.clone();
 
-	    let ne_resliced = cloned_data.ne_bytes.reslice::<$ty>().unwrap();
+            let ne_resliced = cloned_data.ne_bytes.reslice::<$ty>().unwrap();
 
-	    assert_eq!(ne_resliced[0], data.ne_vals);
-	}
-	unsafe {
-	    // Test4: &[$ty] -> &[u8]
+            assert_eq!(ne_resliced[0], data.ne_vals);
+        }
+        unsafe {
+            // Test4: &[$ty] -> &[u8]
 
-	    let data = $data;
+            let data = $data;
 
-	    let ne_slice_vals = &[data.ne_vals];
+            let ne_slice_vals = &[data.ne_vals];
 
-	    let ne_slice_u8 = ne_slice_vals.reslice::<u8>().unwrap();
+            let ne_slice_u8 = ne_slice_vals.reslice::<u8>().unwrap();
 
-	    assert_eq!(ne_slice_u8, &data.ne_bytes[..]);
-	}
+            assert_eq!(ne_slice_u8, &data.ne_bytes[..]);
+        }
     }}
 }
 

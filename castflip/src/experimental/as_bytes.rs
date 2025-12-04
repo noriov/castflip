@@ -131,13 +131,13 @@ where
     T: Cast
 {
     unsafe fn as_bytes_ref(&self) -> &[u8] {
-	slice::from_raw_parts::<u8>(self as *const T as *const u8,
-				    mem::size_of::<T>())
+        slice::from_raw_parts::<u8>(self as *const T as *const u8,
+                                    mem::size_of::<T>())
     }
 
     unsafe fn as_bytes_mut(&mut self) -> &mut [u8] {
-	slice::from_raw_parts_mut::<u8>(self as *mut T as *mut u8,
-					mem::size_of::<T>())
+        slice::from_raw_parts_mut::<u8>(self as *mut T as *mut u8,
+                                        mem::size_of::<T>())
     }
 }
 
@@ -148,12 +148,12 @@ where
     T: Cast
 {
     unsafe fn as_bytes_ref(&self) -> &[u8] {
-	slice::from_raw_parts::<u8>(self as *const [T] as *const u8,
-				    mem::size_of::<T>() * self.len())
+        slice::from_raw_parts::<u8>(self as *const [T] as *const u8,
+                                    mem::size_of::<T>() * self.len())
     }
 
     unsafe fn as_bytes_mut(&mut self) -> &mut [u8] {
-	slice::from_raw_parts_mut::<u8>(self as *mut [T] as *mut u8,
-					mem::size_of::<T>() * self.len())
+        slice::from_raw_parts_mut::<u8>(self as *mut [T] as *mut u8,
+                                        mem::size_of::<T>() * self.len())
     }
 }

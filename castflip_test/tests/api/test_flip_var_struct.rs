@@ -4,33 +4,33 @@ use crate::{FData1, IData1, UData1, UData2, UData3, UData4};
 
 macro_rules! test {
     ( $data:expr ) => {{
-	{
-	    let data = $data;
+        {
+            let data = $data;
 
-	    let mut se_vals = data.ne_vals;
+            let mut se_vals = data.ne_vals;
 
-	    se_vals.flip_var_swapped();
+            se_vals.flip_var_swapped();
 
-	    assert_eq!(se_vals, data.se_vals);
-	}
-	{
-	    let data = $data;
+            assert_eq!(se_vals, data.se_vals);
+        }
+        {
+            let data = $data;
 
-	    let mut ne_vals = data.ne_vals;
-	    let mut se_vals = data.ne_vals;
-	    let mut le_vals = data.ne_vals;
-	    let mut be_vals = data.ne_vals;
+            let mut ne_vals = data.ne_vals;
+            let mut se_vals = data.ne_vals;
+            let mut le_vals = data.ne_vals;
+            let mut be_vals = data.ne_vals;
 
-	    ne_vals.flip_var(NE);
-	    se_vals.flip_var(SE);
-	    le_vals.flip_var(LE);
-	    be_vals.flip_var(BE);
+            ne_vals.flip_var(NE);
+            se_vals.flip_var(SE);
+            le_vals.flip_var(LE);
+            be_vals.flip_var(BE);
 
-	    assert_eq!(ne_vals, data.ne_vals);
-	    assert_eq!(se_vals, data.se_vals);
-	    assert_eq!(le_vals, data.le_vals);
-	    assert_eq!(be_vals, data.be_vals);
-	}
+            assert_eq!(ne_vals, data.ne_vals);
+            assert_eq!(se_vals, data.se_vals);
+            assert_eq!(le_vals, data.le_vals);
+            assert_eq!(be_vals, data.be_vals);
+        }
     }}
 }
 

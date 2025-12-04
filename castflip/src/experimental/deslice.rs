@@ -95,13 +95,13 @@ pub trait Deslice {
     /// into a transmuted reference to a variable of type `U`.
     unsafe fn deslice<U>(&self) -> Option<&U>
     where
-	U: Cast;
+        U: Cast;
 
     /// Converts a mutable reference to the slice `self` of a type
     /// into a mutable transmuted reference to a variable of type `U`.
     unsafe fn deslice_mut<U>(&mut self) -> Option<&mut U>
     where
-	U: Cast;
+        U: Cast;
 }
 
 
@@ -111,25 +111,25 @@ where
 {
     unsafe fn deslice<U>(&self) -> Option<&U>
     where
-	U: Cast
+        U: Cast
     {
-	if mem::size_of::<T>() * self.len() == mem::size_of::<U>() {
-	    let slice1 = self.reslice::<U>()?;
-	    Some(&slice1[0])
-	} else {
-	    None
-	}
+        if mem::size_of::<T>() * self.len() == mem::size_of::<U>() {
+            let slice1 = self.reslice::<U>()?;
+            Some(&slice1[0])
+        } else {
+            None
+        }
     }
 
     unsafe fn deslice_mut<U>(&mut self) -> Option<&mut U>
     where
-	U: Cast
+        U: Cast
     {
-	if mem::size_of::<T>() * self.len() == mem::size_of::<U>() {
-	    let slice1 = self.reslice_mut::<U>()?;
-	    Some(&mut slice1[0])
-	} else {
-	    None
-	}
+        if mem::size_of::<T>() * self.len() == mem::size_of::<U>() {
+            let slice1 = self.reslice_mut::<U>()?;
+            Some(&mut slice1[0])
+        } else {
+            None
+        }
     }
 }

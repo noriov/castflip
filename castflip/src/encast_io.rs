@@ -137,7 +137,7 @@ pub trait EncastIO {
     /// If an error is detected, `Err(io::Error)` is returned.
     fn encast<T>(&mut self) -> io::Result<T>
     where
-	T: Cast;
+        T: Cast;
 
     /// Creates a value of type `T` from a binary representation of
     /// the type read from a reader `self` and returns the resulting
@@ -150,7 +150,7 @@ pub trait EncastIO {
     /// If an error is detected, `Err(io::Error)` is returned.
     fn encastf<T>(&mut self, endian: Endian) -> io::Result<T>
     where
-	T: Cast + Flip;
+        T: Cast + Flip;
 
     /// Creates values of type `T` from binary representations of the
     /// type read from a reader `self`, saves the values in `slice`,
@@ -163,7 +163,7 @@ pub trait EncastIO {
     /// If an error is detected, `Err(io::Error)` is returned.
     fn encasts<T>(&mut self, slice: &mut [T]) -> io::Result<usize>
     where
-	T: Cast;
+        T: Cast;
 
     /// Creates values of type `T` from binary representations of the
     /// type read from a reader `self`, saves the values in `slice`,
@@ -175,9 +175,9 @@ pub trait EncastIO {
     ///
     /// If an error is detected, `Err(io::Error)` is returned.
     fn encastsf<T>(&mut self, slice: &mut [T], endian: Endian)
-		   -> io::Result<usize>
+                   -> io::Result<usize>
     where
-	T: Cast + Flip;
+        T: Cast + Flip;
 
     /// Creates a vector of values of type `T` from binary
     /// representations of the type read from a reader `self` and
@@ -193,7 +193,7 @@ pub trait EncastIO {
     /// If an error is detected, `Err(io::Error)` is returned.
     fn encastv<T>(&mut self, nelem: usize) -> io::Result<Vec<T>>
     where
-	T: Cast;
+        T: Cast;
 
     /// Creates a vector of values of type `T` from binary
     /// representations of the type read from a reader `self` and
@@ -208,9 +208,9 @@ pub trait EncastIO {
     ///
     /// If an error is detected, `Err(io::Error)` is returned.
     fn encastvf<T>(&mut self, nelem: usize, endian: Endian)
-		   -> io::Result<Vec<T>>
+                   -> io::Result<Vec<T>>
     where
-	T: Cast + Flip;
+        T: Cast + Flip;
 }
 
 
@@ -221,104 +221,104 @@ where
     #[inline]
     fn encast<T>(&mut self) -> io::Result<T>
     where
-	T: Cast,
+        T: Cast,
     {
-	unsafe {
-	    let mut val = MaybeUninit::<T>::uninit();
+        unsafe {
+            let mut val = MaybeUninit::<T>::uninit();
 
-	    // Read raw bytes from `self` and save them in `val`.
-	    self.read_exact(val.asif_bytes_mut())?;
+            // Read raw bytes from `self` and save them in `val`.
+            self.read_exact(val.asif_bytes_mut())?;
 
-	    Ok(val.assume_init())
-	}
+            Ok(val.assume_init())
+        }
     }
 
     #[inline]
     fn encastf<T>(&mut self, endian: Endian) -> io::Result<T>
     where
-	T: Cast + Flip,
+        T: Cast + Flip,
     {
-	let mut val = self.encast::<T>()?;
-	val.flip_var(endian); // Flip the endianness if necessary.
-	Ok(val)
+        let mut val = self.encast::<T>()?;
+        val.flip_var(endian); // Flip the endianness if necessary.
+        Ok(val)
     }
 
     #[inline]
     fn encasts<T>(&mut self, slice: &mut [T]) -> io::Result<usize>
     where
-	T: Cast,
+        T: Cast,
     {
-	unsafe {
-	    // Read raw bytes from `self` and save them in `slice`.
-	    self.read_exact(slice.asif_bytes_mut())?;
-	}
+        unsafe {
+            // Read raw bytes from `self` and save them in `slice`.
+            self.read_exact(slice.asif_bytes_mut())?;
+        }
 
-	Ok(mem::size_of::<T>() * slice.len())
+        Ok(mem::size_of::<T>() * slice.len())
     }
 
     #[inline]
     fn encastsf<T>(&mut self, slice: &mut [T], endian: Endian)
-		   -> io::Result<usize>
+                   -> io::Result<usize>
     where
-	T: Cast + Flip,
+        T: Cast + Flip,
     {
-	if !endian.need_swap() {
-	    // The endianness is kept untouched.
-	    self.encasts::<T>(slice)
-	} else {
-	    // The endianness is flipped to swapped endian.
-	    self.encastsf_swapped(slice)
-	}
+        if !endian.need_swap() {
+            // The endianness is kept untouched.
+            self.encasts::<T>(slice)
+        } else {
+            // The endianness is flipped to swapped endian.
+            self.encastsf_swapped(slice)
+        }
 
 /*
-	// The previous version was:
+        // The previous version was:
 
-	let size = self.encasts::<T>(slice)?;
-	for elem in slice {
-	    elem.flip_var(endian);
-	}
-	Ok(size)
+        let size = self.encasts::<T>(slice)?;
+        for elem in slice {
+            elem.flip_var(endian);
+        }
+        Ok(size)
 */
     }
 
     fn encastv<T>(&mut self, nelem: usize) -> io::Result<Vec<T>>
     where
-	T: Cast,
+        T: Cast,
     {
-	let mut vec: Vec<T> = Vec::new();
+        let mut vec: Vec<T> = Vec::new();
 
-	unsafe {
-	    // Append values created from `self` to `vec`.
-	    vec.push_bulk(nelem, | new_slice | {
-		self.encasts(new_slice)
-	    })?;
-	}
+        unsafe {
+            // Append values created from `self` to `vec`.
+            vec.push_bulk(nelem, | new_slice | {
+                self.encasts(new_slice)
+            })?;
+        }
 
-	Ok(vec)
+        Ok(vec)
     }
 
     #[inline]
     fn encastvf<T>(&mut self, nelem: usize, endian: Endian)
-		   -> io::Result<Vec<T>>
+                   -> io::Result<Vec<T>>
     where
-	T: Cast + Flip,
+        T: Cast + Flip,
     {
-	if !endian.need_swap() {
-	    // The endianness is kept untouched.
-	    self.encastv::<T>(nelem)
-	} else {
-	    // The endianness is flipped to swapped endian.
-	    self.encastvf_swapped(nelem)
-	}
+        if !endian.need_swap() {
+            // The endianness is kept untouched.
+            self.encastv::<T>(nelem)
+        } else {
+            // The endianness is flipped to swapped endian.
+            self.encastvf_swapped(nelem)
+        }
 
 /*
-	// The previous version was:
+        // The previous version was:
 
-	let mut vec = self.encastv::<T>(nelem)?;
-	for elem in &mut vec {
-	    elem.flip_var(endian);
-	}
-	Ok(vec)
+        let mut vec = self.encastv::<T>(nelem)?;
+        for elem in &mut vec {
+            elem.flip_var(endian);
+        }
+        Ok(vec)
 */
     }
 }
@@ -339,7 +339,7 @@ trait EncastIOInternal {
     /// If an error is detected, `Err(io::Error)` is returned.
     fn encastsf_swapped<T>(&mut self, slice: &mut [T]) -> io::Result<usize>
     where
-	T: Cast + Flip;
+        T: Cast + Flip;
 
     /// Creates a vector of values of type `T` from binary
     /// representations of the type read from a reader `self`, and
@@ -354,7 +354,7 @@ trait EncastIOInternal {
     /// If an error is detected, `Err(io::Error)` is returned.
     fn encastvf_swapped<T>(&mut self, nelem: usize) -> io::Result<Vec<T>>
     where
-	T: Cast + Flip;
+        T: Cast + Flip;
 }
 
 impl<R> EncastIOInternal for R
@@ -363,35 +363,35 @@ where
 {
     fn encastsf_swapped<T>(&mut self, slice: &mut [T]) -> io::Result<usize>
     where
-	T: Cast + Flip,
+        T: Cast + Flip,
     {
-	let nbytes = mem::size_of::<T>() * slice.len();
+        let nbytes = mem::size_of::<T>() * slice.len();
 
-	// Save endian-flipped values created from `self` to `slice`.
-	for elem in slice {
-	    *elem = self.encast::<T>()?.flip_val_swapped();
-	}
+        // Save endian-flipped values created from `self` to `slice`.
+        for elem in slice {
+            *elem = self.encast::<T>()?.flip_val_swapped();
+        }
 
-	Ok(nbytes)
+        Ok(nbytes)
     }
 
     fn encastvf_swapped<T>(&mut self, nelem: usize) -> io::Result<Vec<T>>
     where
-	T: Cast + Flip,
+        T: Cast + Flip,
     {
-	let mut vec: Vec<T> = Vec::new();
+        let mut vec: Vec<T> = Vec::new();
 
-	unsafe {
-	    // Append endian-flipped values created from `self` to `vec`.
-	    vec.push_bulk(nelem, | new_slice | {
-		let nbytes = mem::size_of::<T>() * new_slice.len();
-		for elem in new_slice {
-		    *elem = self.encast::<T>()?.flip_val_swapped();
-		}
-		Ok::<usize, io::Error>(nbytes)
-	    })?;
-	}
+        unsafe {
+            // Append endian-flipped values created from `self` to `vec`.
+            vec.push_bulk(nelem, | new_slice | {
+                let nbytes = mem::size_of::<T>() * new_slice.len();
+                for elem in new_slice {
+                    *elem = self.encast::<T>()?.flip_val_swapped();
+                }
+                Ok::<usize, io::Error>(nbytes)
+            })?;
+        }
 
-	Ok(vec)
+        Ok(vec)
     }
 }

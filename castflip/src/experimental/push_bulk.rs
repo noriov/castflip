@@ -74,34 +74,34 @@ pub trait PushBulk<T, R, E> {
     /// Extends a vector by `additional` and calls closure
     /// `fill_new_slice` to fill the extended slots.
     unsafe fn push_bulk<F>(&mut self, additional: usize, fill_new_slice: F)
-			   -> Result<R, E>
+                           -> Result<R, E>
     where
-	F: FnMut(&mut [T]) -> Result<R, E>;
+        F: FnMut(&mut [T]) -> Result<R, E>;
 }
 
 impl<T, R, E> PushBulk<T, R, E> for Vec<T>
 {
     unsafe fn push_bulk<F>(&mut self, additional: usize, mut fill_new_slice: F)
-			   -> Result<R, E>
+                           -> Result<R, E>
     where
-	F: FnMut(&mut [T]) -> Result<R, E>
+        F: FnMut(&mut [T]) -> Result<R, E>
     {
-	// Prepare enough size of hidden area.
-	self.reserve(additional);
+        // Prepare enough size of hidden area.
+        self.reserve(additional);
 
-	// Fill hidden area with caller-supplied closure `fill_new_slice`.
-	// The hidden area is passed as an ephemeral slice (soon dropped).
-	let result = fill_new_slice(
-	    slice::from_raw_parts_mut(
-		self.as_mut_ptr().add(self.len()),
-		additional)
-	);
+        // Fill hidden area with caller-supplied closure `fill_new_slice`.
+        // The hidden area is passed as an ephemeral slice (soon dropped).
+        let result = fill_new_slice(
+            slice::from_raw_parts_mut(
+                self.as_mut_ptr().add(self.len()),
+                additional)
+        );
 
-	// If the result is ok, extend the length.
-	if result.is_ok() {
-	    self.set_len(self.len() + additional);
-	}
+        // If the result is ok, extend the length.
+        if result.is_ok() {
+            self.set_len(self.len() + additional);
+        }
 
-	result
+        result
     }
 }

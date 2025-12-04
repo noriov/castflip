@@ -113,13 +113,13 @@ pub trait Reslice {
     /// into a transmuted reference to a slice of type `U`.
     unsafe fn reslice<U>(&self) -> Option<&[U]>
     where
-	U: Cast;
+        U: Cast;
 
     /// Converts a mutable reference to slice `self` of a type
     /// into a mutable transmuted reference to a slice of type `U`.
     unsafe fn reslice_mut<U>(&mut self) -> Option<&mut [U]>
     where
-	U: Cast;
+        U: Cast;
 }
 
 
@@ -129,35 +129,35 @@ where
 {
     unsafe fn reslice<U>(&self) -> Option<&[U]>
     where
-	U: Cast
+        U: Cast
     {
-	let slice_size = mem::size_of::<T>() * self.len();
-	let new_len = slice_size / mem::size_of::<U>();
+        let slice_size = mem::size_of::<T>() * self.len();
+        let new_len = slice_size / mem::size_of::<U>();
 
-	#[allow(unused_parens)]
-	if (slice_size == mem::size_of::<U>() * new_len &&
-	    self.as_ptr().align_offset(mem::align_of::<U>()) == 0) {
-	    Some(slice::from_raw_parts::<U>(self.as_ptr() as *const U,
-					    new_len))
-	} else {
-	    None
-	}
+        #[allow(unused_parens)]
+        if (slice_size == mem::size_of::<U>() * new_len &&
+            self.as_ptr().align_offset(mem::align_of::<U>()) == 0) {
+            Some(slice::from_raw_parts::<U>(self.as_ptr() as *const U,
+                                            new_len))
+        } else {
+            None
+        }
     }
 
     unsafe fn reslice_mut<U>(&mut self) -> Option<&mut [U]>
     where
-	U: Cast
+        U: Cast
     {
-	let slice_size = mem::size_of::<T>() * self.len();
-	let new_len = slice_size / mem::size_of::<U>();
+        let slice_size = mem::size_of::<T>() * self.len();
+        let new_len = slice_size / mem::size_of::<U>();
 
-	#[allow(unused_parens)]
-	if (slice_size == mem::size_of::<U>() * new_len &&
-	    self.as_ptr().align_offset(mem::align_of::<U>()) == 0) {
-	    Some(slice::from_raw_parts_mut::<U>(self.as_ptr() as *mut U,
-						new_len))
-	} else {
-	    None
-	}
+        #[allow(unused_parens)]
+        if (slice_size == mem::size_of::<U>() * new_len &&
+            self.as_ptr().align_offset(mem::align_of::<U>()) == 0) {
+            Some(slice::from_raw_parts_mut::<U>(self.as_ptr() as *mut U,
+                                                new_len))
+        } else {
+            None
+        }
     }
 }

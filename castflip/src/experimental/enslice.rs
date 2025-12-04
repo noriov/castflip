@@ -95,13 +95,13 @@ pub trait Enslice {
     /// into a transmuted reference to a slice of type `U`.
     unsafe fn enslice<U>(&self) -> Option<&[U]>
     where
-	U: Cast;
+        U: Cast;
 
     /// Converts a mutable reference to `self` of a type
     /// into a mutable transmuted reference to a slice of type `U`.
     unsafe fn enslice_mut<U>(&mut self) -> Option<&mut [U]>
     where
-	U: Cast;
+        U: Cast;
 }
 
 
@@ -111,17 +111,17 @@ where
 {
     unsafe fn enslice<U>(&self) -> Option<&[U]>
     where
-	U: Cast
+        U: Cast
     {
-	slice::from_raw_parts::<T>(self as *const T, 1)
-	    .reslice::<U>()
+        slice::from_raw_parts::<T>(self as *const T, 1)
+            .reslice::<U>()
     }
 
     unsafe fn enslice_mut<U>(&mut self) -> Option<&mut [U]>
     where
-	U: Cast
+        U: Cast
     {
-	slice::from_raw_parts_mut::<T>(self as *mut T, 1)
-	    .reslice_mut::<U>()
+        slice::from_raw_parts_mut::<T>(self as *mut T, 1)
+            .reslice_mut::<U>()
     }
 }

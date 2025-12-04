@@ -112,21 +112,21 @@ impl Endian {
     /// ```
     ///
     pub fn relative(&self) -> Endian {
-	#[cfg(target_endian = "little")]
-	match self {
-	    Self::Native  => Self::Native,
-	    Self::Swapped => Self::Swapped,
-	    Self::Little  => Self::Native,
-	    Self::Big     => Self::Swapped,
-	}
+        #[cfg(target_endian = "little")]
+        match self {
+            Self::Native  => Self::Native,
+            Self::Swapped => Self::Swapped,
+            Self::Little  => Self::Native,
+            Self::Big     => Self::Swapped,
+        }
 
-	#[cfg(target_endian = "big")]
-	match self {
-	    Self::Native  => Self::Native,
-	    Self::Swapped => Self::Swapped,
-	    Self::Little  => Self::Swapped,
-	    Self::Big     => Self::Native,
-	}
+        #[cfg(target_endian = "big")]
+        match self {
+            Self::Native  => Self::Native,
+            Self::Swapped => Self::Swapped,
+            Self::Little  => Self::Swapped,
+            Self::Big     => Self::Native,
+        }
     }
 
     /// Returns the corresponding absolute endianness.
@@ -151,21 +151,21 @@ impl Endian {
     /// ```
     ///
     pub fn absolute(&self) -> Endian {
-	#[cfg(target_endian = "little")]
-	match self {
-	    Self::Native  => Self::Little,
-	    Self::Swapped => Self::Big,
-	    Self::Little  => Self::Little,
-	    Self::Big     => Self::Big,
-	}
+        #[cfg(target_endian = "little")]
+        match self {
+            Self::Native  => Self::Little,
+            Self::Swapped => Self::Big,
+            Self::Little  => Self::Little,
+            Self::Big     => Self::Big,
+        }
 
-	#[cfg(target_endian = "big")]
-	match self {
-	    Self::Native  => Self::Big,
-	    Self::Swapped => Self::Little,
-	    Self::Little  => Self::Little,
-	    Self::Big     => Self::Big,
-	}
+        #[cfg(target_endian = "big")]
+        match self {
+            Self::Native  => Self::Big,
+            Self::Swapped => Self::Little,
+            Self::Little  => Self::Little,
+            Self::Big     => Self::Big,
+        }
     }
 
     /// Returns `true` if the endianness (self) is different from the
@@ -192,11 +192,11 @@ impl Endian {
     ///
     #[inline]
     pub fn need_swap(self) -> bool {
-	#[cfg(target_endian = "little")]
-	return self == Self::Swapped || self == Self::Big;
+        #[cfg(target_endian = "little")]
+        return self == Self::Swapped || self == Self::Big;
 
-	#[cfg(target_endian = "big")]
-	return self == Self::Swapped || self == Self::Little;
+        #[cfg(target_endian = "big")]
+        return self == Self::Swapped || self == Self::Little;
     }
 
     /// Returns the name of the endianness (self).
@@ -211,12 +211,12 @@ impl Endian {
     /// ```
     ///
     pub fn name(self) -> &'static str {
-	match self {
-	    Self::Native	=> "Native",
-	    Self::Swapped	=> "Swapped",
-	    Self::Little	=> "Little",
-	    Self::Big		=> "Big",
-	}
+        match self {
+            Self::Native        => "Native",
+            Self::Swapped       => "Swapped",
+            Self::Little        => "Little",
+            Self::Big           => "Big",
+        }
     }
 }
 

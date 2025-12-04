@@ -125,14 +125,14 @@ where
 {
     #[inline]
     unsafe fn asif_bytes_ref(&self) -> &[u8] {
-	slice::from_raw_parts::<u8>(self as *const T as *const u8,
-				    mem::size_of::<T>())
+        slice::from_raw_parts::<u8>(self as *const T as *const u8,
+                                    mem::size_of::<T>())
     }
 
     #[inline]
     unsafe fn asif_bytes_mut(&mut self) -> &mut [u8] {
-	slice::from_raw_parts_mut::<u8>(self as *mut T as *mut u8,
-					mem::size_of::<T>())
+        slice::from_raw_parts_mut::<u8>(self as *mut T as *mut u8,
+                                        mem::size_of::<T>())
     }
 }
 
@@ -143,14 +143,14 @@ where
 {
     #[inline]
     unsafe fn asif_bytes_ref(&self) -> &[u8] {
-	slice::from_raw_parts::<u8>(self as *const [T] as *const u8,
-				    mem::size_of::<T>() * self.len())
+        slice::from_raw_parts::<u8>(self as *const [T] as *const u8,
+                                    mem::size_of::<T>() * self.len())
     }
 
     #[inline]
     unsafe fn asif_bytes_mut(&mut self) -> &mut [u8] {
-	slice::from_raw_parts_mut::<u8>(self as *mut [T] as *mut u8,
-					mem::size_of::<T>() * self.len())
+        slice::from_raw_parts_mut::<u8>(self as *mut [T] as *mut u8,
+                                        mem::size_of::<T>() * self.len())
     }
 }
 
@@ -161,13 +161,13 @@ where
 {
     #[inline]
     unsafe fn asif_bytes_ref(&self) -> &[u8] {
-	slice::from_raw_parts::<u8>(self.as_ptr() as *const u8,
-				    mem::size_of::<T>())
+        slice::from_raw_parts::<u8>(self.as_ptr() as *const u8,
+                                    mem::size_of::<T>())
     }
 
     #[inline]
     unsafe fn asif_bytes_mut(&mut self) -> &mut [u8] {
-	slice::from_raw_parts_mut::<u8>(self.as_mut_ptr() as *mut u8,
-					mem::size_of::<T>())
+        slice::from_raw_parts_mut::<u8>(self.as_mut_ptr() as *mut u8,
+                                        mem::size_of::<T>())
     }
 }
