@@ -1,7 +1,7 @@
 [package]
 name = "castflip_derive"
 version = "0.1.10"
-edition = "2021"
+edition = "2024"
 description = "Derive macros for castflip"
 license = "MIT-0"
 readme = "README.md"
