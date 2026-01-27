@@ -16,4 +16,4 @@ std = ["alloc"]
 
 [dependencies.castflip_derive]
 version = "0.1"
-path = "../castflip_derive"
+path = "derive"

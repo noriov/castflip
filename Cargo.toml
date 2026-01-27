@@ -2,6 +2,6 @@
 resolver = "2"
 members = [
     "castflip",
-    "castflip_derive",
+    "castflip/derive",
     "castflip_test",
 ]
