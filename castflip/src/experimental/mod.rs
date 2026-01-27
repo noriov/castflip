@@ -35,6 +35,7 @@
 
 // Modules in use.
 #[doc(hidden)] pub mod asif_bytes;
+#[doc(hidden)] mod include_doc;
 #[doc(hidden)] #[cfg(feature = "alloc")] pub mod push_bulk;
 
 // Modules not in use.

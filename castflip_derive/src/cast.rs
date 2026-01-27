@@ -1,7 +1,9 @@
 use proc_macro::TokenStream;
 use quote::quote;
-use syn::{Data, DeriveInput, Field, Fields, Ident,
-          punctuated::Punctuated, token::Comma};
+use syn::{
+    Data, DeriveInput, Field, Fields, Ident,
+    punctuated::Punctuated, token::Comma,
+};
 
 
 pub fn proc_tokens(input: TokenStream) -> TokenStream {
@@ -25,8 +27,10 @@ pub fn proc_tokens(input: TokenStream) -> TokenStream {
     }
 }
 
-fn with_bounds(ident: &Ident,
-               punctuated: &Punctuated<Field, Comma>) -> TokenStream {
+fn with_bounds(
+    ident: &Ident,
+    punctuated: &Punctuated<Field, Comma>,
+) -> TokenStream {
     let field_type = punctuated.iter().map(|field| &field.ty);
 
     quote! {

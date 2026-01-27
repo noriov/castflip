@@ -82,8 +82,7 @@ fn proc_unnamed_struct(ident: &Ident, fields: &FieldsUnnamed) -> TokenStream {
 // e.g. struct Ident;
 fn proc_unit_struct(ident: &Ident) -> TokenStream {
     quote! {
-        impl castflip::Flip for #ident
-        {
+        impl castflip::Flip for #ident {
             fn flip_val_swapped(&self) -> Self {
                 Self
             }

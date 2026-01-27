@@ -2,7 +2,7 @@
 //! This crate provides three derive macros for crate `castflip`.
 //!
 //! Please refer to the documentation of `castflip`
-//! at <https://docs.rs/castflip/> for more information.
+//! at <https://docs.rs/castflip/0.1/castflip/> for more information.
 //!
 
 
@@ -14,13 +14,14 @@ use proc_macro::TokenStream;
 
 
 ///
-/// Declares that the succeeding struct or union type is `encast`able
-/// / `decast`able.
+/// Implements trait [`Cast`] for a `struct` type or a `union` type.
 ///
-/// Please refer to the description of trait [`Cast`] in the
-/// documentation of `castflip` at <https://docs.rs/castflip/>
+/// It must be applied together with attribute `#[`[`repr(C)`]`]`.
 ///
-/// [`Cast`]: https://docs.rs/castflip/latest/castflip/trait.Cast.html
+/// For detailed information, see the document of trait [`Cast`].
+///
+/// [`Cast`]: https://docs.rs/castflip/0.1/castflip/trait.Cast.html
+/// [`repr(C)`]: https://doc.rust-lang.org/reference/type-layout.html#the-c-representation
 ///
 #[proc_macro_derive(Cast)]
 pub fn cast_derive(input: TokenStream) -> TokenStream {
@@ -29,12 +30,11 @@ pub fn cast_derive(input: TokenStream) -> TokenStream {
 
 
 ///
-/// Declares that the succeeding struct type is `endian-flip`pable.
+/// Implements trait [`Flip`] for a `struct` type.
 ///
-/// Please refer to the description of trait [`Flip`] in the
-/// documentation of `castflip` at <https://docs.rs/castflip/>
+/// For detailed information, see the document of trait [`Flip`].
 ///
-/// [`Flip`]: https://docs.rs/castflip/latest/castflip/trait.Flip.html
+/// [`Flip`]: https://docs.rs/castflip/0.1/castflip/trait.Flip.html
 ///
 #[proc_macro_derive(Flip)]
 pub fn flip_derive(input: TokenStream) -> TokenStream {
@@ -43,14 +43,11 @@ pub fn flip_derive(input: TokenStream) -> TokenStream {
 
 
 ///
-/// Declares that the succeeding struct or union type is is marked as
-/// `endian-flip`pable but the implemented operation is Nop (No
-/// operation).
+/// Implements trait [`NopFlip`] for a `struct` type or a `union` type.
 ///
-/// Please refer to the description of trait [`NopFlip`] in the
-/// documentation of `castflip` at <https://docs.rs/castflip/>
+/// For detailed information, see the document of trait [`NopFlip`].
 ///
-/// [`NopFlip`]: https://docs.rs/castflip/latest/castflip/trait.NopFlip.html
+/// [`NopFlip`]: https://docs.rs/castflip/0.1/castflip/trait.NopFlip.html
 ///
 #[proc_macro_derive(NopFlip)]
 pub fn nop_flip_derive(input: TokenStream) -> TokenStream {
