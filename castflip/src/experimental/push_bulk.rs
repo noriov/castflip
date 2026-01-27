@@ -43,10 +43,12 @@ use core::slice;
 /// use castflip::experimental::PushBulk;
 ///
 /// // Input data 1 (6 bytes)
-/// let bytes1: [u8; 16] = [0x10, 0x11, 0x12, 0x13,
-///                         0x20, 0x21, 0x22, 0x23,
-///                         0x30, 0x31, 0x32, 0x33,
-///                         0x40, 0x41, 0x42, 0x43];
+/// let bytes1: [u8; 16] = [
+///     0x10, 0x11, 0x12, 0x13,
+///     0x20, 0x21, 0x22, 0x23,
+///     0x30, 0x31, 0x32, 0x33,
+///     0x40, 0x41, 0x42, 0x43,
+/// ];
 /// let mut input1 = Cursor::new(bytes1);
 ///
 /// // Prepare an empty vector `vec2` with capacity = 16.
@@ -55,7 +57,7 @@ use core::slice;
 /// // Fill the vector with loaded data.
 /// for i in 0 .. 4 {
 ///     unsafe {
-///         vec2.push_bulk(4, | buf | {
+///         vec2.push_bulk(4, |buf| {
 ///             input1.read_exact(buf)
 ///         }).unwrap();
 ///     }
@@ -73,18 +75,23 @@ use core::slice;
 pub trait PushBulk<T, R, E> {
     /// Extends a vector by `additional` and calls closure
     /// `fill_new_slice` to fill the extended slots.
-    unsafe fn push_bulk<F>(&mut self, additional: usize, fill_new_slice: F)
-                           -> Result<R, E>
+    unsafe fn push_bulk<F>(
+        &mut self,
+        additional: usize,
+        fill_new_slice: F,
+    ) -> Result<R, E>
     where
         F: FnMut(&mut [T]) -> Result<R, E>;
 }
 
-impl<T, R, E> PushBulk<T, R, E> for Vec<T>
-{
-    unsafe fn push_bulk<F>(&mut self, additional: usize, mut fill_new_slice: F)
-                           -> Result<R, E>
+impl<T, R, E> PushBulk<T, R, E> for Vec<T> {
+    unsafe fn push_bulk<F>(
+        &mut self,
+        additional: usize,
+        mut fill_new_slice: F,
+    ) -> Result<R, E>
     where
-        F: FnMut(&mut [T]) -> Result<R, E>
+        F: FnMut(&mut [T]) -> Result<R, E>,
     {
         // Prepare enough size of hidden area.
         self.reserve(additional);
@@ -92,14 +99,19 @@ impl<T, R, E> PushBulk<T, R, E> for Vec<T>
         // Fill hidden area with caller-supplied closure `fill_new_slice`.
         // The hidden area is passed as an ephemeral slice (soon dropped).
         let result = fill_new_slice(
-            slice::from_raw_parts_mut(
-                self.as_mut_ptr().add(self.len()),
-                additional)
+            unsafe {
+                slice::from_raw_parts_mut(
+                    self.as_mut_ptr().add(self.len()),
+                    additional,
+                )
+            }
         );
 
         // If the result is ok, extend the length.
         if result.is_ok() {
-            self.set_len(self.len() + additional);
+            unsafe {
+                self.set_len(self.len() + additional);
+            }
         }
 
         result

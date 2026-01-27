@@ -128,16 +128,24 @@ pub trait AsBytes {
 #[allow(deprecated)]
 impl<T> AsBytes for T
 where
-    T: Cast
+    T: Cast,
 {
     unsafe fn as_bytes_ref(&self) -> &[u8] {
-        slice::from_raw_parts::<u8>(self as *const T as *const u8,
-                                    mem::size_of::<T>())
+        unsafe {
+            slice::from_raw_parts::<u8>(
+                self as *const T as *const u8,
+                mem::size_of::<T>(),
+            )
+        }
     }
 
     unsafe fn as_bytes_mut(&mut self) -> &mut [u8] {
-        slice::from_raw_parts_mut::<u8>(self as *mut T as *mut u8,
-                                        mem::size_of::<T>())
+        unsafe {
+            slice::from_raw_parts_mut::<u8>(
+                self as *mut T as *mut u8,
+                mem::size_of::<T>(),
+            )
+        }
     }
 }
 
@@ -145,15 +153,23 @@ where
 #[allow(deprecated)]
 impl<T> AsBytes for [T]
 where
-    T: Cast
+    T: Cast,
 {
     unsafe fn as_bytes_ref(&self) -> &[u8] {
-        slice::from_raw_parts::<u8>(self as *const [T] as *const u8,
-                                    mem::size_of::<T>() * self.len())
+        unsafe {
+            slice::from_raw_parts::<u8>(
+                self as *const [T] as *const u8,
+                mem::size_of::<T>() * self.len(),
+            )
+        }
     }
 
     unsafe fn as_bytes_mut(&mut self) -> &mut [u8] {
-        slice::from_raw_parts_mut::<u8>(self as *mut [T] as *mut u8,
-                                        mem::size_of::<T>() * self.len())
+        unsafe {
+            slice::from_raw_parts_mut::<u8>(
+                self as *mut [T] as *mut u8,
+                mem::size_of::<T>() * self.len(),
+            )
+        }
     }
 }

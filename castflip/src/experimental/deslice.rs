@@ -107,14 +107,14 @@ pub trait Deslice {
 
 impl<T> Deslice for [T]
 where
-    T: Cast
+    T: Cast,
 {
     unsafe fn deslice<U>(&self) -> Option<&U>
     where
-        U: Cast
+        U: Cast,
     {
         if mem::size_of::<T>() * self.len() == mem::size_of::<U>() {
-            let slice1 = self.reslice::<U>()?;
+            let slice1 = unsafe { self.reslice::<U>()? };
             Some(&slice1[0])
         } else {
             None
@@ -123,10 +123,10 @@ where
 
     unsafe fn deslice_mut<U>(&mut self) -> Option<&mut U>
     where
-        U: Cast
+        U: Cast,
     {
         if mem::size_of::<T>() * self.len() == mem::size_of::<U>() {
-            let slice1 = self.reslice_mut::<U>()?;
+            let slice1 = unsafe { self.reslice_mut::<U>()? };
             Some(&mut slice1[0])
         } else {
             None

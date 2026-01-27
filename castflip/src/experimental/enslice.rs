@@ -107,21 +107,25 @@ pub trait Enslice {
 
 impl<T> Enslice for T
 where
-    T: Cast
+    T: Cast,
 {
     unsafe fn enslice<U>(&self) -> Option<&[U]>
     where
-        U: Cast
+        U: Cast,
     {
-        slice::from_raw_parts::<T>(self as *const T, 1)
-            .reslice::<U>()
+        unsafe {
+            slice::from_raw_parts::<T>(self as *const T, 1)
+                .reslice::<U>()
+        }
     }
 
     unsafe fn enslice_mut<U>(&mut self) -> Option<&mut [U]>
     where
-        U: Cast
+        U: Cast,
     {
-        slice::from_raw_parts_mut::<T>(self as *mut T, 1)
-            .reslice_mut::<U>()
+        unsafe {
+            slice::from_raw_parts_mut::<T>(self as *mut T, 1)
+                .reslice_mut::<U>()
+        }
     }
 }

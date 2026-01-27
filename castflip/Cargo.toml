@@ -1,7 +1,7 @@
 [package]
 name = "castflip"
 version = "0.1.11"
-edition = "2021"
+edition = "2024"
 description = "Library for encoding/decoding numeric variables, arrays and structures in little-endian and big-endian"
 categories = ["encoding", "parsing"]
 keywords = ["endian", "cast"]

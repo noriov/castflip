@@ -125,11 +125,11 @@ pub trait Reslice {
 
 impl<T> Reslice for [T]
 where
-    T: Cast
+    T: Cast,
 {
     unsafe fn reslice<U>(&self) -> Option<&[U]>
     where
-        U: Cast
+        U: Cast,
     {
         let slice_size = mem::size_of::<T>() * self.len();
         let new_len = slice_size / mem::size_of::<U>();
@@ -137,8 +137,12 @@ where
         #[allow(unused_parens)]
         if (slice_size == mem::size_of::<U>() * new_len &&
             self.as_ptr().align_offset(mem::align_of::<U>()) == 0) {
-            Some(slice::from_raw_parts::<U>(self.as_ptr() as *const U,
-                                            new_len))
+            Some(unsafe {
+                slice::from_raw_parts::<U>(
+                    self.as_ptr() as *const U,
+                    new_len,
+                )
+            })
         } else {
             None
         }
@@ -146,7 +150,7 @@ where
 
     unsafe fn reslice_mut<U>(&mut self) -> Option<&mut [U]>
     where
-        U: Cast
+        U: Cast,
     {
         let slice_size = mem::size_of::<T>() * self.len();
         let new_len = slice_size / mem::size_of::<U>();
@@ -154,8 +158,12 @@ where
         #[allow(unused_parens)]
         if (slice_size == mem::size_of::<U>() * new_len &&
             self.as_ptr().align_offset(mem::align_of::<U>()) == 0) {
-            Some(slice::from_raw_parts_mut::<U>(self.as_ptr() as *mut U,
-                                                new_len))
+            Some(unsafe {
+                slice::from_raw_parts_mut::<U>(
+                    self.as_ptr() as *mut U,
+                    new_len,
+                )
+            })
         } else {
             None
         }

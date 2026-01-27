@@ -121,53 +121,77 @@ pub trait AsifBytes {
 
 impl<T> AsifBytes for T
 where
-    T: Cast
+    T: Cast,
 {
     #[inline]
     unsafe fn asif_bytes_ref(&self) -> &[u8] {
-        slice::from_raw_parts::<u8>(self as *const T as *const u8,
-                                    mem::size_of::<T>())
+        unsafe {
+            slice::from_raw_parts::<u8>(
+                self as *const T as *const u8,
+                mem::size_of::<T>(),
+            )
+        }
     }
 
     #[inline]
     unsafe fn asif_bytes_mut(&mut self) -> &mut [u8] {
-        slice::from_raw_parts_mut::<u8>(self as *mut T as *mut u8,
-                                        mem::size_of::<T>())
+        unsafe {
+            slice::from_raw_parts_mut::<u8>(
+                self as *mut T as *mut u8,
+                mem::size_of::<T>(),
+            )
+        }
     }
 }
 
 
 impl<T> AsifBytes for [T]
 where
-    T: Cast
+    T: Cast,
 {
     #[inline]
     unsafe fn asif_bytes_ref(&self) -> &[u8] {
-        slice::from_raw_parts::<u8>(self as *const [T] as *const u8,
-                                    mem::size_of::<T>() * self.len())
+        unsafe {
+            slice::from_raw_parts::<u8>(
+                self as *const [T] as *const u8,
+                mem::size_of::<T>() * self.len(),
+            )
+        }
     }
 
     #[inline]
     unsafe fn asif_bytes_mut(&mut self) -> &mut [u8] {
-        slice::from_raw_parts_mut::<u8>(self as *mut [T] as *mut u8,
-                                        mem::size_of::<T>() * self.len())
+        unsafe {
+            slice::from_raw_parts_mut::<u8>(
+                self as *mut [T] as *mut u8,
+                mem::size_of::<T>() * self.len(),
+            )
+        }
     }
 }
 
 
 impl<T> AsifBytes for MaybeUninit<T>
 where
-    T: Cast
+    T: Cast,
 {
     #[inline]
     unsafe fn asif_bytes_ref(&self) -> &[u8] {
-        slice::from_raw_parts::<u8>(self.as_ptr() as *const u8,
-                                    mem::size_of::<T>())
+        unsafe {
+            slice::from_raw_parts::<u8>(
+                self.as_ptr() as *const u8,
+                mem::size_of::<T>(),
+            )
+        }
     }
 
     #[inline]
     unsafe fn asif_bytes_mut(&mut self) -> &mut [u8] {
-        slice::from_raw_parts_mut::<u8>(self.as_mut_ptr() as *mut u8,
-                                        mem::size_of::<T>())
+        unsafe {
+            slice::from_raw_parts_mut::<u8>(
+                self.as_mut_ptr() as *mut u8,
+                mem::size_of::<T>(),
+            )
+        }
     }
 }
