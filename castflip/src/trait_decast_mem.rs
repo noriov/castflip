@@ -108,7 +108,7 @@ impl DecastMem for [u8] {
                 // bits by the definition of trait Cast.
                 ptr::copy_nonoverlapping::<u8>(
                     value as *const T as *const u8,
-                    self.as_mut_ptr() as *mut u8,
+                    self.as_mut_ptr(),
                     nbytes,
                 );
             }
@@ -145,7 +145,7 @@ impl DecastMem for [u8] {
                 // bits by the definition of trait Cast.
                 ptr::copy_nonoverlapping::<u8>(
                     slice.as_ptr() as *const u8,
-                    self.as_mut_ptr() as *mut u8,
+                    self.as_mut_ptr(),
                     nbytes,
                 );
             }
