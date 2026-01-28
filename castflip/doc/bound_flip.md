@@ -14,7 +14,7 @@ Trait [`Flip`] is implemented for
   * `f32`, and `f64`,
 - array types whose elements' types implement trait [`Flip`],
 - `struct` types whose all fields' types implement trait [`Flip`] or
-   with no field, and whose type definitions are annotated with
+  with no field, and whose type definitions are annotated with
   attribute `#[`[`derive(Flip)`]`]`, and
 - `struct` types and `union` types whose all fields' types
   implement trait [`Flip`] and whose type definitions are annotated
