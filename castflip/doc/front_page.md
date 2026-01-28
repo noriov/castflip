@@ -86,8 +86,8 @@ fn main() { my_main(); }
 To use this crate, add the following lines to your `Cargo.toml`:
 
 ```toml
-[dependencies.castflip]
-version = "0.1"
+[dependencies]
+castflip = "0.1"
 ```
 
 [RFC768]: https://www.rfc-editor.org/rfc/rfc768.txt
