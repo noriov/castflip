@@ -128,7 +128,7 @@ where
         unsafe {
             slice::from_raw_parts::<u8>(
                 self as *const T as *const u8,
-                mem::size_of::<T>(),
+                mem::size_of_val(self),
             )
         }
     }
@@ -138,7 +138,7 @@ where
         unsafe {
             slice::from_raw_parts_mut::<u8>(
                 self as *mut T as *mut u8,
-                mem::size_of::<T>(),
+                mem::size_of_val(self),
             )
         }
     }
@@ -154,7 +154,7 @@ where
         unsafe {
             slice::from_raw_parts::<u8>(
                 self as *const [T] as *const u8,
-                mem::size_of::<T>() * self.len(),
+                mem::size_of_val(self),
             )
         }
     }
@@ -164,7 +164,7 @@ where
         unsafe {
             slice::from_raw_parts_mut::<u8>(
                 self as *mut [T] as *mut u8,
-                mem::size_of::<T>() * self.len(),
+                mem::size_of_val(self),
             )
         }
     }
@@ -180,7 +180,7 @@ where
         unsafe {
             slice::from_raw_parts::<u8>(
                 self.as_ptr() as *const u8,
-                mem::size_of::<T>(),
+                mem::size_of_val(self),
             )
         }
     }
@@ -190,7 +190,7 @@ where
         unsafe {
             slice::from_raw_parts_mut::<u8>(
                 self.as_mut_ptr() as *mut u8,
-                mem::size_of::<T>(),
+                mem::size_of_val(self),
             )
         }
     }
