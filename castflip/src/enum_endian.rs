@@ -154,6 +154,7 @@ impl Endian {
     ///
     #[inline]
     pub fn need_swap(self) -> bool {
+        #[allow(clippy::collapsible_else_if)]
         if self == Self::Swapped {
             true
         } else {
