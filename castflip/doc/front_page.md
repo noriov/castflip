@@ -17,14 +17,14 @@ This document describes the API of the castflip crate version 0.1.
 Examples:
 
 1. [Basic Example: A `struct` type is encasted and decasted
-    with its endianness flipped as required.](./documents/example1/index.html)
+   with its endianness flipped as required.](./documents/example1/index.html)
 2. [Nested Example: A nested `struct` type is encasted and decasted
-    with its endianness flipped as required.](./documents/example2/index.html)
+   with its endianness flipped as required.](./documents/example2/index.html)
 3. [Arrayed Example: An array of a `struct` type is encasted and decasted
-    with its endianness flipped as required.](./documents/example3/index.html)
+   with its endianness flipped as required.](./documents/example3/index.html)
 4. [I/O Example: A `struct` type is encasted and decasted
-    with its endianness flipped as required using trait `std::io::Read` and
-    trait `std::io::Write`.](./documents/example4/index.html)
+   with its endianness flipped as required using trait `std::io::Read` and
+   trait `std::io::Write`.](./documents/example4/index.html)
 
 A summary of types, traits and crate features:
 
@@ -32,7 +32,7 @@ A summary of types, traits and crate features:
 2. [Traits as Bounds: `Cast`, `Flip` and `NopFlip`
    ](./documents/summary2/index.html)
 3. [Traits to Cast and Flip: `DecastMem` and `EncastMem`/
-    `DecastIO` and `EncastIO`](./documents/summary3/index.html)
+   `DecastIO` and `EncastIO`](./documents/summary3/index.html)
 4. [Crate Features: `alloc` and `std`](./documents/summary4/index.html)
 5. [Planned Releases: Version 0.2 and 0.3](./documents/summary5/index.html)
 
