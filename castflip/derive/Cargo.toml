@@ -2,6 +2,7 @@
 name = "castflip_derive"
 version = "0.1.12"
 edition = "2024"
+rust-version = "1.85.1"
 description = "Derive macros for the castflip crate"
 license = "MIT-0"
 readme = "README.md"

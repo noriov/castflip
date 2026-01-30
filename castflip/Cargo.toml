@@ -2,6 +2,7 @@
 name = "castflip"
 version = "0.1.12"
 edition = "2024"
+rust-version = "1.85.1"
 description = "Library for encoding/decoding numeric variables, arrays and structures in little-endian and big-endian"
 categories = ["encoding", "parsing"]
 keywords = ["endian", "cast"]
