@@ -1,9 +1,24 @@
-# Castflip
+# The Castflip Repository
 
-This crate is a Rust library for encoding and decoding numeric
-variables, arrays and structures in little-endian and big-endian.
+This repository contains three crates.
 
-More precisely, this crate provides several traits
+- Crate castflip\
+  Is a Rust library for encoding and decoding numeric variables,
+  arrays and structures in little-endian and big-endian.
+  It provides methods to convert between a byte representation of a
+  format and a value of a Rust type with endian handling.
+
+- Crate castflip_derive\
+  Provides three derive macros for crate castflip.  They simplifies to
+  implement the fundamental traits of crate castflip for the supported
+  types.
+
+- Crate castflip_test\
+  Is a test suite for the methods of crate castflip.
+
+# Crate castflip
+
+Crate castflip provides several traits
 
 - to *encast* a byte representation of a type as a value of the type,
 - to *decast* a value of a type as a byte representation of the type, and
@@ -15,20 +30,23 @@ The supported types include
 2. array types, `struct` types and `union` types consisting of the
    supported types.
 
-For more information, please see the [documentation] of this crate.
+The alignment of the addresses of byte representations need not be
+considered because data are copied when being encasted or decasted.
+
+For more information, please see the [documentation] of crate castflip.
 It includes some examples and summaries as well as the descriptions of
 its types and its traits.
 
 # A Simple Example
 
-In this example, a byte representation of the UDP header in big-endian
-is encasted as a value of a `struct` type in native-endian.
+In this example, a byte representation of the UDP header in
+big-endian is encasted as a value of a `struct` type in native-endian.
 
 ```rust
 use castflip::{BE, Cast, EncastMem, Flip};
 
 //
-// Step 1: Define struct `UdpHdr` and test data.
+// Step 1: Define struct `UdpHdr`.
 //
 #[repr(C)]            // to make it possible to apply #[derive(Cast)]
 #[derive(Cast, Flip)] // to implement trait Cast and trait Flip
@@ -39,30 +57,26 @@ struct UdpHdr {  // UDP: See https://www.rfc-editor.org/rfc/rfc768.txt
     sum:   u16,  // UDP Checksum
 }
 
-// Test data: A sample byte representation of the UDP header (8 bytes)
-const BYTES1: [u8; 8] = [0xc3, 0xc9, 0x00, 0x35, 0x00, 0x32, 0x82, 0x3f];
+//
+// Step 2: Encast a byte representation of the UDP header in big-endian
+// (`BE`) stored in variable `in_bytes` as a value of struct `UdpHdr` in
+// native-endian and save it to variable `out_hdr`.
+//
 
-fn my_main() -> Option<()> {
-    //
-    // Step 2: Encast a byte representation of the UDP header in
-    // big-endian stored in const `BYTES1` as a value of struct
-    // `UdpHdr` in native-endian and save it to variable `udp_hdr2`.
-    //
-    let udp_hdr2: UdpHdr = BYTES1.encastf(BE)?;
+// Input: A sample byte representation of the UDP header (8 bytes)
+let in_bytes: [u8; 8] = [0xc3, 0xc9, 0x00, 0x35, 0x00, 0x32, 0x82, 0x3f];
 
-    // Check if all fields in variable `udp_hdr2` are as expected.
-    assert_eq!(udp_hdr2.sport, 0xc3c9); // = 50121 (Ephemeral Port)
-    assert_eq!(udp_hdr2.dport, 0x0035); // = 53 (DNS Port)
-    assert_eq!(udp_hdr2.len,   0x0032); // = 50 (Length in Bytes)
-    assert_eq!(udp_hdr2.sum,   0x823f); // = 0x823f (Checksum)
+// Encast a byte representation in big-endian (`BE`) as a value.
+let out_hdr: UdpHdr = in_bytes.encastf(BE).unwrap();
 
-    Some(())
-}
-
-fn main() { my_main(); }
+// Check if all fields in variable `out_hdr` are as expected.
+assert_eq!(out_hdr.sport, 0xc3c9);  // = 50121 (Ephemeral Port)
+assert_eq!(out_hdr.dport, 0x0035);  // = 53 (DNS Port)
+assert_eq!(out_hdr.len,   0x0032);  // = 50 (Length in Bytes)
+assert_eq!(out_hdr.sum,   0x823f);  // = 0x823f (Checksum)
 ```
 
-To use this crate, add the following lines to your `Cargo.toml`:
+To use crate castflip, add the following lines to your `Cargo.toml`:
 
 ```toml
 [dependencies]

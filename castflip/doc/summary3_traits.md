@@ -49,6 +49,9 @@ The following two traits are defined to decast using
 The methods of these traits return [`Result`].  On failure, they return
 an error value of struct [`std::io::Error`] in [`Err`].
 
+Note that the last letter of the trait names is an uppercase "`O`"
+(not an lowercase "`o`").
+
 Fore more information, see the document of each trait.
 
 # The `decast` method family
@@ -63,13 +66,14 @@ The `decast` method family contains four methods.
   as a byte representation of type `T` with its endianness flipped as
   required and writes the resulting bytes to `self`.
 
-* Method `decasts` decasts values of type `T` specified by a parameter
-  as byte representations of type `T` without fliping its endianness
-  and writes the resulting bytes to `self`.
+* Method `decasts` decasts values of type `T` in a slice specified by
+  a parameter as byte representations of type `T` without fliping
+  their endiannesses and writes the resulting bytes to `self`.
 
-* Method `decastsf` decasts values of type `T` specified by a parameter
-  as byte representations of type `T` with its endianness flipped as
-  required and writes the resulting bytes to `self`.
+* Method `decastsf` decasts values of type `T` in a slice specified by
+  a parameter as byte representations of type `T` with their
+  endiannesses flipped as required and writes the resulting bytes to
+  `self`.
 
 # The `encast` method family
 
@@ -84,17 +88,17 @@ The `encast` method family contains six methods.
   resulting value.
 
 * Method `encasts` encasts byte representations of type `T` as values
-  of type `T` without fliping its endianness and writes the resulting
-  values to the slice specified by a parameter.
-
-* Method `encastsf` encasts byte representations of type `T` as values
-  of type `T` with its endianness flipped as required and writes the
+  of type `T` without fliping their endiannesses and writes the
   resulting values to the slice specified by a parameter.
 
+* Method `encastsf` encasts byte representations of type `T` as values
+  of type `T` with thier endiannesses flipped as required and writes
+  the resulting values to the slice specified by a parameter.
+
 * Method `encastv` encasts byte representations of type `T` as values
-  of type `T` without fliping its endianness and returns the resulting
-  values in struct `Vec<T>`.
+  of type `T` without fliping their endiannesses and returns the
+  resulting values in struct `Vec<T>`.
 
 * Method `encastvf` encasts byte representations of type `T` as values
-  of type `T` with its endianness flipped as required and returns the
-  resulting values in struct `Vec<T>`.
+  of type `T` with their endiannesses flipped as required and returns
+  the resulting values in struct `Vec<T>`.

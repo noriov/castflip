@@ -2,13 +2,14 @@ Crate Features: `alloc` and `std`
 
 # Crate Features
 
-The following four crate features are defined in this crate.
+The following two crate features are defined in this crate.
 
 - `alloc`\
   Makes it possible to use [`Vec`]`<T>` with this crate.
 
 - `std` (enabled by default)\
-  Makes it possible to use [`std::io`] with this crate.\
+  Makes it possible to use [`std::io`] with this crate.
+  That is, it makes possible to use [`DecastIO`] and [`EncastIO`].\
   When this feature is enabled, crate feature `alloc` is also enabled.
 
 By default, crate feature `std` is enabled.
@@ -22,7 +23,7 @@ allocator, add the following line to the dependencies in `Cargo.toml`.
 default-features = false
 ```
 
-Below is an example of the dependencies description to use this crate.
+Below is an example of the dependencies description.
 
 ```toml
 [dependencies.castflip]
@@ -38,7 +39,7 @@ default-features = false
 features = ["alloc"]
 ```
 
-Below is an example of the dependencies description to use this crate.
+Below is an example of the dependencies description.
 
 ```toml
 [dependencies.castflip]

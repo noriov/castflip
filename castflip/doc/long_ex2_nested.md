@@ -1,16 +1,16 @@
-Nested Example: A nested `struct` type is encasted[^encast] and
-decasted[^decast] with its endianness flipped as required.
+How to convert between a byte representation and a value of a nested
+`struct` type
+
+The example below encasts[^encast] a byte representation of nested
+struct `Container` in little-endian as a value of struct `Container`
+in native-endian then decasts[^decast] the value as a byte
+representation of struct `Container` in little-endian.
 
 [^encast]: In this crate, to *encast* means to cast a byte
 representation of a type as a value of the type.
 
 [^decast]: In this crate, to *decast* means to cast a value of a type
 as a byte representation of the type.
-
-The example below encasts a byte representation of nested struct
-`Container` in little-endian as a value of struct `Container` in
-native-endian then decasts the value as a byte representation of
-struct `Container` in little-endian.
 
 # Outline
 
@@ -25,12 +25,12 @@ struct `Container` in little-endian.
     `#[`[`derive(NopFlip)`]`]` to it.
 
 - Step 2: Method [`EncastMem::encastf`] encasts a byte
-  representation in little-endian as a value of struct `Container` in
-  native-endian.
+  representation in little-endian ([`LE`]) as a value of struct
+  `Container` in native-endian.
 
 - Step 3: Method [`DecastMem::decastf`] decasts a value of
   struct `Container` in native-endian as a byte representation in
-  little-endian.
+  little-endian ([`LE`]).
 
 # Source Code
 
@@ -71,20 +71,20 @@ const BYTES1: [u8; 16] = [
     0x18, 0x19, 0x1a, 0x1b, 0x00, 0x00, 0x48, 0x41,
 ];
 
-fn my_main() -> Option<()> {
+fn main() {
     //
     // Step 2: Method encastf (1) encasts a byte representation of
     // struct `Container` at the head of const `BYTES1` as a value of the
-    // type, (2) flips the endiannesses of field `s` of struct `FieldS` and
-    // field `f` of f32 from the little-endianness to the native-endianness
-    // (Note: field `u` of union `FieldU` is not flipped), and (3) returns
-    // the resulting value in Ok(Container) which is saved to variable `con2`.
+    // type, (2) flips the endiannesses of field `s` of struct `FieldS`
+    // and field `f` of f32 from the little-endianness (`LE`) to the
+    // native-endianness (Note: field `u` of union `FieldU` is not flipped),
+    // and (3) returns the resulting value in Ok(Container) which is saved
+    // to variable `con2`.
     //
-    // In the following method call, (a) generic argument `Container`
-    // can be omitted because it can be infered by the Rust compiler,
-    // and (b) argument `LE` stands for the Little-Endianness.
+    // In the following method call, generic argument `Container`
+    // can be omitted because it can be infered by the Rust compiler.
     //
-    let con2: Container = BYTES1.encastf::<Container>(LE)?;
+    let con2: Container = BYTES1.encastf::<Container>(LE).unwrap();
 
     // Check if the values of all fields in variable `con2.s` (whose type
     // is struct `FieldS` in struct `Container`) are as expected.
@@ -117,16 +117,15 @@ fn my_main() -> Option<()> {
     // `Container` saved in variable `con2` as a byte representation of the
     // type, (2) flips the endiannesses of field `s` of struct `FieldS` and
     // field `f` of f32 from the native-endianness to the little-endianness
-    // (Note: field `u` of union `FieldU` is not flipped), (3) saves the
-    // resulting bytes to variable `bytes3` and (4) returns the number of
-    // the saved bytes in Ok(usize) which is saved in variable `size3`.
+    // (`LE`) (Note: field `u` of union `FieldU` is not flipped), (3) saves
+    // the resulting bytes to variable `bytes3` and (4) returns the number
+    // of the saved bytes in Ok(usize) which is saved in variable `size3`.
     //
-    // In the following method call, (a) generic argument `Container`
-    // can be omitted because it can be infered by the Rust compiler,
-    // and (b) argument `LE` stands for the Little-Endianness.
+    // In the following method call, generic argument `Container`
+    // can be omitted because it can be infered by the Rust compiler.
     //
     let mut bytes3 = [0_u8; 16];
-    let size3 = bytes3.decastf::<Container>(&con2, LE)?;
+    let size3 = bytes3.decastf::<Container>(&con2, LE).unwrap();
 
     // Check if the value in variable `size3` is as expected.
     assert_eq!(size3, 16); // The size of struct `Container` is 16.
@@ -134,11 +133,7 @@ fn my_main() -> Option<()> {
     // Check if the content of variable `bytes3` is as expected.
     // The endianness of field `u` of union `FieldU` must not be changed.
     assert_eq!(bytes3, BYTES1);
-
-    Some(())
 }
-
-fn main() { my_main(); }
 ```
 
 [`derive(Cast)`]: ../../derive.Cast.html

@@ -4,32 +4,52 @@
 //! This module defines the hierarchy of the document tree.
 //!
 
-pub mod example1 {
-    // 1. Basic Example: A `struct` type is encasted and decasted
-    //    with its endianness flipped as required.
-    #![doc = include_doc!("example1_basic_example.md")]
+pub mod short_example1 {
+    // 1. How to convert between a byte representation and
+    //    a number
+    #![doc = include_doc!("short_ex1_number.md")]
     use crate::*;
 }
 
-pub mod example2 {
-    // 2. Nested Example: A nested `struct` type is encasted and decasted
-    //    with its endianness flipped as required.
-    #![doc = include_doc!("example2_nested_example.md")]
+pub mod short_example2 {
+    // 2. How to convert between a byte representation and
+    //    an array of numbers
+    #![doc = include_doc!("short_ex2_array.md")]
     use crate::*;
 }
 
-pub mod example3 {
-    // 3. Arrayed Example: An array of a `struct` type is encasted and decasted
-    //    with its endianness flipped as required.
-    #![doc = include_doc!("example3_arrayed_example.md")]
+pub mod short_example3 {
+    // 3. How to convert between a byte representation and
+    //    a value of a `struct` type
+    #![doc = include_doc!("short_ex3_struct.md")]
     use crate::*;
 }
 
-pub mod example4 {
-    // 4. I/O Example: A `struct` type is encasted and decasted
-    //    with its endianness flipped as required
-    //    using trait [`std::io::Read`] and trait [`std::io::Write`].
-    #![doc = include_doc!("example4_using_std_io.md")]
+pub mod long_example1 {
+    // 1. How to convert between a byte representation of the UDP
+    //    header and a value of a `struct` type
+    #![doc = include_doc!("long_ex1_struct.md")]
+    use crate::*;
+}
+
+pub mod long_example2 {
+    // 2. How to convert between a byte representation and a value of
+    //    a nested `struct` type
+    #![doc = include_doc!("long_ex2_nested.md")]
+    use crate::*;
+}
+
+pub mod long_example3 {
+    // 3. How to convert between a byte representation and a value of
+    //    an array of a `struct` type
+    #![doc = include_doc!("long_ex3_arrayed.md")]
+    use crate::*;
+}
+
+pub mod long_example4 {
+    // 4. How to utilize struct `std::io::Cursor` and a mutable fat
+    //    pointer of `&mut [u8]`
+    #![doc = include_doc!("long_ex4_std_io.md")]
     use crate::*;
 }
 

@@ -28,6 +28,9 @@ Trait [`Cast`] is implemented for
 
 Trait [`Cast`] has no method.  It is defined as a marker.
 
+The alignment of the addresses of byte representations need not be
+cared about because data are copied when being encasted or decasted.
+
 # Safety
 
 You must not implement trait [`Cast`] manually unless you know what
@@ -90,10 +93,11 @@ executable file format in many operating systems including Linux.  The
   of the ELF Identification header as a value of struct `ElfIdHdr`.
 
 ```rust
+# fn main() {
 use castflip::{Cast, EncastMem};
 
 //
-// Step 1: Define struct `ElfIdHdr` and test data.
+// Step 1: Define struct `ElfIdHdr`.
 // Because it has no multi-byte field, #[derive(Flip)] is not necessary.
 //
 #[repr(C)]      // to make it possible to apply #[derive(Cast)]
@@ -108,33 +112,30 @@ struct ElfIdHdr { // The ELF Identification Header
     pad:      [u8; 7],  //09-0f: Padding (should be 0)
 }
 
-// Test data: A sample byte representation of the ELF Identification Header
-const BYTES1: [u8; 16] = [
+//
+// Step 2: Encast a byte representation of the ELF Identification Header
+// stored in variable `in_bytes` as a value of struct `ElfIdHdr` and
+// save it to variable `out_hdr`.
+//
+
+// Input: A sample byte representation of the ELF Identification Header
+let in_bytes: [u8; 16] = [
     0x7f, 0x45, 0x4c, 0x46, 0x02, 0x01, 0x01, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 ];
 
-fn my_main() -> Option<()> {
-    //
-    // Step 2: Encast a byte representation of the ELF Identification
-    // Header stored in const `BYTES1` as a value of struct `ElfIdHdr`
-    // and save it to variable `id_hdr2`.
-    //
-    let id_hdr2: ElfIdHdr = BYTES1.encast()?;
+// Encast a byte representation as a value.
+let out_hdr: ElfIdHdr = in_bytes.encast().unwrap();
 
-    // Check if all fields in variable `id_hdr2` are as expected.
-    assert_eq!(id_hdr2.magic, *b"\x7fELF");  // Magic Number: 7f 45 4c 46
-    assert_eq!(id_hdr2.class, 2);            // File Class: 64-bit
-    assert_eq!(id_hdr2.encoding, 1);         // Encoding: Little-Endian
-    assert_eq!(id_hdr2.version, 1);          // Version: 1
-    assert_eq!(id_hdr2.os_abi, 0);           // OS/ABI: unspecified
-    assert_eq!(id_hdr2.abi_ver, 0);          // ABI Ver: unspecified
-    assert_eq!(id_hdr2.pad, [0_u8; 7]);      // Padding
-
-    Some(())
-}
-
-fn main() { my_main(); }
+// Check if all fields in variable `out_hdr` are as expected.
+assert_eq!(out_hdr.magic, *b"\x7fELF");  // Magic Number: 7f 45 4c 46
+assert_eq!(out_hdr.class, 2);            // File Class: 64-bit
+assert_eq!(out_hdr.encoding, 1);         // Encoding: Little-Endian
+assert_eq!(out_hdr.version, 1);          // Version: 1
+assert_eq!(out_hdr.os_abi, 0);           // OS/ABI: unspecified
+assert_eq!(out_hdr.abi_ver, 0);          // ABI Ver: unspecified
+assert_eq!(out_hdr.pad, [0_u8; 7]);      // Padding
+# }
 ```
 
 [`derive(Cast)`]: ./derive.Cast.html

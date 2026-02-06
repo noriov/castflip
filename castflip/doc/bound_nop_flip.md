@@ -64,7 +64,8 @@ endianness of such multi-byte field is kept unchanged.
 # Example 1
 
 The example below encasts a byte representation of nested struct
-`Container` in little-endian as a value of the type in native-endian.
+`Container` in little-endian ([`LE`]) as a value of the type in
+native-endian.
 
 - Step 1: Struct `Container`, struct `FieldS` and union `FieldU` are
   defined.
@@ -81,6 +82,7 @@ The example below encasts a byte representation of nested struct
   the type in native-endian.
 
 ```rust
+# fn main() {
 use castflip::{Cast, EncastMem, Flip, LE, NopFlip};
 
 //
@@ -110,51 +112,48 @@ union FieldU {      // 4 bytes (the largest)
     u3: u32,        // 4 bytes
 }
 
-// Test data: A sample byte representation of struct `Container`
+// Input: A sample byte representation of struct `Container`
 // (16 bytes in little-endian)
-const BYTES1: [u8; 16] = [
+let in_bytes: [u8; 16] = [
     0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
     0x18, 0x19, 0x1a, 0x1b, 0x00, 0x00, 0x48, 0x41,
 ];
 
-fn my_main() -> Option<()> {
-    //
-    // Step 2: Encast a byte representation of struct `Container` in
-    // little-endian stored in const `BYTES1` as a value of struct
-    // `Container` in native-endian and save it to variable `con2`.
-    //
-    let con2: Container = BYTES1.encastf(LE)?; // LE = Little-Endian
+//
+// Step 2: Encast a byte representation of struct `Container` in
+// little-endian (`LE`) stored in variable `in_bytes` as a value of
+// struct `Container` in native-endian and save it to variable `out_con`.
+//
 
-    // Check if the values of all fields in variable `con2.s` (whose type
-    // is struct `FieldS` in struct `Container`) are as expected.
-    assert_eq!(con2.s.s1, [0x10, 0x11]);  // s1: [u8; 2],
-    assert_eq!(con2.s.s2, 0x1312);        // s2: u16,
-    assert_eq!(con2.s.s3, 0x17161514);    // s3: u32,
+// Encast a byte representation in little-endian (`LE`) as a value.
+let out_con: Container = in_bytes.encastf(LE).unwrap();
 
-    // Check if the values of all fields in variable `con2.u` (whose type
-    // is union `FieldU` in struct `Container`) are as expected.
-    // Note that their endiannesses must not be changed.
-    unsafe {
-        assert_eq!(con2.u.u1, [0x18, 0x19, 0x1a, 0x1b]); // u1: [u8; 4],
-        if cfg!(target_endian = "little") {
-            assert_eq!(con2.u.u2, [0x1918, 0x1b1a]);     // u2: [u16; 2],
-            assert_eq!(con2.u.u3, 0x1b1a1918);           // u3: u32,
-        } else if cfg!(target_endian = "big") {
-            assert_eq!(con2.u.u2, [0x1819, 0x1a1b]);     // u2: [16; 2],
-            assert_eq!(con2.u.u3, 0x18191a1b);           // u3: u32,
-#       } else {
-#           panic!();
-        }
+// Check if the values of all fields in variable `out_con.s` (whose type
+// is struct `FieldS` in struct `Container`) are as expected.
+assert_eq!(out_con.s.s1, [0x10, 0x11]);  // s1: [u8; 2],
+assert_eq!(out_con.s.s2, 0x1312);        // s2: u16,
+assert_eq!(out_con.s.s3, 0x17161514);    // s3: u32,
+
+// Check if the values of all fields in variable `out_con.u` (whose type
+// is union `FieldU` in struct `Container`) are as expected.
+// Note that their endiannesses must not be changed.
+unsafe {
+    assert_eq!(out_con.u.u1, [0x18, 0x19, 0x1a, 0x1b]); // u1: [u8; 4],
+    if cfg!(target_endian = "little") {
+        assert_eq!(out_con.u.u2, [0x1918, 0x1b1a]);     // u2: [u16; 2],
+        assert_eq!(out_con.u.u3, 0x1b1a1918);           // u3: u32,
+    } else if cfg!(target_endian = "big") {
+        assert_eq!(out_con.u.u2, [0x1819, 0x1a1b]);     // u2: [16; 2],
+        assert_eq!(out_con.u.u3, 0x18191a1b);           // u3: u32,
+#   } else {
+#       panic!();
     }
-
-    // Check if the value of variable `con2.f` (whose type is f32 in
-    // struct `Container`) is as expected.
-    assert_eq!(con2.f, 12.5_f32);  // f: f32,
-
-    Some(())
 }
 
-fn main() { my_main(); }
+// Check if the value of variable `out_con.f` (whose type is f32 in
+// struct `Container`) is as expected.
+assert_eq!(out_con.f, 12.5_f32);  // f: f32,
+# }
 ```
 
 # Example 2
@@ -189,6 +188,7 @@ magic number) are read twice.
   `FatHeader`.
 
 ```rust
+# fn main() {
 use castflip::{Cast, EncastMem, Endian, Flip, NopFlip};
 
 //
@@ -216,52 +216,47 @@ const FAT_MAGIC64: u32 = 0xcafebabf; // Native Endian, 64-bit
 const FAT_CIGAM32: u32 = 0xbebafeca; // Swapped Endian, 32-bit
 const FAT_CIGAM64: u32 = 0xbfbafeca; // Swapped Endian, 64-bit
 
-// Test data: A sample byte representation of the Mach-O fat header
+// Input: A sample byte representation of the Mach-O fat header
 // (8 bytes in big-endian)
-const BYTES1: [u8; 8] = [0xca, 0xfe, 0xba, 0xbe, 0x00, 0x00, 0x00, 0x02];
+let in_bytes: [u8; 8] = [0xca, 0xfe, 0xba, 0xbe, 0x00, 0x00, 0x00, 0x02];
 
-fn my_main() -> Option<()> {
-    //
-    // Step 2: Encast the first 4 bytes of a byte representation of
-    // the Mach-O fat header in `BYTES1` as a value of struct `FatMagic`
-    // without flipping its endianness to determine the endianness of
-    // const `BYTES1`.  The resulting endianness is saved to `endian2`.
-    //
-    let magic: FatMagic = BYTES1.encast()?;
-    let endian2 = match magic.number {
-        FAT_MAGIC32 | FAT_MAGIC64 => Endian::Native,
-        FAT_CIGAM32 | FAT_CIGAM64 => Endian::Swapped,
-        _ => panic!("Unsupported magic number: {:#x}", magic.number),
-    };
+//
+// Step 2: Encast the first 4 bytes of a byte representation of the
+// Mach-O fat header in `in_bytes` as a value of struct `FatMagic`
+// without flipping its endianness to determine the endianness of
+// variable `in_bytes`.  The resulting endianness is saved to `endian`.
+//
+let magic: FatMagic = in_bytes.encast().unwrap();
+let endian = match magic.number {
+    FAT_MAGIC32 | FAT_MAGIC64 => Endian::Native,
+    FAT_CIGAM32 | FAT_CIGAM64 => Endian::Swapped,
+    _ => panic!("Unsupported magic number: {:#x}", magic.number),
+};
 
-    // Check if variable `endian2` is equivalent to the big-endianness.
-    assert_eq!(endian2.absolute(), Endian::Big);
+// Check if variable `endian` is equivalent to the big-endianness.
+assert_eq!(endian.absolute(), Endian::Big);
 
-    //
-    // Step 3: Encast a byte representation of the Mach-O fat header
-    // in const `BYTES1` as a value of struct `FatHeader` and save it
-    // to variable `fat_hdr3`.
-    //
-    let fat_hdr3: FatHeader = BYTES1.encastf(endian2)?;
+//
+// Step 3: Encast a byte representation of the Mach-O fat header
+// in variable `in_bytes` as a value of struct `FatHeader` and save it
+// to variable `out_hdr`.
+//
+let out_hdr: FatHeader = in_bytes.encastf(endian).unwrap();
 
-    // Check if the value in variable `fat_hdr3.magic` is as expected.
-    // The endianness of the value must be kept.
-    if cfg!(target_endian = "little") {
-        assert_eq!(fat_hdr3.magic.number, FAT_CIGAM32); // Swapped-Endian
-    } else if cfg!(target_endian = "big") {
-        assert_eq!(fat_hdr3.magic.number, FAT_MAGIC32); // Native-Endian
-#     } else {
-#       panic!();
-    }
-
-    // Check if the value in variable `fat_hdr3.nfat_arch` is as expected.
-    // The endianness of the value must be the native-endianness.
-    assert_eq!(fat_hdr3.nfat_arch, 2);
-
-    Some(())
+// Check if the value in variable `out_hdr.magic` is as expected.
+// The endianness of the value must be kept.
+if cfg!(target_endian = "little") {
+    assert_eq!(out_hdr.magic.number, FAT_CIGAM32); // Swapped-Endian
+} else if cfg!(target_endian = "big") {
+    assert_eq!(out_hdr.magic.number, FAT_MAGIC32); // Native-Endian
+# } else {
+#   panic!();
 }
 
-fn main() { my_main(); }
+// Check if the value in variable `out_hdr.nfat_arch` is as expected.
+// The endianness of the value must be the native-endianness.
+assert_eq!(out_hdr.nfat_arch, 2);
+# }
 ```
 
 [`derive(Cast)`]: ./derive.Cast.html

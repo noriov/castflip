@@ -2,7 +2,7 @@ Planned Releases: Version 0.2 and 0.3
 
 # Planned Releases
 
-The following versions are planned to be released.
+The following releases are planned.  Preparations are in progress.
 
 Version 0.2 :
 

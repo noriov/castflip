@@ -62,19 +62,20 @@ It is exhcanged in big-endian on the Internet.
     `#[`[`derive(Flip)`]`]` to it.
 
 - Step 2: Method[`EncastIO::encastf`] encasts a byte
-  representation of the UDP header in big-endian as a value of struct
-  `UdpHdr` in native-endian.
+  representation of the UDP header in big-endian ([`BE`]) as a value
+  of struct `UdpHdr` in native-endian.
 
 The input byte representation is read using struct [`std::io::Cursor`]
 which wraps an in-memory buffer and provides it through trait
 [`std::io::Read`].
 
 ```rust
+# fn main() {
 use castflip::{BE, Cast, EncastIO, Flip};
 use std::io::Cursor;
 
 //
-// Step 1: Define struct `UdpHdr` and test data.
+// Step 1: Define struct `UdpHdr`.
 //
 #[repr(C)]            // to make it possible to apply #[derive(Cast)]
 #[derive(Cast, Flip)] // to implement trait Cast and trait Flip
@@ -85,35 +86,34 @@ struct UdpHdr {  // UDP: See https://www.rfc-editor.org/rfc/rfc768.txt
     sum:   u16,  // UDP Checksum
 }
 
-// Test data: The UDP header (8 bytes) + part of the DNS header (8 bytes)
-const BYTES1: [u8; 16] = [
+//
+// Step 2: Encast a byte representation of the UDP header in big-endian
+// (`BE`) read from variable `in_cursor` as a value of struct `UdpHdr` in
+// native-endian and save it to variable `out_hdr`.
+//
+// Because the UDP header is 8 bytes, only the first 8 bytes are read
+// and remaining 8 bytes are not read.
+//
+
+// Input: The UDP header (8 bytes) + part of the DNS header (8 bytes)
+let in_bytes: [u8; 16] = [
     0xc3, 0xc9, 0x00, 0x35, 0x00, 0x32, 0x82, 0x3f,
     0x1a, 0xd1, 0x01, 0x20, 0x00, 0x01, 0x00, 0x00,
 ];
 
-fn main() -> std::io::Result<()> {
-    //
-    // Step 2: Encast a byte representation of the UDP header in
-    // big-endian read from variable `input2` as a value of struct
-    // `UdpHdr` in native-endian and save it to variable `udp_hdr2`.
-    //
-    // Because the UDP header is 8 bytes, only the first 8 bytes are
-    // read and remaining 8 bytes are not read.
-    //
-    let mut input2 = Cursor::new(BYTES1);
-    let udp_hdr2: UdpHdr = input2.encastf(BE)?; // BE = Big-Endian
+// Encast a byte representation in big-endian (`BE`) as a value.
+let mut in_cursor = Cursor::new(in_bytes);
+let out_hdr: UdpHdr = in_cursor.encastf(BE).unwrap();
 
-    // Check if the current position of variable `input2` is as expected.
-    assert_eq!(input2.position(), 8); // The size of the UDP header is 8.
+// Check if the current position of variable `in_cursor` is as expected.
+assert_eq!(in_cursor.position(), 8); // The size of the UDP header is 8.
 
-    // Check if all fields in variable `udp_hdr2` are as expected.
-    assert_eq!(udp_hdr2.sport, 0xc3c9); // = 50121 (Ephemeral Port)
-    assert_eq!(udp_hdr2.dport, 0x0035); // = 53 (DNS Port)
-    assert_eq!(udp_hdr2.len,   0x0032); // = 50 (Length in Bytes)
-    assert_eq!(udp_hdr2.sum,   0x823f); // = 0x823f (Checksum)
-
-    Ok(())
-}
+// Check if all fields in variable `out_hdr` are as expected.
+assert_eq!(out_hdr.sport, 0xc3c9);  // = 50121 (Ephemeral Port)
+assert_eq!(out_hdr.dport, 0x0035);  // = 53 (DNS Port)
+assert_eq!(out_hdr.len,   0x0032);  // = 50 (Length in Bytes)
+assert_eq!(out_hdr.sum,   0x823f);  // = 0x823f (Checksum)
+# }
 ```
 
 [`derive(Cast)`]: ./derive.Cast.html

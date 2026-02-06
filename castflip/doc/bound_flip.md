@@ -114,7 +114,8 @@ For more information, see the description of trait [`NopFlip`].
 # Example 1
 
 The example below encasts a byte representation of the UDP[^UDP]
-header in big-endian as a value of struct `UdpHdr` in native-endian.
+header in big-endian ([`BE`]) as a value of struct `UdpHdr` in
+native-endian.
 
 [^UDP]: The User Datagram Protocol ([UDP]) is one of the fundamental
 protocols of the Internet protocol suite.  It is defined in [RFC768].
@@ -131,10 +132,11 @@ It is exhcanged in big-endian on the Internet.
   `UdpHdr` in native-endian.
 
 ```rust
+# fn main() {
 use castflip::{BE, Cast, EncastMem, Flip};
 
 //
-// Step 1: Define struct `UdpHdr` and test data.
+// Step 1: Define struct `UdpHdr`.
 //
 #[repr(C)]            // to make it possible to apply #[derive(Cast)]
 #[derive(Cast, Flip)] // to implement trait Cast and trait Flip
@@ -145,27 +147,24 @@ struct UdpHdr {  // UDP: See https://www.rfc-editor.org/rfc/rfc768.txt
     sum:   u16,  // UDP Checksum
 }
 
-// Test data: A sample byte representation of the UDP header (8 bytes)
-const BYTES1: [u8; 8] = [0xc3, 0xc9, 0x00, 0x35, 0x00, 0x32, 0x82, 0x3f];
+//
+// Step 2: Encast a byte representation of the UDP header in big-endian
+// (`BE`) stored in variable `in_bytes` as a value of struct `UdpHdr` in
+// native-endian and save it to variable `out_hdr`.
+//
 
-fn my_main() -> Option<()> {
-    //
-    // Step 2: Encast a byte representation of the UDP header in
-    // big-endian stored in const `BYTES1` as a value of struct
-    // `UdpHdr` in native-endian and save it to variable `udp_hdr2`.
-    //
-    let udp_hdr2: UdpHdr = BYTES1.encastf(BE)?; // BE = Big-Endian
+// Input: A sample byte representation of the UDP header (8 bytes)
+let in_bytes: [u8; 8] = [0xc3, 0xc9, 0x00, 0x35, 0x00, 0x32, 0x82, 0x3f];
 
-    // Check if all fields in variable `udp_hdr2` are as expected.
-    assert_eq!(udp_hdr2.sport, 0xc3c9); // = 50121 (Ephemeral Port)
-    assert_eq!(udp_hdr2.dport, 0x0035); // = 53 (DNS Port)
-    assert_eq!(udp_hdr2.len,   0x0032); // = 50 (Length in Bytes)
-    assert_eq!(udp_hdr2.sum,   0x823f); // = 0x823f (Checksum)
+// Encast a byte representation in big-endian (`BE`) as a value.
+let out_hdr: UdpHdr = in_bytes.encastf(BE).unwrap();
 
-    Some(())
-}
-
-fn main() { my_main(); }
+// Check if all fields in variable `out_hdr` are as expected.
+assert_eq!(out_hdr.sport, 0xc3c9);  // = 50121 (Ephemeral Port)
+assert_eq!(out_hdr.dport, 0x0035);  // = 53 (DNS Port)
+assert_eq!(out_hdr.len,   0x0032);  // = 50 (Length in Bytes)
+assert_eq!(out_hdr.sum,   0x823f);  // = 0x823f (Checksum)
+# }
 ```
 
 # Example 2
@@ -174,41 +173,38 @@ In the example below, the endiannesses of a couple of values are
 flipped by using the mothods of trait [`Flip`].
 
 ```rust
+# fn main() {
 use castflip::{BE, Flip, LE};
 
-fn main() {
-    //
-    // Step 1: Read the value of variable `int0` in little-endian and
-    // save it to variable `int1` in native-endian.
-    // Note: `LE` stands for the Little-Endianness.
-    //
-    let int0 = 0x1234_u16.to_le();
-    let int1 = int0.flip_val(LE); // `self` is in little-endian.
+//
+// Step 1: Read the value of variable `int0` in little-endian (`LE`)
+// and save it to variable `int1` in native-endian.
+//
+let int0 = 0x1234_u16.to_le(); // `int0` is in little-endian.
+let int1 = int0.flip_val(LE);  // `int1` is in native-endian.
 
-    // Check if the value in variable `int1` is as expected.
-    assert_eq!(int1, 0x1234);
+// Check if the value in variable `int1` is as expected.
+assert_eq!(int1, 0x1234);
 
-    //
-    // Step 2: Read the literal integer 0x5678 in big-endian and save it
-    // to variable `int2` in native-endian.
-    // Note: `BE` stands for the Big-Endianness.
-    //
-    let int2 = 0x5678_u16.to_be().flip_val(BE); // `self` is in big-endian.
+//
+// Step 2: Read the literal integer 0x5678 in big-endian (`BE`)
+// and save it to variable `int2` in native-endian.
+//
+let int2 = 0x5678_u16.to_be().flip_val(BE); // `self` is in big-endian.
 
-    // Check if the value in variable `int2` is as expected.
-    assert_eq!(int2, 0x5678);
+// Check if the value in variable `int2` is as expected.
+assert_eq!(int2, 0x5678);
 
-    //
-    // Step 3: Flip the endianness of the value in variable `int3`
-    // from the little-endianness to the native-endianness.
-    // Note: `LE` stands for the Little-Endianness.
-    //
-    let mut int3 = 0xabcd_u16.to_le();
-    int3.flip_var(LE); // `self` is in little-endian.
+//
+// Step 3: Flip the endianness of the value in variable `int3`
+// from the little-endianness (`LE`) to the native-endianness.
+//
+let mut int3 = 0xabcd_u16.to_le(); // `int3` is in little-endian.
+int3.flip_var(LE); // `int3` is in native-endian now.
 
-    // Check if the value in variable `int3` is as expected.
-    assert_eq!(int3, 0xabcd);
-}
+// Check if the value in variable `int3` is as expected.
+assert_eq!(int3, 0xabcd);
+# }
 ```
 
 [`derive(Cast)`]: ./derive.Cast.html

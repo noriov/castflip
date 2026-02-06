@@ -1,16 +1,12 @@
-//!
-//! This crate provides three derive macros for crate `castflip`.
-//!
-//! Please refer to the documentation of `castflip`
-//! at <https://docs.rs/castflip/0.1/castflip/> for more information.
-//!
+#![doc = include_str!("front_page.md")]
+
+
+use proc_macro::TokenStream;
 
 
 mod cast;
 mod flip;
 mod nop_flip;
-
-use proc_macro::TokenStream;
 
 
 ///
