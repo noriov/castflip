@@ -20,7 +20,7 @@ required, then return the resulting values in [`Ok`] if successful.
 On failure, they return an error value of struct [`std::io::Error`] in
 [`Err`].
 
-The number of those bytes that can be read from reader `self` must be
+The number of the bytes that can be read from reader `self` must be
 larger than or equal to the number of the bytes in the byte
 representations of the type.  If this condition is satisfied, the
 required number of the bytes is read from reader `self` and is
@@ -56,10 +56,10 @@ protocols of the Internet protocol suite.  It is defined in [RFC768].
 It is exhcanged in big-endian on the Internet.
 
 - Step 1: Struct `UdpHdr` is defined.
-  - It implements trait [`Cast`] by applying both attribute
-    `#[`[`derive(Cast)`]`]` and attribute `#[`[`repr(C)`]`]` to it.
-  - It implements trait [`Flip`] by applying attribute
-    `#[`[`derive(Flip)`]`]` to it.
+    - It implements trait [`Cast`] by applying both attribute
+      `#[`[`derive(Cast)`]`]` and attribute `#[`[`repr(C)`]`]` to it.
+    - It implements trait [`Flip`] by applying attribute
+      `#[`[`derive(Flip)`]`]` to it.
 
 - Step 2: Method[`EncastIO::encastf`] encasts a byte
   representation of the UDP header in big-endian ([`BE`]) as a value

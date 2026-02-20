@@ -1,9 +1,8 @@
-How to convert between a byte representation and a value of a nested
-`struct` type
+How to convert between bytes and a nested `struct`
 
 The example below encasts[^encast] a byte representation of nested
-struct `Container` in little-endian as a value of struct `Container`
-in native-endian then decasts[^decast] the value as a byte
+struct `Container` in little-endian as a value of the type in
+native-endian, then decasts[^decast] the value as a byte
 representation of struct `Container` in little-endian.
 
 [^encast]: In this crate, to *encast* means to cast a byte
@@ -16,13 +15,13 @@ as a byte representation of the type.
 
 - Step 1: Struct `Container`, struct `FieldS` and union `FieldU` are
   defined.
-  - They implement trait [`Cast`] by applying both attribute
-    `#[`[`derive(Cast)`]`]` and attribute `#[`[`repr(C)`]`]` to them.
-  - Struct `Container` and struct `FieldS` implement trait [`Flip`] by
-    applying attribute `#[`[`derive(Flip)`]`]` to them.
-  - Union `FieldU` implements both trait [`Flip`] whose methods do
-    nothing and trait [`NopFlip`] by applying attribute
-    `#[`[`derive(NopFlip)`]`]` to it.
+    - They implement trait [`Cast`] by applying both attribute
+      `#[`[`derive(Cast)`]`]` and attribute `#[`[`repr(C)`]`]` to them.
+    - Struct `Container` and struct `FieldS` implement trait [`Flip`]
+      by applying attribute `#[`[`derive(Flip)`]`]` to them.
+    - Union `FieldU` implements both trait [`Flip`] whose methods do
+      nothing and trait [`NopFlip`] by applying attribute
+      `#[`[`derive(NopFlip)`]`]` to it.
 
 - Step 2: Method [`EncastMem::encastf`] encasts a byte
   representation in little-endian ([`LE`]) as a value of struct
@@ -93,8 +92,8 @@ fn main() {
     assert_eq!(con2.s.s3, 0x17161514);    // s3: u32,
 
     // Check if the values of all fields in variable `con2.u` (whose type
-    // is union `FieldU` in struct `Container`) are as expected.
-    // Note that their endiannesses must not be changed.
+    // is union `FieldU` in struct `Container`) are evaluated as expected.
+    // Note that their endiannesses are retained.
     unsafe {
         assert_eq!(con2.u.u1, [0x18, 0x19, 0x1a, 0x1b]); // u1: [u8; 4],
         if cfg!(target_endian = "little") {
@@ -131,7 +130,7 @@ fn main() {
     assert_eq!(size3, 16); // The size of struct `Container` is 16.
 
     // Check if the content of variable `bytes3` is as expected.
-    // The endianness of field `u` of union `FieldU` must not be changed.
+    // The endianness of field `u` of union `FieldU` is retained.
     assert_eq!(bytes3, BYTES1);
 }
 ```

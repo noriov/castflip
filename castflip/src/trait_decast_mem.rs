@@ -202,7 +202,7 @@ trait DecastMemInternal {
     /// [`Some`]`(usize)`.  On failure, [`None`] is returned.
     ///
     /// The endianness of the resulting bytes is the swapped
-    /// endianness of the value(s) in `self`.
+    /// endianness of the values in `self`.
     ///
     fn decastsf_swapped<T: Cast + Flip>(
         &mut self,

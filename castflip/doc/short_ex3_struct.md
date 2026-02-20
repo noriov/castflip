@@ -1,10 +1,10 @@
-How to convert between a byte representation and a value of a `struct`
-type
+How to convert between bytes and a `struct`
 
-Both regular `struct` types which have named fields and tuple `struct`
-types which have unnamed fields can be converted.
+Both a regular `struct` type (with named fields) and a tuple `struct`
+type (with unnamed fields) can be converted.  However, only a regular
+`struct` type is converted in the examples below.
 
-# 1. Converting a Byte Representation of a Struct Type to a Value
+# 1. Converting Bytes to a `Struct`
 
 The example below *encast*s[^encast] a byte representation of struct
 `Coord` in big-endian ([`BE`]) as a value of struct `Coord` in
@@ -31,7 +31,7 @@ assert_eq!(out_coord.y, 0x5678);
 In the case where an input byte representation is in native-endian,
 method [`EncastMem::encast`] can be used instead.
 
-# 2. Converting a Value of a Struct Type to a Byte Representation
+# 2. Converting a `Struct` to Bytes
 
 The example below *decast*s[^decast] a value of struct `Coord` in
 native-endian as a byte representation of struct `Coord` in big-endian
@@ -48,7 +48,7 @@ struct Coord {
     y: u16,
 }
 
-let in_coord = Coord { x: 0x08765, y: 0x4321 };
+let in_coord = Coord { x: 0x8765, y: 0x4321 };
 let mut out_bytes: [u8; 4] = [0; 4];
 out_bytes.decastf(&in_coord, BE).unwrap();
 assert_eq!(out_bytes, [0x87, 0x65, 0x43, 0x21]);

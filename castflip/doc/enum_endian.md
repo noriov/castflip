@@ -6,16 +6,16 @@ Swapped) and Absolute Endiannesses (Little and Big).
 Enum [`Endian`] defines two categories of endiannesses.
 
 1. Relative Endiannesses
-   - Native-Endianness
-     (denoted as [`Endian::Native`], or [`NE`] for short)
-   - Swapped-Endianness
-     (denoted as [`Endian::Swapped`], or [`SE`] for short)
+    - Native-Endianness
+      (denoted as [`Endian::Native`], or [`NE`] for short)
+    - Swapped-Endianness
+      (denoted as [`Endian::Swapped`], or [`SE`] for short)
 
 2. Absolute Endiannesses
-   - Little-Endianness
-     (denoted as [`Endian::Little`], or [`LE`] for short)
-   - Big-Endianness
-     (denoted as [`Endian::Big`], or [`BE`] for short)
+    - Little-Endianness
+      (denoted as [`Endian::Little`], or [`LE`] for short)
+    - Big-Endianness
+      (denoted as [`Endian::Big`], or [`BE`] for short)
 
 The following example shows the relationship between these two
 categories.  Note that method [`Endian::absolute`] returns the
@@ -42,7 +42,7 @@ if cfg!(target_endian = "little") {
 # Relative Endianness vs. Absolute Endianness
 
 The main purpose of enum [`Endian`] is to specify the endianness of a
-byte representation of a type.
+byte representation of a format.
 
 In most cases, the endianness of a byte representation is specified
 using an absolute endianness.  For example, most protocols of the

@@ -1,16 +1,15 @@
-Types that implement trait [`Flip`] whose methods do nothing.
+Marks types that implement trait [`Flip`] whose methods do nothing.
 
 # Description
 
-Those types that implement trait [`NopFlip`] also implement trait
-[`Flip`] whose methods do nothing.  Note that NOP stands for "No
-OPeration".
+Types that implement trait [`NopFlip`] also implement trait [`Flip`]
+whose methods do nothing.  Note that NOP stands for "No OPeration".
 
 It is implemented for
 
 - `struct` types and `union` types whose all fields' types implement
-  trait [`Flip`] and whose type definitions are annotated with
-  attribute `#[`[`derive(NopFlip)`]`]`[^NopFlip].
+  trait [`Flip`] or with no field and whose type definitions are
+  annotated with attribute `#[`[`derive(NopFlip)`]`]`[^NopFlip].
 
 [^NopFlip]: The types annotated with attribute `#[`[`derive(NopFlip)`]`]`
 implement both trait [`Flip`] with NOP (No OPeration) methods and
@@ -21,17 +20,17 @@ It is defined as a marker.
 
 # Safety
 
-When you implement trait [`NopFlip`] for a type, you also need to
-implement trait [`Flip`] whose methods do nothing for the type.  But
-for safety reasons, you must not implement trait [`Flip`] manually
-unless you know what you are doing.
+When you implement trait [`NopFlip`] for a type, you need to implement
+trait [`Flip`] whose methods do nothing for the type.  But for safety
+reasons, you must not implement trait [`Flip`] manually unless you
+know what you are doing.
 
 The recommended way to implement both trait [`Flip`] whose methods do
 nothing and trait [`NopFlip`] for a type is to apply attribute
 `#[`[`derive(NopFlip)`]`]` to the type.
 
 Note that the internal specification of attribute
-`#[`[`derive(NopFlip)`]`]` may change in a future release.
+`#[`[`derive(NopFlip)`]`]` may be revised in a future release.
 
 # Background
 
@@ -39,18 +38,17 @@ Because there is no common way to flip the endianness of a value of a
 `union` type, attribute `#[`[`derive(Flip)`]`]` does not support a
 `union` type.  Therefore, if a `struct` type contains a field of a
 `union` type, attribute `#[`[`derive(Flip)`]`]` cannot be applied to
-the `struct` type without implementing trait [`Flip`] with custom-made
-methods to the `union` type.
+the `struct` type unless the `union` type manually implements trait
+[`Flip`].  In order to simplify such manual work, attribute
+`#[`[`derive(NopFlip)`]`]` is introduced.
 
-Attribute `#[`[`derive(NopFlip)`]`]` is introduced to simplify such
-manual implementations.  By applying attribute
-`#[`[`derive(NopFlip)`]`]` to a `struct` type or a `union` type, trait
-[`Flip`] whose methods do nothing is implemented for the type so that
-the type can be a member of a `struct` type that implement trait
-[`Flip`].  You should manually flip the endianness of the value or the
-byte representation of the type as required when encasting or
-decasting.  By applying the attribute, marker trait [`NopFlip`] is
-also implemented for the type.
+Attribute `#[`[`derive(NopFlip)`]`]` can be applied to a `struct` type
+or a `union` type if its all fields implement [`Flip`] or it has no
+field.  By applying the attribute to such type, it implements trait
+[`Flip`] whose methods do nothing (NOP = No OPeration).  What you
+should do manually is to flip the endiannesses of its values or its
+byte representations where necessary.  In addition, it also implements
+trait [`NopFlip`].
 
 Attribute `#[`[`derive(NopFlip)`]`]` is also useful for a `struct`
 type.  For example, the [Mach-O] header and the [PCAP] format have a
@@ -59,7 +57,7 @@ their files.  In such cases, it is often simple to read and write the
 value of such multi-byte field without flipping its endianness.  By
 defining a single-field `struct` type containing such multi-byte field
 and applying attribute `#[`[`derive(NopFlip)`]`]` to the type, the
-endianness of such multi-byte field is kept unchanged.
+endianness of such multi-byte field is retained.
 
 # Example 1
 
@@ -69,13 +67,13 @@ native-endian.
 
 - Step 1: Struct `Container`, struct `FieldS` and union `FieldU` are
   defined.
-  - They implement trait [`Cast`] by applying both attribute
-    `#[`[`derive(Cast)`]`]` and attribute `#[`[`repr(C)`]`]` to them.
-  - Struct `Container` and struct `FieldS` implement trait [`Flip`] by
-    applying attribute `#[`[`derive(Flip)`]`]` to them.
-  - Union `FieldU` implements both trait [`Flip`] whose methods do
-    nothing and trait [`NopFlip`] by applying attribute
-    `#[`[`derive(NopFlip)`]`]` to it.
+    - They implement trait [`Cast`] by applying both attribute
+      `#[`[`derive(Cast)`]`]` and attribute `#[`[`repr(C)`]`]` to them.
+    - Struct `Container` and struct `FieldS` implement trait [`Flip`]
+      by applying attribute `#[`[`derive(Flip)`]`]` to them.
+    - Union `FieldU` implements both trait [`Flip`] whose methods do
+      nothing and trait [`NopFlip`] by applying attribute
+      `#[`[`derive(NopFlip)`]`]` to it.
 
 - Step 2: Method [`EncastMem::encastf`] encasts a byte
   representation of struct `Container` in little-endian as a value of
@@ -135,8 +133,8 @@ assert_eq!(out_con.s.s2, 0x1312);        // s2: u16,
 assert_eq!(out_con.s.s3, 0x17161514);    // s3: u32,
 
 // Check if the values of all fields in variable `out_con.u` (whose type
-// is union `FieldU` in struct `Container`) are as expected.
-// Note that their endiannesses must not be changed.
+// is union `FieldU` in struct `Container`) are evaluated as expected.
+// Note that their endiannesses are retained.
 unsafe {
     assert_eq!(out_con.u.u1, [0x18, 0x19, 0x1a, 0x1b]); // u1: [u8; 4],
     if cfg!(target_endian = "little") {
@@ -171,13 +169,13 @@ demonstrate how trait [`NopFlip`] works, the first 4 bytes (i.e.,
 magic number) are read twice.
 
 - Step 1: Struct `FatHeader` and struct `FatMagic` are defined.
-  - They implement trait [`Cast`] by applying both attribute
-    `#[`[`derive(Cast)`]`]` and attribute `#[`[`repr(C)`]`]` to them.
-  - Struct `FatHeader` implements trait [`Flip`] by applying attribute
-    `#[`[`derive(Flip)`]`]` to it.
-  - struct `FatMagic` implements both trait [`Flip`] whose methods do
-    nothing and trait [`NopFlip`] by applying attribute
-    `#[`[`derive(NopFlip)`]`]` to it.
+    - They implement trait [`Cast`] by applying both attribute
+      `#[`[`derive(Cast)`]`]` and attribute `#[`[`repr(C)`]`]` to them.
+    - Struct `FatHeader` implements trait [`Flip`] by applying attribute
+      `#[`[`derive(Flip)`]`]` to it.
+    - struct `FatMagic` implements both trait [`Flip`] whose methods do
+      nothing and trait [`NopFlip`] by applying attribute
+      `#[`[`derive(NopFlip)`]`]` to it.
 
 - Step 2: Method [`EncastMem::encast`] encasts the first 4 bytes of
   a byte representation of the Mach-O fat header as a value of struct
@@ -224,7 +222,7 @@ let in_bytes: [u8; 8] = [0xca, 0xfe, 0xba, 0xbe, 0x00, 0x00, 0x00, 0x02];
 // Step 2: Encast the first 4 bytes of a byte representation of the
 // Mach-O fat header in `in_bytes` as a value of struct `FatMagic`
 // without flipping its endianness to determine the endianness of
-// variable `in_bytes`.  The resulting endianness is saved to `endian`.
+// variable `in_bytes`.  The determined endianness is saved to `endian`.
 //
 let magic: FatMagic = in_bytes.encast().unwrap();
 let endian = match magic.number {
@@ -244,7 +242,7 @@ assert_eq!(endian.absolute(), Endian::Big);
 let out_hdr: FatHeader = in_bytes.encastf(endian).unwrap();
 
 // Check if the value in variable `out_hdr.magic` is as expected.
-// The endianness of the value must be kept.
+// The endianness of the value is retained.
 if cfg!(target_endian = "little") {
     assert_eq!(out_hdr.magic.number, FAT_CIGAM32); // Swapped-Endian
 } else if cfg!(target_endian = "big") {

@@ -1,6 +1,6 @@
-How to convert between a byte representation and an array of numbers
+How to convert between bytes and an array of numbers
 
-# 1. Converting a Byte Representation to an Array of Numbers
+# 1. Converting Bytes to an Array of Numbers
 
 The example below *encast*s[^encast] a byte representation of type
 `[u16; 2]` in big-endian ([`BE`]) as a value of type `[u16; 2]` in
@@ -11,15 +11,15 @@ native-endian by using method [`EncastMem::encastf`].
 use castflip::{BE, EncastMem};
 
 let in_bytes: [u8; 4] = [0x12, 0x34, 0x56, 0x78];
-let out_value: [u16; 2] = in_bytes.encastf(BE).unwrap();
-assert_eq!(out_value, [0x1234, 0x5678]);
+let out_numbers: [u16; 2] = in_bytes.encastf(BE).unwrap();
+assert_eq!(out_numbers, [0x1234, 0x5678]);
 # }
 ```
 
 In the case where an input byte representation is in native-endian,
 method [`EncastMem::encast`] can be used instead.
 
-# 2. Converting an Array of Numbers to a Byte Representation
+# 2. Converting an Array of Numbers to Bytes
 
 The example below *decast*s[^decast] a value of type `[u16; 2]` in
 native-endian as a byte representation of type `[u16; 2]` in
@@ -30,9 +30,9 @@ little-endian ([`LE`]) by using method
 # fn main() {
 use castflip::{DecastMem, LE};
 
-let in_value: [u16; 2] = [0x8765, 0x4321];
+let in_numbers: [u16; 2] = [0x8765, 0x4321];
 let mut out_bytes: [u8; 4] = [0; 4];
-out_bytes.decastf(&in_value, LE).unwrap();
+out_bytes.decastf(&in_numbers, LE).unwrap();
 assert_eq!(out_bytes, [0x65, 0x87, 0x21, 0x43]);
 # }
 ```

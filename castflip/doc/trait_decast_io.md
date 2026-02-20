@@ -57,10 +57,10 @@ protocols of the Internet protocol suite.  It is defined in [RFC768].
 It is exhcanged in big-endian on the Internet.
 
 - Step 1: Struct `UdpHdr` is defined.
-  - It implements trait [`Cast`] by applying both attribute
-    `#[`[`derive(Cast)`]`]` and attribute `#[`[`repr(C)`]`]` to it.
-  - It implements trait [`Flip`] by applying attribute
-    `#[`[`derive(Flip)`]`]` to it.
+    - It implements trait [`Cast`] by applying both attribute
+      `#[`[`derive(Cast)`]`]` and attribute `#[`[`repr(C)`]`]` to it.
+    - It implements trait [`Flip`] by applying attribute
+      `#[`[`derive(Flip)`]`]` to it.
 
 - Step 2: Method [`DecastIO::decastf`] decasts a value of
   struct `UdpHdr` in native-endian as a byte representation of the

@@ -1,17 +1,17 @@
-Those types that the endiannesses of their values can be flipped by
-using the methods of this crate.
+Marks types whose values' endiannesses can be flipped by the methods
+of this crate.
 
 # Description
 
-The endianness of the values of those types that implement trait
-[`Flip`] can be flipped by using the methods of this crate.
+The endiannesses of the values of types that implement trait [`Flip`]
+can be flipped by the methods of this crate.
 
 Trait [`Flip`] is implemented for
 
 - all primitive numeric types, i.e.,
-  * `i8`, `i16`, `i32`, `i64`, `i128`, `isize`,
-  * `u8`, `u16`, `u32`, `u64`, `u128`, `usize`,
-  * `f32`, and `f64`,
+    * `i8`, `i16`, `i32`, `i64`, `i128`, `isize`,
+    * `u8`, `u16`, `u32`, `u64`, `u128`, `usize`,
+    * `f32`, and `f64`,
 - array types whose elements' types implement trait [`Flip`],
 - `struct` types whose all fields' types implement trait [`Flip`] or
   with no field, and whose type definitions are annotated with
@@ -39,75 +39,77 @@ The recommended way to implement trait [`Flip`] for a struct type is
 to apply attribute `#[`[`derive(Flip)`]`]` to the type.
 
 Note that the internal specification of attribute
-`#[`[`derive(Flip)`]`]` may change in a future release.
+`#[`[`derive(Flip)`]`]` may be revised in a future release.
 
 # Method Naming Convention
 
 Each method name consits of two parts.
 
-The first part: The methods whose names start with
+The first part determines the result handling.  The methods whose
+names start with
 
 1. "`flip_val`" return the value in `self`, and
 
-2. "`flip_var`" flip the endianness of the value in `self`.
+2. "`flip_var`" manipulate the value in `self`.
 
-The second part: The methods whose names end with
+The second part determines the endianness handling.  The methods whose
+names end with
 
-1. "" (no suffix) keep the endianness of the resulting value
-   regardless of its actual endianness, and
+1. "" (no suffix) flip the endianness of the value if parameter
+   `endian` is not equivalent to the endianness of the target system,
+   and
 
-2. "`_swapped`" reverse the endianness of the resulting value
-   regardless of its actual endianness.
+2. "`_swapped`" reverse the endianness, i.e., the endianness of the
+   resulting value is reversed from the endianness of the source
+   value.
 
 # Comparison With Trait `Copy`
 
-As shown in [the Description section](#description) above, all types
-that implement trait [`Flip`] can be duplicated simply by copying
-bits.  But trait [`Flip`] is not a subtrait of trait [`Copy`].  The
-reasons why trait [`Flip`] is defined independently from trait
-[`Copy`] are (1) to exclude pointers, and (2) to avoid unexpected copy
-operation.  Therefore, when a `struct` type or a `union` type needs to
-implement both trait [`Flip`] and trait [`Copy`], you must implement
-both trait [`Flip`] and trait [`Copy`] separately.
+As you may have noticed by reading [the Description
+section](#description) above, all types that implement trait [`Flip`]
+can be duplicated simply by copying bits.  However, trait [`Flip`] is
+not a subtrait of trait [`Copy`].  The reasons why trait [`Flip`] is
+defined independently from trait [`Copy`] are (1) to exclude pointers,
+and (2) to avoid unexpected copy operation.  Therefore, when a
+`struct` type or a `union` type needs to implement both trait [`Flip`]
+and trait [`Copy`], you must implement both traits explicitly.
 
-When the methods of this crate flip the endiannesses of the values of
-those types that implement trait [`Flip`], the methods read those
-values by using the functions provided by module [`core::ptr`] instead
-of using the Rust assignment expressions because the types of the
-values may not implement trait [`Copy`].
+When the methods of this crate flip the endiannesses of one or more
+values of a type that implement trait [`Flip`], the methods read and
+write the bits of the values by the functions provided by module
+[`core::ptr`] instead of by the Rust assignment expressions because
+the type may not implement trait [`Copy`].
 
 # Comparison With Trait `Cast`
 
-The set of those types that can implement trait [`Flip`] is equal to
-the set of those types that can implement trait [`Cast`].
+The set of types that can implement trait [`Flip`] is equal to
+the set of types that can implement trait [`Cast`].
 
-But there is a difference between those derive macros that support
-them; attribute `#[`[`derive(Flip)`]`]` does not support a `union`
-type because there is no common way to flip the endianness of a
-`union` type, while attribute `#[`[`derive(Cast)`]`]` supports a
-`union` type because the value of a `union` type can be duplicated
-simply by copying bits.
+But there is a difference between derive macros that support them;
+attribute `#[`[`derive(Flip)`]`]` does not support a `union` type
+because there is no common way to flip the endianness of a `union`
+type, while attribute `#[`[`derive(Cast)`]`]` supports a `union` type
+because the value of a `union` type can be duplicated by copying bits.
 
-In order to distinguish them properly in the internal implementation,
-trait [`Flip`] is defined independently from trait [`Cast`].
+In order to distinguish the difference properly, trait [`Flip`] is
+defined independently from trait [`Cast`].
 
 # `union` types and trait `Flip`
 
 Because attribute `#[`[`derive(Flip)`]`]` cannot be applied to a
 `union` type, if a `struct` type contains a field of a `union` type,
 attribute `#[`[`derive(Flip)`]`]` cannot be applied to the `struct`
-type without manually implementing trait [`Flip`] to the `union` type.
-In order to simplify such manual work, attribute
+type unless the `union` type manually implements trait [`Flip`].  In
+order to simplify such manual work, attribute
 `#[`[`derive(NopFlip)`]`]` is introduced.
 
-Attribute `#[`[`derive(NopFlip)`]`]` can be applied to both a `struct`
-type and a `union` type whose all fields' types implement [`Flip`] or
-with no field.  By applying the attribute to those types, those types
-implement trait [`Flip`] whose methods do nothing (NOP = No
-OPeration).  You should manually flip the endiannesses of the values
-or the byte representations of those types as required when encasting
-or decasting.  It also implements trait [`NopFlip`] which is a
-subtrait of trait [`Flip`].
+Attribute `#[`[`derive(NopFlip)`]`]` can be applied to a `struct` type
+or a `union` type if its all fields implement [`Flip`] or it has no
+field.  By applying the attribute to such type, it implements trait
+[`Flip`] whose methods do nothing (NOP = No OPeration).  What you
+should do manually is to flip the endiannesses of its values or its
+byte representations where necessary.  In addition, it also implements
+trait [`NopFlip`].
 
 For more information, see the description of trait [`NopFlip`].
 
@@ -122,10 +124,10 @@ protocols of the Internet protocol suite.  It is defined in [RFC768].
 It is exhcanged in big-endian on the Internet.
 
 - Step 1: Struct `UdpHdr` is defined.
-  - It implements trait [`Cast`] by applying both attribute
-    `#[`[`derive(Cast)`]`]` and attribute `#[`[`repr(C)`]`]` to it.
-  - It implements trait [`Flip`] by applying attribute
-    `#[`[`derive(Flip)`]`]` to it.
+    - It implements trait [`Cast`] by applying both attribute
+      `#[`[`derive(Cast)`]`]` and attribute `#[`[`repr(C)`]`]` to it.
+    - It implements trait [`Flip`] by applying attribute
+      `#[`[`derive(Flip)`]`]` to it.
 
 - Step 2: Method [`EncastMem::encastf`] encasts a byte
   representation of the UDP header in big-endian as a value of struct

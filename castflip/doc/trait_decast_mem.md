@@ -1,13 +1,14 @@
 Provides methods that decast[^decast] one or more values of a type
 specified by a parameter as one or more byte representations of the
-type and save the resulting byte representations to the memory at the
-head of `self`.
+type and save the resulting byte representations at the head of byte
+slice specified by `self`.
 
 [^decast]: In this crate, to *decast* means to cast a value of a type
 as a byte representation of the type.
 
-The alignment of the addresses of byte representations need not be
-cared about because data are copied when being decasted.
+The alignment of the addresses of the byte representations need not be
+cared about because the bits in the byte representations are copied to
+variables located on their natural alignment when being encasted.
 
 This trait is implemented for `[u8]`.
 
@@ -16,16 +17,16 @@ This trait is implemented for `[u8]`.
 The methods of this trait decast one or more values of a type
 specified by a parameter as one or more byte representations of the
 type, flip the endianness of the byte representations as required,
-save the resulting byte representations to the memory at the head of
-`self`, then return the number of the bytes in the byte
+save the resulting byte representations at the head of byte slice
+specified by `self`, then return the number of the bytes in the byte
 representations in [`Some`]`(usize)` if successful.  On failure, they
 return [`None`]
 
 The number of the bytes in `self` must be larger than or equal to the
 number of the bytes in the byte representations of the type.  If this
 condition is satisfied, the resulting byte representations are saved
-to the memory at the head of `self`.  The remaining bytes in `self`
-are unchanged.
+at the head of byte slice specified by `self`.  The remaining bytes in
+`self` are unchanged.
 
 # Method Naming Convention
 
@@ -56,10 +57,10 @@ protocols of the Internet protocol suite.  It is defined in [RFC768].
 It is exhcanged in big-endian on the Internet.
 
 - Step 1: Struct `UdpHdr` is defined.
-  - It implements trait [`Cast`] by applying both attribute
-    `#[`[`derive(Cast)`]`]` and attribute `#[`[`repr(C)`]`]` to it.
-  - It implements trait [`Flip`] by applying attribute
-    `#[`[`derive(Flip)`]`]` to it.
+    - It implements trait [`Cast`] by applying both attribute
+      `#[`[`derive(Cast)`]`]` and attribute `#[`[`repr(C)`]`]` to it.
+    - It implements trait [`Flip`] by applying attribute
+      `#[`[`derive(Flip)`]`]` to it.
 
 - Step 2: Method [`DecastMem::decastf`] decasts a value of
   struct `UdpHdr` in native-endian as a byte representation of the

@@ -1,7 +1,7 @@
 Crate castflip is a Rust library for encoding and decoding numeric
 variables, arrays and structures in little-endian and big-endian.
 It provides methods to convert between a byte representation of a
-format and a value of a Rust type with endian handling.
+format and a value of a Rust type with endianness handling.
 
 # Introduction
 
@@ -9,7 +9,7 @@ Crate castflip provides several traits
 
 - to *encast* a byte representation of a type as a value of the type,
 - to *decast* a value of a type as a byte representation of the type, and
-- to *flip* the endianness of a value of a type as required.
+- to flip the endianness of a value of a type as required.
 
 The supported types include
 
@@ -17,55 +17,10 @@ The supported types include
 2. array types, `struct` types and `union` types consisting of the
    supported types.
 
-The alignment of the addresses of byte representations need not be
-cared about because data are copied when being encasted or decasted.
-
-This document describes the API of the castflip crate version 0.1.
-To use the API, add the following lines to your `Cargo.toml`:
-
-```toml
-[dependencies]
-castflip = "0.1"
-```
-
-# Documents
-
-Short Examples as a Quick Start Guide:
-
-1. [How to convert between a byte representation and
-   a number](./documents/short_example1/index.html)
-
-2. [How to convert between a byte representation and
-   an array of numbers](./documents/short_example2/index.html)
-
-3. [How to convert between a byte representation and
-   a value of a `struct` type](./documents/short_example3/index.html)
-
-Long Examples with Explanations:
-
-1. [How to convert between a byte representation of the UDP header and
-   a value of a `struct` type](./documents/long_example1/index.html)
-2. [How to convert between a byte representation and a value of a nested
-   `struct` type](./documents/long_example2/index.html)
-3. [How to convert between a byte representation and a value of an array
-   of a `struct` type](./documents/long_example3/index.html)
-4. [How to utilize struct `std::io::Cursor` and a mutable fat pointer of
-   `&mut [u8]`](./documents/long_example4/index.html)
-
-A Summary of Types, Traits and Crate Features:
-
-1. [Enum Type: `Endian`](./documents/summary1/index.html)
-2. [Traits as Bounds: `Cast`, `Flip` and `NopFlip`
-   ](./documents/summary2/index.html)
-3. [Traits to Cast and Flip: `DecastMem` and `EncastMem`/
-   `DecastIO` and `EncastIO`](./documents/summary3/index.html)
-4. [Crate Features: `alloc` and `std`](./documents/summary4/index.html)
-5. [Planned Releases: Version 0.2 and 0.3](./documents/summary5/index.html)
-
 # A Simple Example
 
-In this example, a byte representation of the UDP[^UDP] header in
-big-endian is encasted as a value of a `struct` type in native-endian.
+The example below encasts a byte representation of the UDP[^UDP]
+header in big-endian as a value of a `struct` type in native-endian.
 
 [^UDP]: The User Datagram Protocol ([UDP]) is one of the fundamental
 protocols of the Internet protocol suite.  It is defined in [RFC768].
@@ -106,6 +61,63 @@ assert_eq!(out_hdr.len,   0x0032);  // = 50 (Length in Bytes)
 assert_eq!(out_hdr.sum,   0x823f);  // = 0x823f (Checksum)
 # }
 ```
+
+# Dependencies
+
+To use crate castflip version 0.1, add the following lines to your
+`Cargo.toml`:
+
+```toml
+[dependencies]
+castflip = "0.1"
+```
+
+# Documents
+
+The documents below describes the API of the castflip crate version
+0.1.
+
+Short Examples as a Quick Start Guide:
+
+1. [How to convert between bytes and a number
+   ](./documents/short_example1/index.html)
+2. [How to convert between bytes and an array of numbers
+   ](./documents/short_example2/index.html)
+3. [How to convert between bytes and a `struct`
+   ](./documents/short_example3/index.html)
+4. [How to convert between bytes and an array of `struct`s
+   ](./documents/short_example4/index.html)
+
+Long Examples with Explanations:
+
+1. [How to convert between bytes and a `struct` (The UDP header)
+   ](./documents/long_example1/index.html)
+2. [How to convert between bytes and a nested `struct`
+   ](./documents/long_example2/index.html)
+3. [How to convert between bytes and an array of `struct`s
+   ](./documents/long_example3/index.html)
+    1. [As a value of type `[T; N]`
+       ](./documents/long_example3_1/index.html)
+    2. [As consecutive values of type `T`
+       ](./documents/long_example3_2/index.html)
+    3. [As an element of slice `[[T; N]]`
+       ](./documents/long_example3_3/index.html)
+4. [How to convert between bytes and a `struct` (The UDP header)
+   using `std::io`](./documents/long_example4/index.html)
+    1. [Through a byte stream provided by struct `std::io::Cursor`
+       ](./documents/long_example4_1/index.html)
+    2. [Through a byte stream provided by a mutable byte slice `&mut [u8]`
+       ](./documents/long_example4_2/index.html)
+
+Summaries of Types, Traits, Crate Features, etc.:
+
+1. [Enum Type: `Endian`](./documents/summary1/index.html)
+2. [Traits as Bounds: `Cast`, `Flip` and `NopFlip`
+   ](./documents/summary2/index.html)
+3. [Traits to Encast and Decast: `EncastMem` and `DecastMem` /
+   `EncastIO` and `DecastIO`](./documents/summary3/index.html)
+4. [Crate Features: `alloc` and `std`](./documents/summary4/index.html)
+5. [Planned Releases: Version 0.2 and 0.3](./documents/summary5/index.html)
 
 [RFC768]: https://www.rfc-editor.org/rfc/rfc768.txt
 [UDP]: https://en.wikipedia.org/wiki/User_Datagram_Protocol

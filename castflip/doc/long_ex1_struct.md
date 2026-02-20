@@ -1,9 +1,8 @@
-How to convert between a byte representation of the UDP header and a
-value of a `struct` type
+How to convert between bytes and a `struct` (The UDP header)
 
 The example below encasts[^encast] a byte representation of the
 UDP[^UDP] header in big-endian as a value of struct `UdpHdr` in
-native-endian then decasts[^decast] a value of struct `UdpHdr` in
+native-endian, then decasts[^decast] a value of struct `UdpHdr` in
 native-endian as a byte representation of the UDP header in
 big-endian.
 
@@ -20,10 +19,10 @@ It is exhcanged in big-endian on the Internet.
 # Outline
 
 - Step 1: Struct `UdpHdr` is defined.
-  - It implements trait [`Cast`] by applying both attribute
-    `#[`[`derive(Cast)`]`]` and attribute `#[`[`repr(C)`]`]` to it.
-  - It implements trait [`Flip`] by applying attribute
-    `#[`[`derive(Flip)`]`]` to it.
+    - It implements trait [`Cast`] by applying both attribute
+      `#[`[`derive(Cast)`]`]` and attribute `#[`[`repr(C)`]`]` to it.
+    - It implements trait [`Flip`] by applying attribute
+      `#[`[`derive(Flip)`]`]` to it.
 
 - Step 2: Method [`EncastMem::encastf`] encasts a byte
   representation of the UDP header in big-endian ([`BE`]) as a value

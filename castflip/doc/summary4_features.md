@@ -5,16 +5,20 @@ Crate Features: `alloc` and `std`
 The following two crate features are defined in this crate.
 
 - `alloc`\
-  Makes it possible to use [`Vec`]`<T>` with this crate.
+  Enables methods that use struct [`Vec`]`<T>`.  If this feature is
+  enabled, this crate imports crate [`alloc`].  If feature `std` is
+  enabled, this feature is also enabled.
 
 - `std` (enabled by default)\
-  Makes it possible to use [`std::io`] with this crate.
-  That is, it makes possible to use [`DecastIO`] and [`EncastIO`].\
-  When this feature is enabled, crate feature `alloc` is also enabled.
+  Enables trait [`EncastIO`] and trait [`DecastIO`].  If this feature
+  is enabled, this crate imports crate [`std::io`] and feature `alloc`
+  is enabled.
 
-By default, crate feature `std` is enabled.
+By default, feature `std` is enabled.
 
-# Notes on `#![no_std]`
+# How to Use This Crate on a `no_std` Environment
+
+## Without Memory Allocator
 
 To use this crate on a [`no_std`] environment without memory
 allocator, add the following line to the dependencies in `Cargo.toml`.
@@ -30,6 +34,8 @@ Below is an example of the dependencies description.
 version = "0.1"
 default-features = false
 ```
+
+## With Memory Allocator
 
 To use this crate on a [`no_std`] environment with memory allocator,
 add the following lines to the dependencies in `Cargo.toml`.

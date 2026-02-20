@@ -3,7 +3,7 @@
 Crate castflip is a Rust library for encoding and decoding numeric
 variables, arrays and structures in little-endian and big-endian.
 It provides methods to convert between a byte representation of a
-format and a value of a Rust type with endian handling.
+format and a value of a Rust type with endianness handling.
 
 # Introduction
 
@@ -11,7 +11,7 @@ Crate castflip provides several traits
 
 - to *encast* a byte representation of a type as a value of the type,
 - to *decast* a value of a type as a byte representation of the type, and
-- to *flip* the endianness of a value of a type as required.
+- to flip the endianness of a value of a type as required.
 
 The supported types include
 
@@ -19,17 +19,14 @@ The supported types include
 2. array types, `struct` types and `union` types consisting of the
    supported types.
 
-The alignment of the addresses of byte representations need not be
-considered because data are copied when being encasted or decasted.
-
 For more information, please see the [documentation] of crate castflip.
 It includes some examples and summaries as well as the descriptions of
 its types and its traits.
 
 # A Simple Example
 
-In this example, a byte representation of the UDP header in
-big-endian is encasted as a value of a `struct` type in native-endian.
+The example below encasts a byte representation of the UDP
+header in big-endian as a value of a `struct` type in native-endian.
 
 ```rust
 use castflip::{BE, Cast, EncastMem, Flip};
@@ -65,7 +62,8 @@ assert_eq!(out_hdr.len,   0x0032);  // = 50 (Length in Bytes)
 assert_eq!(out_hdr.sum,   0x823f);  // = 0x823f (Checksum)
 ```
 
-To use crate castflip, add the following lines to your `Cargo.toml`:
+To use crate castflip version 0.1, add the following lines to your
+`Cargo.toml`:
 
 ```toml
 [dependencies]

@@ -1,5 +1,5 @@
-Types whose values can be encasted[^encast] and decasted[^decast] by
-using the methods of this crate.
+Marks types whose values can be encasted[^encast] and
+decasted[^decast] by the methods of this crate.
 
 [^encast]: In this crate, to *encast* means to cast a byte
 representation of a type as a value of the type.
@@ -9,15 +9,15 @@ as a byte representation of the type.
 
 # Description
 
-The values of those types that implement Trait [`Cast`] can be
-encasted and decasted by using the methods of this crate.
+The values of types that implement Trait [`Cast`] can be encasted and
+decasted by the methods of this crate.
 
 Trait [`Cast`] is implemented for
 
 - all primitive numeric types, i.e.,
-  * `i8`, `i16`, `i32`, `i64`, `i128`, `isize`,
-  * `u8`, `u16`, `u32`, `u64`, `u128`, `usize`,
-  * `f32`, and `f64`,
+    * `i8`, `i16`, `i32`, `i64`, `i128`, `isize`,
+    * `u8`, `u16`, `u32`, `u64`, `u128`, `usize`,
+    * `f32`, and `f64`,
 - array types whose elements' types implement trait [`Cast`],
 - `struct` types and `union` types whose all fields' types implement
   trait [`Cast`] and whose type definitions are annotated with both
@@ -27,9 +27,6 @@ Trait [`Cast`] is implemented for
   annotated with attribute `#[`[`derive(Cast)`]`]`.
 
 Trait [`Cast`] has no method.  It is defined as a marker.
-
-The alignment of the addresses of byte representations need not be
-cared about because data are copied when being encasted or decasted.
 
 # Safety
 
@@ -42,39 +39,43 @@ attribute `#[`[`repr(C)`]`]` to the type.  If the type has no field,
 attribute `#[`[`repr(C)`]`]` can be omitted.
 
 Note that the internal specification of attribute
-`#[`[`derive(Cast)`]`]` may change in a future release.
+`#[`[`derive(Cast)`]`]` may be revised in a future release.
 
 # Comparison With Trait `Copy`
 
-As shown in [the Description section](#description) above, all types
-that implement trait [`Cast`] can be duplicated simply by copying
-bits.  But trait [`Cast`] is not a subtrait of trait [`Copy`].  The
-reasons why trait [`Cast`] is defined independently from trait
-[`Copy`] are (1) to exclude pointers, and (2) to avoid unexpected copy
-operation.  Therefore, when a `struct` type or a `union` type needs to
-implement both trait [`Cast`] and trait [`Copy`], you must implement
-both trait [`Cast`] and trait [`Copy`] separately.
+As you may have noticed by reading [the Description
+section](#description) above, all types that implement trait [`Cast`]
+can be duplicated simply by copying bits.  However, trait [`Cast`] is
+not a subtrait of trait [`Copy`].  The reasons why trait [`Cast`] is
+defined independently from trait [`Copy`] are (1) to exclude pointers,
+and (2) to avoid unexpected copy operation.  Therefore, when a
+`struct` type or a `union` type needs to implement both trait [`Cast`]
+and trait [`Copy`], you must implement both traits explicitly.
 
-When the methods of this crate decast the values of those types that
-implement trait [`Cast`], the methods read those values by using the
-functions provided by module [`core::ptr`] instead of using the Rust
-assignment expressions because the types of the values may not
-implement trait [`Copy`].
+When the methods of this crate encast one or more byte representations
+of a type that implement trait [`Cast`] as one or more values of the
+type, or the methods of this crate decast one or more values of a type
+that implement trait [`Cast`] as one or more byte representations of
+the type, the methods copy the bits between the values and the byte
+representations by the functions provided by module [`core::ptr`]
+instead of by the Rust assignment expressions because (1) the type may
+not implement trait [`Copy`], and (2) the byte representations of the
+type may not be placed on their natural alignment.
 
 # Comparison With Trait `Flip`
 
-The set of those types that can implement trait [`Cast`] is equal to
-the set of those types that can implement trait [`Flip`].
+The set of types that can implement trait [`Cast`] is equal to
+the set of types that can implement trait [`Flip`].
 
-But there is a difference between those derive macros that support
-them; attribute `#[`[`derive(Cast)`]`]` supports a `union` type
-because the value of a `union` type can be duplicated simply by
-copying bits, while attribute `#[`[`derive(Flip)`]`]` does not support
-a `union` type because there is no common way to flip the endianness
-of a `union` type.
+But there is a difference between derive macros that support them;
+attribute `#[`[`derive(Cast)`]`]` supports a `union` type because the
+value of a `union` type can be duplicated by copying bits, while
+attribute `#[`[`derive(Flip)`]`]` does not support a `union` type
+because there is no common way to flip the endianness of a `union`
+type.
 
-In order to distinguish them properly in the internal implementation,
-trait [`Cast`] is defined independently from trait [`Flip`].
+In order to distinguish the difference properly, trait [`Cast`] is
+defined independently from trait [`Flip`].
 
 # Example
 
@@ -86,8 +87,8 @@ executable file format in many operating systems including Linux.  The
 [ELF] Identification header is the first 16 bytes of the [ELF] header.
 
 - Step 1: Struct `ElfIdHdr` is defined.
-  - It implements trait [`Cast`] by applying both attribute
-    `#[`[`derive(Cast)`]`]` and attribute `#[`[`repr(C)`]`]` to it.
+    - It implements trait [`Cast`] by applying both attribute
+      `#[`[`derive(Cast)`]`]` and attribute `#[`[`repr(C)`]`]` to it.
 
 - Step 2: Method [`EncastMem::encastf`] encasts a byte representation
   of the ELF Identification header as a value of struct `ElfIdHdr`.
@@ -102,23 +103,23 @@ use castflip::{Cast, EncastMem};
 //
 #[repr(C)]      // to make it possible to apply #[derive(Cast)]
 #[derive(Cast)] // to implement trait Cast
-struct ElfIdHdr { // The ELF Identification Header
-    magic:    [u8; 4],  //00-03: Magic Number 0x7f "ELF"
-    class:    u8,       //04   : File Class
-    encoding: u8,       //05   : Data Encoding
-    version:  u8,       //06   : Version (should be 1)
-    os_abi:   u8,       //07   : OS and ABI
-    abi_ver:  u8,       //08   : ABI Version
-    pad:      [u8; 7],  //09-0f: Padding (should be 0)
+struct ElfIdHdr { // The ELF Identification header
+    magic:      [u8; 4],  //00-03: Magic Number 0x7f "ELF"
+    class:      u8,       //04   : File Class (1 = 32-bit, 2 = 64-bit)
+    data:       u8,       //05   : Data Encoding (1 = little, 2 = big endian)
+    version:    u8,       //06   : ELF Version (should be 1)
+    osabi:      u8,       //07   : OS and ABI
+    abiversion: u8,       //08   : ABI Version
+    pad:        [u8; 7],  //09-0f: Padding (should be 0)
 }
 
 //
-// Step 2: Encast a byte representation of the ELF Identification Header
+// Step 2: Encast a byte representation of the ELF Identification header
 // stored in variable `in_bytes` as a value of struct `ElfIdHdr` and
 // save it to variable `out_hdr`.
 //
 
-// Input: A sample byte representation of the ELF Identification Header
+// Input: A sample byte representation of the ELF Identification header
 let in_bytes: [u8; 16] = [
     0x7f, 0x45, 0x4c, 0x46, 0x02, 0x01, 0x01, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -130,10 +131,10 @@ let out_hdr: ElfIdHdr = in_bytes.encast().unwrap();
 // Check if all fields in variable `out_hdr` are as expected.
 assert_eq!(out_hdr.magic, *b"\x7fELF");  // Magic Number: 7f 45 4c 46
 assert_eq!(out_hdr.class, 2);            // File Class: 64-bit
-assert_eq!(out_hdr.encoding, 1);         // Encoding: Little-Endian
-assert_eq!(out_hdr.version, 1);          // Version: 1
-assert_eq!(out_hdr.os_abi, 0);           // OS/ABI: unspecified
-assert_eq!(out_hdr.abi_ver, 0);          // ABI Ver: unspecified
+assert_eq!(out_hdr.data, 1);             // Data Encoding: Little-Endian
+assert_eq!(out_hdr.version, 1);          // ELF Version: 1
+assert_eq!(out_hdr.osabi, 0);            // OS and ABI: unspecified
+assert_eq!(out_hdr.abiversion, 0);       // ABI Version: unspecified
 assert_eq!(out_hdr.pad, [0_u8; 7]);      // Padding
 # }
 ```

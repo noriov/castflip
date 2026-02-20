@@ -1,28 +1,28 @@
 Provides methods that encast[^encast] one or more byte representations
-of a type in the memory at the head of `self` as one or more values of
-the type and return the resulting values.
+of a type at the head of a byte slice specified by `self` as one or
+more values of the type and return the resulting values.
 
 [^encast]: In this crate, to *encast* means to cast a byte
 representation of a type as a value of the type.
 
-The alignment of the addresses of byte representations need not be
-cared about because data are copied when being encasted.
+The alignment of the addresses of the byte representations need not be
+cared about because the bits in the byte representations are copied to
+variables located on their natural alignment when being encasted.
 
 This trait is implemented for `[u8]`.
 
 # Implementation for `[u8]`
 
 The methods of this trait encast one or more byte representations of a
-type in the memory at the head of `self` as one or more values of the
-type, flip the endianness of the values as required, then return the
-resulting values in [`Some`] if successful.  On failure, they return
-[`None`].
+type at the head of a byte slice specified by `self` as one or more
+values of the type, flip the endianness of the values as required,
+then return the resulting values in [`Some`] if successful.  On
+failure, they return [`None`].
 
 The number of the bytes in `self` must be larger than or equal to the
 number of the bytes in the byte representations of the type.  If this
-condition is satisfied, the required number of the bytes in the memory
-at the head of `self` is encasted as values.  The remaining bytes are
-ignored.
+condition is satisfied, the required number of the bytes is encasted
+as values.  The remaining bytes are ignored.
 
 # Method Naming Convention
 
@@ -54,10 +54,10 @@ protocols of the Internet protocol suite.  It is defined in [RFC768].
 It is exhcanged in big-endian on the Internet.
 
 - Step 1: Struct `UdpHdr` is defined.
-  - It implements trait [`Cast`] by applying both attribute
-    `#[`[`derive(Cast)`]`]` and attribute `#[`[`repr(C)`]`]` to it.
-  - It implements trait [`Flip`] by applying attribute
-    `#[`[`derive(Flip)`]`]` to it.
+    - It implements trait [`Cast`] by applying both attribute
+      `#[`[`derive(Cast)`]`]` and attribute `#[`[`repr(C)`]`]` to it.
+    - It implements trait [`Flip`] by applying attribute
+      `#[`[`derive(Flip)`]`]` to it.
 
 - Step 2: Method[`EncastMem::encastf`] encasts a byte
   representation of the UDP header in big-endian ([`BE`]) as a value
