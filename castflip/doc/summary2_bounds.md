@@ -5,7 +5,7 @@ Traits as Bounds: `Cast`, `Flip` and `NopFlip`
 Trait [`Cast`] and trait [`Flip`] are the fundamental traits of this
 crate.
 
-1. Trait [`Cast`] : The values of types that implement trait [`Cast`]
+1. Trait [`Cast`] : The values of types implementing trait [`Cast`]
    can be encasted[^encast] and decasted[^decast] by the methods of
    this crate.  Trait [`Cast`] is implemented for
 
@@ -18,8 +18,8 @@ crate.
     - `struct` types with no field and whose type definitions are
       annotated with attribute `#[`[`derive(Cast)`]`]`.
 
-2. Trait [`Flip`] : The endiannesses of the values of types that
-   implement trait [`Flip`] can be flipped by the methods of this
+2. Trait [`Flip`] : The endiannesses of the values of types
+   implementing trait [`Flip`] can be flipped by the methods of this
    crate.  Trait [`Flip`] is implemented for
 
     - all primitive numeric types,

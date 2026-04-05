@@ -10,7 +10,7 @@ pub mod short_example1 {
 
 pub mod short_example2 {
     // 2. How to convert between bytes and an array of numbers
-    #![doc = include_doc!("short_ex2_number_array.md")]
+    #![doc = include_doc!("short_ex2_arrayed_numbers.md")]
     use crate::*;
 }
 
@@ -22,48 +22,54 @@ pub mod short_example3 {
 
 pub mod short_example4 {
     // 4. How to convert between bytes and an array of a `struct`s
-    #![doc = include_doc!("short_ex4_struct_array.md")]
+    #![doc = include_doc!("short_ex4_arrayed_structs.md")]
+    use crate::*;
+}
+
+pub mod short_example5 {
+    // 5. How to convert between bytes and nested `struct`s
+    #![doc = include_doc!("short_ex5_nested_structs.md")]
     use crate::*;
 }
 
 pub mod long_example1 {
-    // 1. How to convert between bytes and a `struct` (The UDP header)
+    // 1. How to convert between bytes and a `struct` (of the UDP header)
     #![doc = include_doc!("long_ex1_struct.md")]
     use crate::*;
 }
 
 pub mod long_example2 {
-    // 2. How to convert between bytes and a nested `struct`
-    #![doc = include_doc!("long_ex2_nested.md")]
+    // 2. How to convert between bytes and nested `struct`s
+    #![doc = include_doc!("long_ex2_nested_structs.md")]
     use crate::*;
 }
 
 pub mod long_example3 {
-    // 3. How to convert between bytes and an array of `struct`s
-    #![doc = include_doc!("long_ex3_arrayed.md")]
+    // 3. How to convert between bytes and an array of type `[T; N]`
+    #![doc = include_doc!("long_ex3_array.md")]
     use crate::*;
 }
 
 pub mod long_example3_1 {
     // 3.1. As a value of type `[T; N]`
-    #![doc = include_doc!("long_ex3_1_an_array.md")]
+    #![doc = include_doc!("long_ex3_1_a_value.md")]
     use crate::*;
 }
 
 pub mod long_example3_2 {
-    // 3.2. As consecutive values of type `T`
+    // 3.2. As N-consecutive values of type `T`
     #![doc = include_doc!("long_ex3_2_consecutive_values.md")]
     use crate::*;
 }
 
 pub mod long_example3_3 {
     // 3.3. As an element of slice `[[T; N]]`
-    #![doc = include_doc!("long_ex3_3_an_element_of_slice.md")]
+    #![doc = include_doc!("long_ex3_3_a_slice_element.md")]
     use crate::*;
 }
 
 pub mod long_example4 {
-    // 4. How to convert between bytes and a `struct` (The UDP header)
+    // 4. How to convert between bytes and a `struct` (of the UDP header)
     //    using `std::io`
     #![doc = include_doc!("long_ex4_std_io.md")]
     use crate::*;

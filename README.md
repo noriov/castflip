@@ -2,16 +2,15 @@
 
 This repository contains three crates.
 
-- Crate castflip\
+- [Crate castflip]\
   Is a Rust library for encoding and decoding numeric variables,
-  arrays and structures in little-endian and big-endian.
-  It provides methods to convert between a byte representation of a
-  format and a value of a Rust type with endianness handling.
+  arrays and structures.  It provides methods to convert between a
+  byte representation of a fixed binary format and a value of a Rust
+  type with endianness handling.
 
-- Crate castflip_derive\
-  Provides three derive macros for crate castflip.  They simplifies to
-  implement the fundamental traits of crate castflip for the supported
-  types.
+- [Crate castflip_derive]\
+  Provides five derive macros to implement the basic traits of crate
+  castflip for their supported types.
 
 - Crate castflip_test\
   Is a test suite for the methods of crate castflip.
@@ -20,9 +19,11 @@ This repository contains three crates.
 
 Crate castflip provides several traits
 
-- to *encast* a byte representation of a type as a value of the type,
-- to *decast* a value of a type as a byte representation of the type, and
-- to flip the endianness of a value of a type as required.
+- to *encast* a byte representation of a type as a value of the type
+  with endianness handling,
+- to *decast* a value of a type as a byte representation of the type
+  with endianness handling, and
+- to be used as bounds to determine which methods can be applied.
 
 The supported types include
 
@@ -31,19 +32,19 @@ The supported types include
    supported types.
 
 For more information, please see the [documentation] of crate castflip.
-It includes some examples and summaries as well as the descriptions of
-its types and its traits.
+It includes a number of examples and summaries as well as the detailed
+descriptions of its types and its traits.
 
 # A Simple Example
 
 The example below encasts a byte representation of the UDP
-header in big-endian as a value of a `struct` type in native-endian.
+header in big-endian as a value of struct `UdpHdr` in native-endian.
 
 ```rust
 use castflip::{BE, Cast, EncastMem, Flip};
 
 //
-// Step 1: Define struct `UdpHdr`.
+// Step 1: Define struct `UdpHdr` (The UDP header) and test data.
 //
 #[repr(C)]            // to make it possible to apply #[derive(Cast)]
 #[derive(Cast, Flip)] // to implement trait Cast and trait Flip
@@ -54,16 +55,14 @@ struct UdpHdr {  // UDP: See https://www.rfc-editor.org/rfc/rfc768.txt
     sum:   u16,  // UDP Checksum
 }
 
-//
-// Step 2: Encast a byte representation of the UDP header in big-endian
-// (`BE`) stored in variable `in_bytes` as a value of struct `UdpHdr` in
-// native-endian and save it to variable `out_hdr`.
-//
-
 // Input: A sample byte representation of the UDP header (8 bytes)
 let in_bytes: [u8; 8] = [0xc3, 0xc9, 0x00, 0x35, 0x00, 0x32, 0x82, 0x3f];
 
-// Encast a byte representation in big-endian (`BE`) as a value.
+//
+// Step 2: Encast a byte representation of the UDP header in big-endian
+// (`BE`) at the head of variable `in_bytes` as a value of struct
+// `UdpHdr` in native-endian and save it to variable `out_hdr`.
+//
 let out_hdr: UdpHdr = in_bytes.encastf(BE).unwrap();
 
 // Check if all fields in variable `out_hdr` are as expected.
@@ -81,4 +80,6 @@ To use crate castflip version 0.1, add the following lines to your
 castflip = "0.1"
 ```
 
-[documentation]: https://docs.rs/castflip/0.1/castflip/
+[Crate castflip]: https://docs.rs/castflip/0.1
+[Crate castflip_derive]: https://docs.rs/castflip_derive/0.1
+[documentation]: https://docs.rs/castflip/0.1

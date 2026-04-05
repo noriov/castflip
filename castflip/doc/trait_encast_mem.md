@@ -1,28 +1,38 @@
 Provides methods that encast[^encast] one or more byte representations
-of a type at the head of a byte slice specified by `self` as one or
-more values of the type and return the resulting values.
+of a type at the head of a byte slice specified by parameter `self` as
+one or more values of the type with endianness handling, and return
+the resulting values.
 
 [^encast]: In this crate, to *encast* means to cast a byte
 representation of a type as a value of the type.
-
-The alignment of the addresses of the byte representations need not be
-cared about because the bits in the byte representations are copied to
-variables located on their natural alignment when being encasted.
 
 This trait is implemented for `[u8]`.
 
 # Implementation for `[u8]`
 
 The methods of this trait encast one or more byte representations of a
-type at the head of a byte slice specified by `self` as one or more
-values of the type, flip the endianness of the values as required,
-then return the resulting values in [`Some`] if successful.  On
-failure, they return [`None`].
+type at the head of a byte slice specified by parameter `self` as one
+or more values of the type, and flip the endianness of the values as
+required.  If successful, some methods return the resulting values in
+[`Some`], and other methods save the resulting values to the specified
+parameter and return the number of the source bytes in
+[`Some`]`(usize)`.  On failure, the methods return [`None`].
 
-The number of the bytes in `self` must be larger than or equal to the
-number of the bytes in the byte representations of the type.  If this
-condition is satisfied, the required number of the bytes is encasted
-as values.  The remaining bytes are ignored.
+Internally, the methods of this trait simply copy the bits of the byte
+representations onto the target variable with endianness handling.
+They use the functions of module [`core::ptr`] to copy the bits since
+(1) the type of the variable may not implement trait [`Copy`] while
+the type MUST implement trait [`Cast`] to implement this trait, and
+(2) the byte representations may not be placed on the natural
+alignment of the type.  In addition, they use the methods of trait
+[`Flip`] to flip the endianness of the resulting values since the type
+of the variable MUST implement trait [`Flip`] if the endianness of the
+variable needs to be flipped as required.
+
+The number of the bytes in parameter `self` must be larger than or
+equal to the number of the bytes in the byte representations of the
+type.  If this condition is satisfied, the required number of the
+bytes is encasted as values.  The remaining bytes are ignored.
 
 # Method Naming Convention
 
@@ -34,13 +44,17 @@ as values.  The remaining bytes are ignored.
   `endian`.
 
 * The methods whose names end with `` or `f` return the resulting
-  value.
+  value in [`Some`]`(T)`.
 
 * The methods whose names end with `s` or `sf` write the resulting
-  values to the slice specified by parameter `slice`.
+  values to the slice specified by parameter `slice`, and return the
+  number of source bytes in [`Some`]`(usize)`.
 
 * The methods whose names end with `v` or `vf` return the resulting
-  values in struct `Vec<T>`.
+  values in [`Some`]`(Vec<T>)`.
+
+All methods read byte representations at the head of the byte slice
+specified by parameter `self`.
 
 For details, see the description of each method.
 
@@ -60,15 +74,16 @@ It is exhcanged in big-endian on the Internet.
       `#[`[`derive(Flip)`]`]` to it.
 
 - Step 2: Method[`EncastMem::encastf`] encasts a byte
-  representation of the UDP header in big-endian ([`BE`]) as a value
-  of struct `UdpHdr` in native-endian.
+  representation of the UDP header in big-endian ([`BE`]) at the head
+  of parameter `self` as a value of struct `UdpHdr` in native-endian,
+  and returns the value in [`Ok`]`(UdpHdr)`.
 
 ```rust
 # fn main() {
 use castflip::{BE, Cast, EncastMem, Flip};
 
 //
-// Step 1: Define struct `UdpHdr`.
+// Step 1: Define struct `UdpHdr` (The UDP header) and test data.
 //
 #[repr(C)]            // to make it possible to apply #[derive(Cast)]
 #[derive(Cast, Flip)] // to implement trait Cast and trait Flip
@@ -79,22 +94,20 @@ struct UdpHdr {  // UDP: See https://www.rfc-editor.org/rfc/rfc768.txt
     sum:   u16,  // UDP Checksum
 }
 
-//
-// Step 2: Encast a byte representation of the UDP header in big-endian
-// (`BE`) stored in variable `in_bytes` as a value of struct `UdpHdr` in
-// native-endian and save it to variable `out_hdr`.
-//
-// Because the UDP header is 8 bytes, only the first 8 bytes are read
-// and remaining 8 bytes are not read.
-//
-
 // Input: The UDP header (8 bytes) + part of the DNS header (8 bytes)
 let in_bytes: [u8; 16] = [
     0xc3, 0xc9, 0x00, 0x35, 0x00, 0x32, 0x82, 0x3f,
     0x1a, 0xd1, 0x01, 0x20, 0x00, 0x01, 0x00, 0x00,
 ];
 
-// Encast a byte representation in big-endian (`BE`) as a value.
+//
+// Step 2: Encast a byte representation of the UDP header in big-endian
+// (`BE`) at the head of variable `in_bytes` as a value of struct
+// `UdpHdr` in native-endian and save it to variable `out_hdr`.
+//
+// Because the UDP header is 8 bytes, only the first 8 bytes are read
+// and remaining 8 bytes are not read.
+//
 let out_hdr: UdpHdr = in_bytes.encastf(BE).unwrap();
 
 // Check if all fields in variable `out_hdr` are as expected.

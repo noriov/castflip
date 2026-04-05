@@ -1,5 +1,5 @@
 Marks types whose values can be encasted[^encast] and
-decasted[^decast] by the methods of this crate.
+decasted[^decast] by using the methods of this crate.
 
 [^encast]: In this crate, to *encast* means to cast a byte
 representation of a type as a value of the type.
@@ -9,8 +9,8 @@ as a byte representation of the type.
 
 # Description
 
-The values of types that implement Trait [`Cast`] can be encasted and
-decasted by the methods of this crate.
+The values of types implementing Trait [`Cast`] can be encasted and
+decasted by using the methods of this crate.
 
 Trait [`Cast`] is implemented for
 
@@ -39,12 +39,12 @@ attribute `#[`[`repr(C)`]`]` to the type.  If the type has no field,
 attribute `#[`[`repr(C)`]`]` can be omitted.
 
 Note that the internal specification of attribute
-`#[`[`derive(Cast)`]`]` may be revised in a future release.
+`#[`[`derive(Cast)`]`]` may be revised in future releases.
 
 # Comparison With Trait `Copy`
 
 As you may have noticed by reading [the Description
-section](#description) above, all types that implement trait [`Cast`]
+section](#description) above, all types implementing trait [`Cast`]
 can be duplicated simply by copying bits.  However, trait [`Cast`] is
 not a subtrait of trait [`Copy`].  The reasons why trait [`Cast`] is
 defined independently from trait [`Copy`] are (1) to exclude pointers,
@@ -53,26 +53,27 @@ and (2) to avoid unexpected copy operation.  Therefore, when a
 and trait [`Copy`], you must implement both traits explicitly.
 
 When the methods of this crate encast one or more byte representations
-of a type that implement trait [`Cast`] as one or more values of the
+of a type implementing trait [`Cast`] as one or more values of the
 type, or the methods of this crate decast one or more values of a type
-that implement trait [`Cast`] as one or more byte representations of
-the type, the methods copy the bits between the values and the byte
-representations by the functions provided by module [`core::ptr`]
-instead of by the Rust assignment expressions because (1) the type may
-not implement trait [`Copy`], and (2) the byte representations of the
-type may not be placed on their natural alignment.
+implementing trait [`Cast`] as one or more byte representations of the
+type, the methods copy the bits between the values and the byte
+representations by calling the functions provided by module
+[`core::ptr`] instead of by using the Rust assignment expressions
+since (1) the type may not implement trait [`Copy`], and (2) the byte
+representations of the type may not be placed on their natural
+alignment.
 
 # Comparison With Trait `Flip`
 
 The set of types that can implement trait [`Cast`] is equal to
 the set of types that can implement trait [`Flip`].
 
-But there is a difference between derive macros that support them;
+But there is a difference between derive macros that implement them;
 attribute `#[`[`derive(Cast)`]`]` supports a `union` type because the
-value of a `union` type can be duplicated by copying bits, while
-attribute `#[`[`derive(Flip)`]`]` does not support a `union` type
-because there is no common way to flip the endianness of a `union`
-type.
+value of a `union` type can be duplicated simply by copying bits,
+while attribute `#[`[`derive(Flip)`]`]` does not support a `union`
+type because there is no common way to flip the endianness of a
+`union` type.
 
 In order to distinguish the difference properly, trait [`Cast`] is
 defined independently from trait [`Flip`].
@@ -80,31 +81,35 @@ defined independently from trait [`Flip`].
 # Example
 
 The example below encasts a byte representation of the ELF[^ELF]
-Identification header as a value of struct `ElfIdHdr`.
+identification header as a value of struct `ElfIdHdr`.
 
 [^ELF]: The Executable and Linkable Format ([ELF]) is the primary
 executable file format in many operating systems including Linux.  The
-[ELF] Identification header is the first 16 bytes of the [ELF] header.
+ELF identification header is the first 16 bytes of the ELF header.
 
 - Step 1: Struct `ElfIdHdr` is defined.
     - It implements trait [`Cast`] by applying both attribute
       `#[`[`derive(Cast)`]`]` and attribute `#[`[`repr(C)`]`]` to it.
 
 - Step 2: Method [`EncastMem::encastf`] encasts a byte representation
-  of the ELF Identification header as a value of struct `ElfIdHdr`.
+  of the ELF identification header at the head of parameter `self` as
+  a value of struct `ElfIdHdr`, and returns the value in
+  [`Ok`]`(ElfIdHdr)`.
 
 ```rust
 # fn main() {
 use castflip::{Cast, EncastMem};
 
 //
-// Step 1: Define struct `ElfIdHdr`.
+// Step 1: Define struct `ElfIdHdr` (The ELF identification header)
+// and test data.
+//
 // Because it has no multi-byte field, #[derive(Flip)] is not necessary.
 //
 #[repr(C)]      // to make it possible to apply #[derive(Cast)]
 #[derive(Cast)] // to implement trait Cast
-struct ElfIdHdr { // The ELF Identification header
-    magic:      [u8; 4],  //00-03: Magic Number 0x7f "ELF"
+struct ElfIdHdr { // The ELF identification header
+    magic:      [u8; 4],  //00-03: Magic Number b"\x7fELF"
     class:      u8,       //04   : File Class (1 = 32-bit, 2 = 64-bit)
     data:       u8,       //05   : Data Encoding (1 = little, 2 = big endian)
     version:    u8,       //06   : ELF Version (should be 1)
@@ -113,19 +118,17 @@ struct ElfIdHdr { // The ELF Identification header
     pad:        [u8; 7],  //09-0f: Padding (should be 0)
 }
 
-//
-// Step 2: Encast a byte representation of the ELF Identification header
-// stored in variable `in_bytes` as a value of struct `ElfIdHdr` and
-// save it to variable `out_hdr`.
-//
-
-// Input: A sample byte representation of the ELF Identification header
+// Input: A sample byte representation of the ELF identification header
 let in_bytes: [u8; 16] = [
     0x7f, 0x45, 0x4c, 0x46, 0x02, 0x01, 0x01, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 ];
 
-// Encast a byte representation as a value.
+//
+// Step 2: Encast a byte representation of the ELF identification
+// header at the head of variable `in_bytes` as a value of struct
+// `ElfIdHdr` and save it to variable `out_hdr`.
+//
 let out_hdr: ElfIdHdr = in_bytes.encast().unwrap();
 
 // Check if all fields in variable `out_hdr` are as expected.

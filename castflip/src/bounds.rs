@@ -45,12 +45,12 @@ impl<T: Cast, const N: usize> Cast for [T; N] {}
 #[doc = include_doc!("bound_flip.md")]
 pub trait Flip: Sized {
     ///
-    /// Returns the value in `self` with its endianness reversed.
+    /// Returns the value of `self` with its endianness reversed.
     ///
     fn flip_val_swapped(&self) -> Self;
 
     ///
-    /// Reads the value in `self`, flips the endianness of the value
+    /// Reads the value of `self`, flips the endianness of the value
     /// if `endian` is not equivalent to the endianness of the target
     /// system, then returns the resulting value.
     ///

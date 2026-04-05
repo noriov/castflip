@@ -10,7 +10,7 @@ mod nop_flip;
 
 
 ///
-/// Derive macro generating an impl of trait [`Cast`] for a `struct`
+/// Derive macro generating an `impl` of trait [`Cast`] for a `struct`
 /// type or a `union` type.
 ///
 /// It must be applied together with attribute `#[`[`repr(C)`]`]`.
@@ -27,7 +27,7 @@ pub fn cast_derive(input: TokenStream) -> TokenStream {
 
 
 ///
-/// Derive macro generating an impl of trait [`Flip`] for a `struct`
+/// Derive macro generating an `impl` of trait [`Flip`] for a `struct`
 /// type.
 ///
 /// For detailed information, see the document of trait [`Flip`].
@@ -41,7 +41,7 @@ pub fn flip_derive(input: TokenStream) -> TokenStream {
 
 
 ///
-/// Derive macro generating an impl of both trait [`Flip`] whose
+/// Derive macro generating `impl`s of both trait [`Flip`] whose
 /// methods do nothing and trait [`NopFlip`] for a `struct` type or a
 /// `union` type.
 ///

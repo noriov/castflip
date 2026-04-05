@@ -1,7 +1,7 @@
 Provides methods that decast[^decast] one or more values of a type
 specified by a parameter as one or more byte representations of the
-type and write the resulting byte representations to writer `self`
-using trait [`std::io::Write`].
+type with endianness handling, and write the resulting byte
+representations to writer `self` using trait [`std::io::Write`].
 
 [^decast]: In this crate, to *decast* means to cast a value of a type
 as a byte representation of the type.
@@ -16,11 +16,19 @@ a lowercase "`o`").
 
 The methods of this trait decast one or more values of a type
 specified by a parameter as one or more byte representations of the
-type, flip the endianness of the byte representations as required,
+type, flip the endianness of the byte representations as required, and
 write the resulting byte representations to writer `self` using trait
-[`std::io::Write`], then return the number of the bytes in the byte
-representations in [`Ok`]`(usize)` if successful.  On failure, they
-return an error value of struct [`std::io::Error`] in [`Err`].
+[`std::io::Write`].  If successful, the methods return the number of
+the bytes in the byte representations in [`Ok`]`(usize)`.  On failure,
+the methods return an error value of struct [`std::io::Error`] in
+[`Err`].
+
+Internally, the methods of this trait simply writes the bits of the
+values to the specified writer using trait [`std::io::Write`] with
+endianness handling.  They use the methods of trait [`Flip`] to
+flip the endianness of the resulting values since the type of the
+variable MUST implement trait [`Flip`] if the endianness of the
+variable needs to be flipped as required.
 
 The number of the writable bytes to writer `self` must be larger than
 or equal to the number of the bytes in the byte representations of
@@ -36,14 +44,18 @@ representations are written to writer `self` using trait
   resulting byte representations to the endian specified by parameter
   `endian`.
 
-* The methods whose names end with `` or `f` decast a value specified
-  by parameter `value`.
+* The methods whose names end with `` or `f` decast the value
+  specified by parameter `value`.
 
-* The methods whose names end with `s` or `sf` decast values in the
-  slice specified by parameter `slice`.
+* The methods whose names end with `s` or `sf` decast the values in
+  the slice specified by parameter `slice`.
 
 * The methods whose names end with `v` or `vf` are equivalent to the
   methods whose names end with `s` or `sf` respectively.
+
+If successful, all methods write the resulting byte representations to
+writer `self` using trait [`std::io::Write`] and return the the number
+of the bytes in the byte representations in [`Ok`]`(usize)`.
 
 For details, see the description of each method.
 
@@ -63,12 +75,14 @@ It is exhcanged in big-endian on the Internet.
       `#[`[`derive(Flip)`]`]` to it.
 
 - Step 2: Method [`DecastIO::decastf`] decasts a value of
-  struct `UdpHdr` in native-endian as a byte representation of the
-  UDP[^UDP] header in big-endian ([`BE`]).
+  struct `UdpHdr` in native-endian in parameter `value` as a byte
+  representation of the UDP header in big-endian ([`BE`]), writes the
+  bytes to struct [`std::io::Cursor`], and returns the number of the
+  bytes in [`Ok`]`(usize)`.
 
-The resulting byte representation is written using struct
-[`std::io::Cursor`] which wraps an in-memory buffer and provides it
-through trait [`std::io::Write`].
+Note: Struct [`std::io::Cursor`] wraps an in-memory buffer and
+provides the buffer using trait [`std::io::Read`] and trait
+[`std::io::Write`].
 
 ```rust
 # fn main() {
@@ -76,7 +90,7 @@ use castflip::{BE, Cast, DecastIO, Flip};
 use std::io::Cursor;
 
 //
-// Step 1: Define struct `UdpHdr`.
+// Step 1: Define struct `UdpHdr` (The UDP header) and test data.
 //
 #[repr(C)]            // to make it possible to apply #[derive(Cast)]
 #[derive(Cast, Flip)] // to implement trait Cast and trait Flip
@@ -87,16 +101,6 @@ struct UdpHdr {  // UDP: See https://www.rfc-editor.org/rfc/rfc768.txt
     sum:   u16,  // UDP Checksum
 }
 
-//
-// Step 2: Decast a value of struct `UdpHdr` in native-endian stored
-// in variable `in_hdr` as a byte representation of the UDP header
-// in big-endian (`BE`) and write it to variable `out_cursor`.
-//
-// Because the UDP header is 8 bytes, only the first 8 bytes of
-// the buffer in variable `out_cursor` are filled with data and
-// remaining 8 bytes are unchanged.
-//
-
 // Input: A sample UDP header
 let in_hdr: UdpHdr = UdpHdr {
     sport: 0xc3c9,  // = 50121 (Ephemeral Port)
@@ -105,7 +109,15 @@ let in_hdr: UdpHdr = UdpHdr {
     sum:   0x823f,  // = 0x823f (Checksum)
 };
 
-// Decast a value as a byte representation in big-endian (`BE`).
+//
+// Step 2: Decast a value of struct `UdpHdr` in native-endian in
+// variable `in_hdr` as a byte representation of the UDP header
+// in big-endian (`BE`) and write it to variable `out_cursor`.
+//
+// Because the UDP header is 8 bytes, only the first 8 bytes of
+// the buffer in variable `out_cursor` are filled with data and
+// remaining 8 bytes are unchanged.
+//
 let mut out_cursor = Cursor::new(vec![0_u8; 16]);
 let out_size = out_cursor.decastf(&in_hdr, BE).unwrap();
 

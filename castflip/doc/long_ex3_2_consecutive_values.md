@@ -1,9 +1,10 @@
-How to convert between bytes and consecutive values of type `T`
+How to convert between bytes and N-consecutive values of type `T`
 
-The example below encasts consecutive byte representations of type `T`
-in big-endian as values of the type in native-endian in two different
-ways, then decasts values of type `T` in native-endian as consecutive
-byte representations of the type in big-endian.
+The example below encasts N-consecutive byte representations of type
+`T` in big-endian as N-consecutive values of the type in native-endian
+in two different ways, then decasts N-consecutive values of type `T`
+in native-endian as N-consecutive byte representations of the type in
+big-endian.
 
 # Outline
 
@@ -13,21 +14,24 @@ byte representations of the type in big-endian.
     - It implements trait [`Flip`] by applying attribute
       `#[`[`derive(Flip)`]`]` to it.
 
-- Step 2: Method [`EncastMem::encastsf`] encasts a byte
-  representation of consecutive values of type `T` in big-endian
-  ([`BE`]) as the values of type `T` in native-endian, saves the
-  resulting values to the specified slice, and returns the number of
-  the source bytes in [`Ok`]`(usize)`.
+- Step 2: Method [`EncastMem::encastsf`] encasts
+  N-consecutive byte representations of type `T` in big-endian
+  ([`BE`]) at the head of parameter `self` as N-consecutive values of
+  type `T` in native-endian, saves the N-consecutive values to the
+  specified mutable N-element slice of type `T`, and returns the
+  number of the source bytes in [`Ok`]`(usize)`.
 
-- Step 3: Method [`EncastMem::encastvf`] encasts a byte
-  representation of consecutive values of type `T` in big-endian
-  ([`BE`]) as the values of type `T` in native-endian and returns the
-  resulting values in `Ok(Vec<T>)`.
+- Step 3: Method [`EncastMem::encastvf`] encasts
+  N-consecutive byte representations of type `T` in big-endian
+  ([`BE`]) at the head of parameter `self` as N-consecutive values of
+  type `T` in native-endian, and returns the N-consecutive values in
+  [`Ok`]`(Vec<T>)`,
 
-- Step 4: Method [`DecastMem::decastsf`] decasts a
-  slice of type `T` in native-endian as a byte representation of
-  consecutive values of type `T` in big-endian ([`BE`]) and saves the
-  resulting bytes to `self`.
+- Step 4: Method [`DecastMem::decastsf`] decasts a slice
+  containing N-consecutive values of type `T` in native-endian in a
+  parameter as N-consecutive byte representations of type `T` in
+  big-endian ([`BE`]), saves the bytes to `self`, and returns the
+  number of the bytes in [`Ok`]`(usize)`.
 
 # Source Code
 
@@ -35,86 +39,90 @@ byte representations of the type in big-endian.
 use castflip::{BE, Cast, DecastMem, EncastMem, Flip};
 
 //
-// Step 1: Define struct `Point` and test data.
+// Step 1: Define struct `Pair` and test data.
 //
 #[repr(C)]            // to make it possible to apply #[derive(Cast)]
 #[derive(Cast, Flip)] // to implement trait Cast and trait Flip
 #[derive(Default)]    // to give this type a default value
 #[derive(Debug, PartialEq)] // to use assert_eq!
-struct Point (u16, u16); // 4 bytes (in total)
+struct Pair (u16, u16); // 4 bytes (in total)
 
-// Test data: Sample arrayed values of struct Point.
-const ARRAY1: [Point; 3] = [ // 12 bytes (in total)
-    Point(0x2021, 0x2223),   //  4 bytes
-    Point(0x2425, 0x2627),   //  4 bytes
-    Point(0x2829, 0x2a2b),   //  4 bytes
+// Test data: Sample arrayed values of struct Pair.
+const ARRAY1: [Pair; 3] = [ // 12 bytes (in total)
+    Pair(0x2021, 0x2223),   //  4 bytes
+    Pair(0x2425, 0x2627),   //  4 bytes
+    Pair(0x2829, 0x2a2b),   //  4 bytes
 ];
+
+static SLICE1: &[Pair] = &ARRAY1;
 
 // The byte representation of the array above (12 bytes in big-endian)
 const BYTES1: [u8; 12] = [
-    0x20, 0x21, 0x22, 0x23,  // = Point(0x2021, 0x2223)
-    0x24, 0x25, 0x26, 0x27,  // = Point(0x2425, 0x2627)
-    0x28, 0x29, 0x2a, 0x2b,  // = Point(0x2829, 0x2a2b)
+    0x20, 0x21, 0x22, 0x23,  // = Pair(0x2021, 0x2223)
+    0x24, 0x25, 0x26, 0x27,  // = Pair(0x2425, 0x2627)
+    0x28, 0x29, 0x2a, 0x2b,  // = Pair(0x2829, 0x2a2b)
 ];
 
 fn main() {
     //
-    // Step 2: Method encastsf (1) encasts a byte representation
-    // of consecutive three values of struct `Point` at the head of const
-    // `BYTES1` as three values of the type, (2) flips the endianness of
-    // three pairs of 16-bit unsigned integers in the values from
-    // the big-endianness (`BE`) to the native-endianness, (3) saves
-    // resulting three values to variable `array2`, and (4) returns the
-    // number of the source bytes in Ok(usize) which is saved to variable
-    // `size2`.
+    // Step 2: Method encastsf (1) encasts a byte
+    // representation of three consecutive values of struct `Pair`
+    // at the head of const `BYTES1` as three consecutive values of
+    // the type, (2) flips the endianness of three pairs of 16-bit
+    // unsigned integers in the values from the big-endianness (`BE`)
+    // to the native-endianness, (3) saves the resulting three
+    // consecutive values to variable `array2`, and (4) returns
+    // the number of the source bytes in Ok(usize) which is saved
+    // to variable `size2`.
     //
-    // In the following method call, generic arguments `Point`
+    // In the following method call, generic arguments `Pair`
     // can be omitted because it can be infered by the Rust compiler.
     //
-    let mut array2: [Point; 3] = Default::default();
-    let size2 = BYTES1.encastsf::<Point>(&mut array2, BE).unwrap();
+    let mut array2: [Pair; 3] = Default::default();
+    let size2 = BYTES1.encastsf::<Pair>(&mut array2, BE).unwrap();
 
     // Check if the value in variable `size2` is as expected.
-    assert_eq!(size2, 12); // The size of type `[Point; 3]` is 12.
+    assert_eq!(size2, 12); // The size of type `[Pair; 3]` is 12.
 
     // Check if the content of variable `array2` is as expected.
     assert_eq!(array2, ARRAY1);
 
     //
-    // Step 3: Method encastvf (1) encasts a byte representation
-    // of consecutive three values of struct `Point` at the head of const
-    // `BYTES1` as three values of the type, (2) flips the endianness of
-    // three pairs of 16-bit unsigned integers in the values from the
-    // big-endianness (`BE`) to the native-endianness, and (3) returns
-    // the resulting values in Ok(Vec<Point>) which are saved to variable
+    // Step 3: Method encastvf (1) encasts a byte
+    // representation of three consecutive values of struct `Pair`
+    // at the head of const `BYTES1` as three consecutive values of
+    // the type, (2) flips the endianness of three pairs of 16-bit
+    // unsigned integers in the values from the big-endianness (`BE`)
+    // to the native-endianness, and (3) returns the resulting three
+    // consecutive values in Ok(Vec<Pair>) which are saved to variable
     // `vec3`.
     //
-    // In the following method call, generic arguments `Point`
+    // In the following method call, generic arguments `Pair`
     // can be omitted because it can be infered by the Rust compiler.
     //
-    let vec3: Vec<Point> = BYTES1.encastvf::<Point>(3, BE).unwrap();
+    let vec3: Vec<Pair> = BYTES1.encastvf::<Pair>(3, BE).unwrap();
 
     // Check if the content of variable `vec3` is as expected.
-    assert_eq!(&vec3, &ARRAY1);
+    assert_eq!(&vec3, SLICE1);
 
     //
-    // Step 4: Method decastsf (1) decasts consecutive three
-    // values of struct `Point` stored in `ARRAY1` as a byte representation
-    // of consecutive three values of struct `Point`, (2) flips the
-    // endianness of three pairs of 16-bit unsigned integers in the bytes
-    // from the native-endianness to the big-endianness (`BE`), (3) saves
-    // the resulting bytes to `self`, i.e., variable `bytes4`, and
-    // (4) returns the number of the resulting bytes in Ok(usize) which is
-    // saved to variable `size4`.
+    // Step 4: Method decastsf (1) decasts three consecutive
+    // values of struct `Pair` in static `SLICE1` as three consecutive
+    // byte representations of struct `Pair`, (2) flips the endianness
+    // of three pairs of 16-bit unsigned integers in the byte
+    // representations from the native-endianness to the big-endianness
+    // (`BE`), (3) saves the resulting bytes to  variable `bytes4`,
+    // and (4) returns the number of the resulting bytes in Ok(usize)
+    // which is saved to variable `size4`.
     //
-    // In the following method call, generic arguments `Point`
+    // In the following method call, generic arguments `Pair`
     // can be omitted because it can be infered by the Rust compiler.
     //
-    let mut bytes4 = [0_u8; 12]; // The size of three struct `Point`s is 12.
-    let size4 = bytes4.decastsf::<Point>(&ARRAY1, BE).unwrap();
+    let mut bytes4 = [0_u8; 12]; // The size of three struct `Pair`s is 12.
+    let size4 = bytes4.decastsf::<Pair>(SLICE1, BE).unwrap();
 
     // Check if the value in variable `size4` is as expected.
-    assert_eq!(size4, 12); // The size of three struct `Point`s is 12.
+    assert_eq!(size4, 12); // The size of three struct `Pair`s is 12.
 
     // Check if the content of variable `bytes4` is as expected.
     assert_eq!(bytes4, BYTES1);

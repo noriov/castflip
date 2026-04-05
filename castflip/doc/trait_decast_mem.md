@@ -1,14 +1,11 @@
 Provides methods that decast[^decast] one or more values of a type
 specified by a parameter as one or more byte representations of the
-type and save the resulting byte representations at the head of byte
-slice specified by `self`.
+type with endianness handling, and save the resulting byte
+representations at the head of the byte slice specified by parameter
+`self`.
 
 [^decast]: In this crate, to *decast* means to cast a value of a type
 as a byte representation of the type.
-
-The alignment of the addresses of the byte representations need not be
-cared about because the bits in the byte representations are copied to
-variables located on their natural alignment when being encasted.
 
 This trait is implemented for `[u8]`.
 
@@ -16,17 +13,29 @@ This trait is implemented for `[u8]`.
 
 The methods of this trait decast one or more values of a type
 specified by a parameter as one or more byte representations of the
-type, flip the endianness of the byte representations as required,
-save the resulting byte representations at the head of byte slice
-specified by `self`, then return the number of the bytes in the byte
-representations in [`Some`]`(usize)` if successful.  On failure, they
-return [`None`]
+type, flip the endianness of the byte representations as required, and
+save the resulting byte representations at the head of a byte slice
+specified by parameter `self`.  If successful, the methods return the
+number of the bytes in the byte representations in [`Some`]`(usize)`.
+On failure, the methods return [`None`].
 
-The number of the bytes in `self` must be larger than or equal to the
-number of the bytes in the byte representations of the type.  If this
-condition is satisfied, the resulting byte representations are saved
-at the head of byte slice specified by `self`.  The remaining bytes in
-`self` are unchanged.
+Internally, the methods of this trait simply copy the bits of the
+values onto the specified byte slice with endianness handling.
+They use the functions of module [`core::ptr`] to copy the bits since
+(1) the type of the variable may not implement trait [`Copy`] while
+the type MUST implement trait [`Cast`] to implement this trait, and
+(2) the byte representations may not be placed on the natural
+alignment of the type.  In addition, they use the methods of trait
+[`Flip`] to flip the endianness of the resulting values since the type
+of the variable MUST implement trait [`Flip`] if the endianness of the
+variable needs to be flipped as required.
+
+The number of the bytes in parameter `self` must be larger than or
+equal to the number of the bytes in the byte representations of the
+type.  If this condition is satisfied, the resulting byte
+representations are saved at the head of a byte slice specified by
+parameter `self`.  The remaining bytes in parameter `self` are
+unchanged.
 
 # Method Naming Convention
 
@@ -36,14 +45,18 @@ at the head of byte slice specified by `self`.  The remaining bytes in
   resulting byte representations to the endian specified by parameter
   `endian`.
 
-* The methods whose names end with `` or `f` decast a value specified
-  by parameter `value`.
+* The methods whose names end with `` or `f` decast the value
+  specified by parameter `value`.
 
-* The methods whose names end with `s` or `sf` decast values in the
-  slice specified by parameter `slice`.
+* The methods whose names end with `s` or `sf` decast the values in
+  the slice specified by parameter `slice`.
 
 * The methods whose names end with `v` or `vf` are equivalent to the
   methods whose names end with `s` or `sf` respectively.
+
+If successful, all methods save the resulting byte representations to
+the memory at the head of parameter `self` and return the the number
+of the bytes in the byte representations in [`Some`]`(usize)`.
 
 For details, see the description of each method.
 
@@ -63,15 +76,17 @@ It is exhcanged in big-endian on the Internet.
       `#[`[`derive(Flip)`]`]` to it.
 
 - Step 2: Method [`DecastMem::decastf`] decasts a value of
-  struct `UdpHdr` in native-endian as a byte representation of the
-  UDP[^UDP] header in big-endian ([`BE`]).
+  struct `UdpHdr` in native-endian in parameter `value` as a byte
+  representation of the UDP header in big-endian ([`BE`]), saves the
+  resulting bytes at the head of parameter `self`, and returns the
+  number of the resulting bytes in [`Ok`]`(usize)`.
 
 ```rust
 # fn main() {
 use castflip::{BE, Cast, DecastMem, Flip};
 
 //
-// Step 1: Define struct `UdpHdr`.
+// Step 1: Define struct `UdpHdr` (The UDP header) and test data.
 //
 #[repr(C)]            // to make it possible to apply #[derive(Cast)]
 #[derive(Cast, Flip)] // to implement trait Cast and trait Flip
@@ -82,16 +97,6 @@ struct UdpHdr {  // UDP: See https://www.rfc-editor.org/rfc/rfc768.txt
     sum:   u16,  // UDP Checksum
 }
 
-//
-// Step 2: Decast a value of struct `UdpHdr` in native-endian stored
-// in variable `in_hdr` as a byte representation of the UDP header
-// in big-endian (`BE`) and save it to variable `out_bytes`.
-//
-// Because the UDP header is 8 bytes, only the first 8 bytes of
-// variable `out_bytes` are filled with data and remaining 8 bytes
-// are unchanged.
-//
-
 // Input: A sample UDP header
 let in_hdr: UdpHdr = UdpHdr {
     sport: 0xc3c9,  // = 50121 (Ephemeral Port)
@@ -100,7 +105,15 @@ let in_hdr: UdpHdr = UdpHdr {
     sum:   0x823f,  // = 0x823f (Checksum)
 };
 
-// Decast a value as a byte representation in big-endian (`BE`).
+//
+// Step 2: Decast a value of struct `UdpHdr` in native-endian in
+// variable `in_hdr` as a byte representation of the UDP header
+// in big-endian (`BE`) and save it to variable `out_bytes`.
+//
+// Because the UDP header is 8 bytes, only the first 8 bytes of
+// variable `out_bytes` are filled with data and remaining 8 bytes
+// are unchanged.
+//
 let mut out_bytes = [0_u8; 16];
 let out_size = out_bytes.decastf(&in_hdr, BE).unwrap();
 

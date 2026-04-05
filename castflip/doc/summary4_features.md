@@ -5,14 +5,14 @@ Crate Features: `alloc` and `std`
 The following two crate features are defined in this crate.
 
 - `alloc`\
-  Enables methods that use struct [`Vec`]`<T>`.  If this feature is
-  enabled, this crate imports crate [`alloc`].  If feature `std` is
-  enabled, this feature is also enabled.
+  Enables methods that use struct [`Vec`]`<T>`.
+  * If this feature is enabled, this crate imports crate [`alloc`].
+  * If feature `std` is enabled, this feature is also enabled.
 
 - `std` (enabled by default)\
-  Enables trait [`EncastIO`] and trait [`DecastIO`].  If this feature
-  is enabled, this crate imports crate [`std::io`] and feature `alloc`
-  is enabled.
+  Enables trait [`EncastIO`] and trait [`DecastIO`].
+  * If this feature is enabled, this crate imports crate [`std::io`].
+  * If this feature is enabled, feature `alloc` is also enabled.
 
 By default, feature `std` is enabled.
 

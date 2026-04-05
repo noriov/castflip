@@ -1,12 +1,12 @@
-How to convert between bytes and a `struct` (The UDP header)
+How to convert between bytes and a `struct` (of the UDP header)
 using `std::io`
 
-The examples below use platform independent types that implement both
-trait [`std::io::Read`] and trait [`std::io::Write`] so that they can
-run on any platform.  Needless to say, the steps in the examples can
-be applied to those types that implement trait [`std::io::Read`]
-and/or trait [`std::io::Write`] such as the types for file I/O and
-network I/O.
+The examples below use only platform independent types that implement
+both trait [`std::io::Read`] and trait [`std::io::Write`] so that
+these examples can run on any platform.  Needless to say, the steps in
+these examples can be applied to any types that implement trait
+[`std::io::Read`] and/or trait [`std::io::Write`], e.g., types for
+file I/O and network I/O.
 
 1. [Through a byte stream provided by struct `std::io::Cursor`
    ](../long_example4_1/index.html)

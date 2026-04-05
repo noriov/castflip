@@ -1,4 +1,4 @@
-How to convert between bytes and a `struct` (The UDP header)
+How to convert between bytes and a `struct` (of the UDP header)
 
 The example below encasts[^encast] a byte representation of the
 UDP[^UDP] header in big-endian as a value of struct `UdpHdr` in
@@ -25,12 +25,15 @@ It is exhcanged in big-endian on the Internet.
       `#[`[`derive(Flip)`]`]` to it.
 
 - Step 2: Method [`EncastMem::encastf`] encasts a byte
-  representation of the UDP header in big-endian ([`BE`]) as a value
-  of struct `UdpHdr` in native-endian.
+  representation of the UDP header in big-endian ([`BE`]) at the head
+  of parameter `self` as a value of struct `UdpHdr` in native-endian,
+  and returns the value in [`Ok`]`(UdpHdr)`.
 
 - Step 3: Method [`DecastMem::decastf`] decasts a value of
-  struct `UdpHdr` in native-endian as a byte representation of the UDP
-  header in big-endian ([`BE`]).
+  struct `UdpHdr` in native-endian in a parameter as a byte
+  representation of the UDP header in big-endian ([`BE`]), saves the
+  resulting bytes at the head of parameter `self`, and returns the
+  number of the resulting bytes in [`Ok`]`(usize)`.
 
 # Source Code
 
@@ -38,7 +41,7 @@ It is exhcanged in big-endian on the Internet.
 use castflip::{BE, Cast, DecastMem, EncastMem, Flip};
 
 //
-// Step 1: Define struct `UdpHdr` and test data.
+// Step 1: Define struct `UdpHdr` (The UDP header) and test data.
 //
 #[repr(C)]            // to make it possible to apply #[derive(Cast)]
 #[derive(Cast, Flip)] // to implement trait Cast and trait Flip
@@ -66,12 +69,12 @@ const BYTES1: [u8; 16] = [
 
 fn main() {
     //
-    // Step 2: Method encastf (1) encasts a byte representation of
-    // the UDP header at the head of const `BYTES1` as a value of struct
-    // `UdpHdr`, (2) flips the endianness of four 16-bit unsigned integers
-    // in the value from the big-endianness (`BE`) to the native-endianness,
-    // and (3) returns the resulting value in Ok(UdpHdr) which is saved to
-    // variable `udp_hdr2`.
+    // Step 2: Method encastf (1) encasts a byte representation
+    // of the UDP header at the head of const `BYTES1` as a value of
+    // struct `UdpHdr`, (2) flips the endianness of four 16-bit
+    // unsigned integers in the value from the big-endianness (`BE`)
+    // to the native-endianness, and (3) returns the resulting value
+    // in Ok(UdpHdr) which is saved to variable `udp_hdr2`.
     //
     // In the following method call, generic argument `UdpHdr`
     // can be omitted because it can be infered by the Rust compiler.
@@ -79,16 +82,17 @@ fn main() {
     let udp_hdr2: UdpHdr = BYTES1.encastf::<UdpHdr>(BE).unwrap();
 
     // Check if the content of variable `udp_hdr2` is as expected.
+    // Note: const `UDP_HDR1` contains the expected value of struct `UdpHdr`.
     assert_eq!(udp_hdr2, UDP_HDR1);
 
     //
     // Step 3: Method decastf (1) decasts a value of struct `UdpHdr`
-    // stored in const `UDP_HDR1` as a byte representation of the UDP header,
-    // (2) flips the endianness of four 16-bit unsigned integers in the bytes
-    // from the native-endianness to the big-endianness (`BE`), (3) saves the
-    // resulting bytes at the head of `self`, i.e., at the head of variable
-    // `bytes3`, and (4) returns the number of the resulting bytes in
-    // Ok(usize) which is saved to variable `size3`.
+    // in const `UDP_HDR1` as a byte representation of the UDP header,
+    // (2) flips the endianness of four 16-bit unsigned integers in
+    // the bytes from the native-endianness to the big-endianness (`BE`),
+    // (3) saves the resulting bytes at the head of variable `bytes3`,
+    // and (4) returns the number of the resulting bytes in Ok(usize)
+    // which is saved to variable `size3`.
     //
     // In the following method call, generic argument `UdpHdr`
     // can be omitted because it can be infered by the Rust compiler.
@@ -100,8 +104,10 @@ fn main() {
     assert_eq!(size3, 8); // The size of the UDP header is 8.
 
     // Check if the content of variable `bytes3` is as expected.
-    assert_eq!(bytes3[0..8], BYTES1[0..8]); // The UDP header is stored.
-    assert_eq!(bytes3[8..16], [0_u8; 8]);   // Zero because not changed.
+    // Note: The first 8 bytes of const `BYTES1` contains the expected
+    // byte representation of the UDP header.
+    assert_eq!(bytes3[0..8], BYTES1[0..8]); // The expected UDP header.
+    assert_eq!(bytes3[8..16], [0_u8; 8]);   // Zeros because not changed.
 }
 ```
 

@@ -17,6 +17,6 @@ Two categories of endiannesses are defined in enum [`Endian`].
       (denoted as [`Endian::Big`], or [`BE`] for short)
 
 The main purpose of enum [`Endian`] is to specify the endianness of a
-byte representation of a type.
+byte representation of a fixed binary format.
 
 Fore more information, see the document of enum [`Endian`].

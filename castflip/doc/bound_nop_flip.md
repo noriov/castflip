@@ -20,17 +20,17 @@ It is defined as a marker.
 
 # Safety
 
-When you implement trait [`NopFlip`] for a type, you need to implement
-trait [`Flip`] whose methods do nothing for the type.  But for safety
-reasons, you must not implement trait [`Flip`] manually unless you
-know what you are doing.
+When you implement trait [`NopFlip`] for a type, you also need to
+implement trait [`Flip`] whose methods do nothing for the type.  But
+for safety reasons, you must not implement trait [`Flip`] manually
+unless you know what you are doing.
 
 The recommended way to implement both trait [`Flip`] whose methods do
 nothing and trait [`NopFlip`] for a type is to apply attribute
 `#[`[`derive(NopFlip)`]`]` to the type.
 
 Note that the internal specification of attribute
-`#[`[`derive(NopFlip)`]`]` may be revised in a future release.
+`#[`[`derive(NopFlip)`]`]` may be revised in future releases.
 
 # Background
 
@@ -38,17 +38,17 @@ Because there is no common way to flip the endianness of a value of a
 `union` type, attribute `#[`[`derive(Flip)`]`]` does not support a
 `union` type.  Therefore, if a `struct` type contains a field of a
 `union` type, attribute `#[`[`derive(Flip)`]`]` cannot be applied to
-the `struct` type unless the `union` type manually implements trait
-[`Flip`].  In order to simplify such manual work, attribute
+the `struct` type unless the `union` type implements trait [`Flip`]
+manually.  In order to simplify such manual work, attribute
 `#[`[`derive(NopFlip)`]`]` is introduced.
 
 Attribute `#[`[`derive(NopFlip)`]`]` can be applied to a `struct` type
 or a `union` type if its all fields implement [`Flip`] or it has no
 field.  By applying the attribute to such type, it implements trait
 [`Flip`] whose methods do nothing (NOP = No OPeration).  What you
-should do manually is to flip the endiannesses of its values or its
-byte representations where necessary.  In addition, it also implements
-trait [`NopFlip`].
+should manually do is only to flip the endiannesses of its values or
+its byte representations where necessary.  In addition, it also
+implements trait [`NopFlip`].
 
 Attribute `#[`[`derive(NopFlip)`]`]` is also useful for a `struct`
 type.  For example, the [Mach-O] header and the [PCAP] format have a
@@ -62,8 +62,7 @@ endianness of such multi-byte field is retained.
 # Example 1
 
 The example below encasts a byte representation of nested struct
-`Container` in little-endian ([`LE`]) as a value of the type in
-native-endian.
+`Container` in little-endian as a value of the type in native-endian.
 
 - Step 1: Struct `Container`, struct `FieldS` and union `FieldU` are
   defined.
@@ -76,8 +75,9 @@ native-endian.
       `#[`[`derive(NopFlip)`]`]` to it.
 
 - Step 2: Method [`EncastMem::encastf`] encasts a byte
-  representation of struct `Container` in little-endian as a value of
-  the type in native-endian.
+  representation of struct `Container` in little-endian ([`LE`]) at
+  the head of parameter `self` as a value of the type in
+  native-endian.
 
 ```rust
 # fn main() {
@@ -118,12 +118,11 @@ let in_bytes: [u8; 16] = [
 ];
 
 //
-// Step 2: Encast a byte representation of struct `Container` in
-// little-endian (`LE`) stored in variable `in_bytes` as a value of
-// struct `Container` in native-endian and save it to variable `out_con`.
+// Step 2: Encast a byte representation of struct `Container`
+// in little-endian (`LE`) at the head of variable `in_bytes`
+// as a value of struct `Container` in native-endian and
+// save it to variable `out_con`.
 //
-
-// Encast a byte representation in little-endian (`LE`) as a value.
 let out_con: Container = in_bytes.encastf(LE).unwrap();
 
 // Check if the values of all fields in variable `out_con.s` (whose type
@@ -178,12 +177,13 @@ magic number) are read twice.
       `#[`[`derive(NopFlip)`]`]` to it.
 
 - Step 2: Method [`EncastMem::encast`] encasts the first 4 bytes of
-  a byte representation of the Mach-O fat header as a value of struct
-  `FatMagic` to determine the endianness of the byte representation.
+  a byte representation of the Mach-O fat header at the head of
+  parameter `self` as a value of struct `FatMagic` to determine the
+  endianness of the byte representation.
 
 - Step 3: Method [`EncastMem::encastf`] encasts a byte
-  representation of the Mach-O fat header as a value of struct
-  `FatHeader`.
+  representation of the Mach-O fat header at the head of parameter
+  `self` as a value of struct `FatHeader`.
 
 ```rust
 # fn main() {
@@ -219,10 +219,11 @@ const FAT_CIGAM64: u32 = 0xbfbafeca; // Swapped Endian, 64-bit
 let in_bytes: [u8; 8] = [0xca, 0xfe, 0xba, 0xbe, 0x00, 0x00, 0x00, 0x02];
 
 //
-// Step 2: Encast the first 4 bytes of a byte representation of the
-// Mach-O fat header in `in_bytes` as a value of struct `FatMagic`
-// without flipping its endianness to determine the endianness of
-// variable `in_bytes`.  The determined endianness is saved to `endian`.
+// Step 2: Determine the endianness of the byte representation of
+// the Mach-O fat header in variable `in_bytes` by encasting the
+// first 4 bytes of the byte representation as a value of struct
+// `FatMagic` without flipping its endianness.
+// The determined endianness is saved to `endian`.
 //
 let magic: FatMagic = in_bytes.encast().unwrap();
 let endian = match magic.number {
@@ -235,9 +236,9 @@ let endian = match magic.number {
 assert_eq!(endian.absolute(), Endian::Big);
 
 //
-// Step 3: Encast a byte representation of the Mach-O fat header
-// in variable `in_bytes` as a value of struct `FatHeader` and save it
-// to variable `out_hdr`.
+// Step 3: Encast a byte representation of the Mach-O fat header at
+// the head of variable `in_bytes` as a value of struct `FatHeader`
+// and save it to variable `out_hdr`.
 //
 let out_hdr: FatHeader = in_bytes.encastf(endian).unwrap();
 

@@ -1,16 +1,20 @@
 How to convert between bytes and a number
 
+The examples below show how to convert between a byte representation
+of a primitive numeric type and a value of the type with endianness
+handling.
+
 # 1. Converting Bytes to a Number
 
 The example below *encast*s[^encast] a byte representation of `u32` in
-big-endian ([`BE`]) as a value of `u32` in native-endian by using
+big-endian ([`BE`]) as a value of the type in native-endian by using
 method [`EncastMem::encastf`].
 
 ```rust
 # fn main() {
 use castflip::{BE, EncastMem};
 
-let in_bytes: [u8; 4] = [0x12, 0x34, 0x56, 0x78];
+let in_bytes: [u8; 4] = [0x12, 0x34, 0x56, 0x78]; // in Big-Endian (`BE`)
 let out_number: u32 = in_bytes.encastf(BE).unwrap();
 assert_eq!(out_number, 0x12345678);
 # }
@@ -22,8 +26,8 @@ method [`EncastMem::encast`] can be used instead.
 # 2. Converting a Number to Bytes
 
 The example below *decast*s[^decast] a value of `u32` in native-endian
-as a byte representation of `u32` in little-endian ([`LE`]) by using
-method [`DecastMem::decastf`].
+as a byte representation of the type in little-endian ([`LE`]) by
+using method [`DecastMem::decastf`].
 
 ```rust
 # fn main() {
@@ -32,7 +36,7 @@ use castflip::{DecastMem, LE};
 let in_number: u32 = 0x87654321;
 let mut out_bytes: [u8; 4] = [0; 4];
 out_bytes.decastf(&in_number, LE).unwrap();
-assert_eq!(out_bytes, [0x21, 0x43, 0x65, 0x87]);
+assert_eq!(out_bytes, [0x21, 0x43, 0x65, 0x87]); // in Little-Endian (`LE`)
 # }
 ```
 

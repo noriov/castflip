@@ -10,17 +10,20 @@ written to memory.
 - Trait [`EncastMem`]\
   Provides the `encast` method family whose methods encast one or more
   byte representations of a type at the head of a byte slice specified
-  by `self` as one or more values of the type, flip the endianness of
-  the values as required, then return the resulting values in
-  [`Some`].
+  by parameter `self` as one or more values of the type, and flip the
+  endianness of the values as required.  If successful, some methods
+  return the resulting values in [`Some`], and other methods save the
+  resulting values to the specified parameter and return the number of
+  the source bytes in [`Some`]`(usize)`.
 
 - Trait [`DecastMem`]\
   Provides the `decast` method family whose methods decast one or more
   values of a type specified by a parameter as one or more byte
   representations of the type, flip the endianness of the byte
-  representations as required, save the resulting byte representations
-  at the head of byte slice specified by `self`, then return the
-  number of the bytes in the byte representations in [`Some`]`(usize)`.
+  representations as required, and save the resulting byte
+  representations at the head of byte slice specified by parameter
+  `self`.  If successful, the methods return the number of the bytes
+  in the byte representations in [`Some`]`(usize)`.
 
 The methods of these traits return [`Option`].  On failure, they return
 [`None`].
@@ -37,18 +40,20 @@ values as byte representations written to a writer using
 - Trait [`EncastIO`]\
   Provides the `encast` method family whose methods encast one or more
   byte representations of a type read from reader `self` using trait
-  [`std::io::Read`] as one or more values of the type, flip the
-  endianness of the values as required, then return the resulting
-  values in [`Ok`].
+  [`std::io::Read`] as one or more values of the type, and flip the
+  endianness of the values as required.  If successful, some methods
+  return the resulting values in [`Ok`], and other methods save the
+  resulting values to the specified parameter and return the number of
+  the source bytes in [`Ok`]`(usize)`.
 
 - Trait [`DecastIO`]\
   Provides the `decast` method family whose methods decast one or more
   values of a type specified by a parameter as one or more byte
   representations of the type, flip the endianness of the byte
-  representations as required, write the resulting byte
-  representations to writer `self` using trait [`std::io::Write`],
-  then return the number of the bytes in the byte representations in
-  [`Ok`]`(usize)`.
+  representations as required, and write the resulting byte
+  representations to writer `self` using trait [`std::io::Write`].  If
+  successful, the methods return the number of the bytes in the byte
+  representations in [`Ok`]`(usize)`.
 
 The methods of these traits return [`Result`].  On failure, they return
 an error value of struct [`std::io::Error`] in [`Err`].

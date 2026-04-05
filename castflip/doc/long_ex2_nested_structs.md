@@ -1,4 +1,4 @@
-How to convert between bytes and a nested `struct`
+How to convert between bytes and nested `struct`s
 
 The example below encasts[^encast] a byte representation of nested
 struct `Container` in little-endian as a value of the type in
@@ -24,12 +24,15 @@ as a byte representation of the type.
       `#[`[`derive(NopFlip)`]`]` to it.
 
 - Step 2: Method [`EncastMem::encastf`] encasts a byte
-  representation in little-endian ([`LE`]) as a value of struct
-  `Container` in native-endian.
+  representation in little-endian ([`LE`]) at the head of parameter
+  `self` as a value of struct `Container` in native-endian, and
+  returns the value in [`Ok`]`(Container)`.
 
 - Step 3: Method [`DecastMem::decastf`] decasts a value of
-  struct `Container` in native-endian as a byte representation in
-  little-endian ([`LE`]).
+  struct `Container` in native-endian in a parameter as a byte
+  representation in little-endian ([`LE`]), saves the resulting bytes
+  at the head of parameter `self`, and returns the number of the
+  resulting bytes in [`Ok`]`(usize)`.
 
 # Source Code
 
@@ -72,13 +75,13 @@ const BYTES1: [u8; 16] = [
 
 fn main() {
     //
-    // Step 2: Method encastf (1) encasts a byte representation of
-    // struct `Container` at the head of const `BYTES1` as a value of the
-    // type, (2) flips the endiannesses of field `s` of struct `FieldS`
-    // and field `f` of f32 from the little-endianness (`LE`) to the
-    // native-endianness (Note: field `u` of union `FieldU` is not flipped),
-    // and (3) returns the resulting value in Ok(Container) which is saved
-    // to variable `con2`.
+    // Step 2: Method encastf (1) encasts a byte representation
+    // of struct `Container` at the head of const `BYTES1` as a value
+    // of the type, (2) flips the endiannesses of field `s` of struct
+    // `FieldS` and field `f` of f32 from the little-endianness (`LE`)
+    // to the native-endianness (Note: field `u` of union `FieldU` is not
+    // flipped), and (3) returns the resulting value in Ok(Container)
+    // which is saved to variable `con2`.
     //
     // In the following method call, generic argument `Container`
     // can be omitted because it can be infered by the Rust compiler.
@@ -113,12 +116,13 @@ fn main() {
 
     //
     // Step 3: Method decastf (1) decasts the value of struct
-    // `Container` saved in variable `con2` as a byte representation of the
-    // type, (2) flips the endiannesses of field `s` of struct `FieldS` and
-    // field `f` of f32 from the native-endianness to the little-endianness
-    // (`LE`) (Note: field `u` of union `FieldU` is not flipped), (3) saves
-    // the resulting bytes to variable `bytes3` and (4) returns the number
-    // of the saved bytes in Ok(usize) which is saved in variable `size3`.
+    // `Container` in variable `con2` as a byte representation of
+    // the type, (2) flips the endiannesses of field `s` of struct
+    // `FieldS` and field `f` of f32 from the native-endianness to
+    // the little-endianness (`LE`) (Note: field `u` of union `FieldU`
+    // is not flipped), (3) saves the resulting bytes at the head of
+    // variable `bytes3` and (4) returns the number of the saved bytes
+    // in Ok(usize) which is saved in variable `size3`.
     //
     // In the following method call, generic argument `Container`
     // can be omitted because it can be infered by the Rust compiler.

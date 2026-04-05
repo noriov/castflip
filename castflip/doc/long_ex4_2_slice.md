@@ -1,23 +1,31 @@
-How to convert between bytes and a `struct` (The UDP header)
-through a byte stream provided by a mutable byte slice `&mut [u8]`
+How to convert between bytes and a `struct` (of the UDP header)
+through a byte stream provided by
+a mutable byte slice `&mut [u8]`
 
-Because `&[u8]` implements trait [`std::io::Read`], the methods of
-trait [`EncastIO`] can encast in-memory byte representations as values
-through a slice of type `&[u8]`.  Because `&mut [u8]` implements trait
-[`std::io::Write`], the methods of trait [`DecastIO`] can decast
-values as in-memory byte representations through a slice of type `&mut
-[u8]`.
+The example below encasts[^encast] a byte representation of the
+UDP[^UDP] header in big-endian read from
+a mutable byte slice `&mut [u8]`
+as a value of struct `UdpHdr` in native-endian, then decasts[^decast]
+a value of struct `UdpHdr` in native-endian as a byte representation
+of the UDP header in big-endian which is written to
+a mutable byte slice `&mut [u8]`.
 
-The example below encasts a byte representation of the UDP[^UDP]
-header in big-endian read from a mutable byte slice `&mut [u8]` as a
-value of struct `UdpHdr` in native-endian, then decasts a value of
-struct `UdpHdr` in native-endian as a byte representation of the
-UDP[^UDP] header in big-endian which is written to a mutable byte
-slice `&mut [u8]`.
+[^encast]: In this crate, to *encast* means to cast a byte
+representation of a type as a value of the type.
+
+[^decast]: In this crate, to *decast* means to cast a value of a type
+as a byte representation of the type.
 
 [^UDP]: The User Datagram Protocol ([UDP]) is one of the fundamental
 protocols of the Internet protocol suite.  It is defined in [RFC768].
 It is exhcanged in big-endian on the Internet.
+
+Note: Because `&[u8]` implements trait [`std::io::Read`], the methods
+of trait [`EncastIO`] can encast in-memory byte representations as
+values through a slice of type `&[u8]`.  Because `&mut [u8]`
+implements trait [`std::io::Write`], the methods of trait [`DecastIO`]
+can decast values as in-memory byte representations through a slice of
+type `&mut [u8]`.
 
 # Outline
 
@@ -29,23 +37,28 @@ It is exhcanged in big-endian on the Internet.
 
 - Step 2: Method [`EncastIO::encastf`] encasts a byte
   representation of the UDP header in big-endian ([`BE`]) read from
-  a mutable byte slice `&mut [u8]` as a value of struct `UdpHdr` in
-  native-endian.
+  parameter `self`
+  (a mutable byte slice)
+  as a value of struct `UdpHdr` in native-endian, and returns the
+  value in [`Ok`]`(UdpHdr)`.
 
 - Step 3: Method [`DecastIO::decastf`] decasts a value of
   struct `UdpHdr` in native-endian as a byte representation of the UDP
-  header in big-endian ([`BE`]) and writes it to a mutable byte slice
-  `&mut [u8]`.
+  header in big-endian ([`BE`]), writes the bytes to parameter `self`
+  (a mutable byte slice),
+  and returns the number of the bytes in [`Ok`]`(usize)`.
 
 - Step 4: Method [`EncastIO::encastf`] encasts a byte
-  representation of the UDP header in big-endian ([`BE`]) read from
-  a mutable byte slice `&mut [u8]` as four 16-bit unsigned integers in
-  native-endian.
+  representation of `u16` in big-endian ([`BE`]) read from parameter `self`
+  (a mutable byte slice)
+  as a value of `u16` in native-endian, and returns the value in
+  [`Ok`]`(u16)`.
 
-- Step 5: Method [`DecastIO::decastf`] decasts four 16-bit
-  unsigned integers in native-endian as a byte representation of the
-  UDP header in big-endian ([`BE`]) and writes it to a mutable byte
-  slice `&mut [u8]`.
+- Step 5: Method [`DecastIO::decastf`] decasts a value of
+  `u16` in native-endian as a byte representation of `u16`, writes the
+  bytes to parameter `self`
+  (a mutable byte slice),
+  and returns the number of the bytes in [`Ok`]`(usize)`.
 
 # Source Code
 
@@ -53,7 +66,7 @@ It is exhcanged in big-endian on the Internet.
 use castflip::{BE, Cast, DecastIO, EncastIO, Flip};
 
 //
-// Step 1: Define struct `UdpHdr` and test data.
+// Step 1: Define struct `UdpHdr` (The UDP header) and test data.
 //
 #[repr(C)]            // to make it possible to apply #[derive(Cast)]
 #[derive(Cast, Flip)] // to implement trait Cast and trait Flip
@@ -81,12 +94,13 @@ const BYTES1: [u8; 16] = [
 
 fn main() {
     //
-    // Step 2: Method encastf (1) encasts a byte representation of
-    // the UDP header at the head of variable `slice2` as a value of struct
-    // `UdpHdr`, (2) flips the endianness of four 16-bit unsigned integers
-    // in the value from the big-endianness (`BE`) to the native-endianness,
-    // and (3) returns the resulting value in Ok(UdpHdr) which is saved to
-    // variable `udp_hdr2`.
+    // Step 2: Method encastf (1) encasts a byte
+    // representation of the UDP header at the head of variable
+    // `slice2` as a value of struct `UdpHdr`, (2) flips the
+    // endianness of four 16-bit unsigned integers in the value
+    // from the big-endianness (`BE`) to the native-endianness,
+    // and (3) returns the resulting value in Ok(UdpHdr) which
+    // is saved to variable `udp_hdr2`.
     //
     // In the following method call, generic argument `UdpHdr`
     // can be omitted because it can be infered by the Rust compiler.
@@ -99,16 +113,18 @@ fn main() {
     assert_eq!(slice2, &BYTES1[8..]);
 
     // Check if the content of variable `udp_hdr2` is as expected.
+    // Note: const `UDP_HDR1` contains the expected value of struct `UdpHdr`.
     assert_eq!(udp_hdr2, UDP_HDR1);
 
     //
-    // Step 3: Method decastf (1) decasts a value of struct `UdpHdr`
-    // stored in const `UDP_HDR1` as a byte representation of the UDP header,
-    // (2) flips the endianness of four 16-bit unsigned integers in the bytes
-    // from the native-endianness to the big-endianness (`BE`), (3) saves the
-    // resulting bytes at the head of `self`, i.e., at the head of variable
-    // `slice3`, and (4) returns the number of the resulting bytes in
-    // Ok(usize) which is saved to variable `size3`.
+    // Step 3: Method decastf (1) decasts a value of
+    // struct `UdpHdr` in const `UDP_HDR1` as a byte representation
+    // of the UDP header, (2) flips the endianness of four 16-bit
+    // unsigned integers in the bytes from the native-endianness
+    // to the big-endianness (`BE`), (3) saves the resulting bytes
+    // at the head of variable `slice3`, and (4) returns the
+    // number of the resulting bytes in Ok(usize) which is saved
+    // to variable `size3`.
     //
     // In the following method call, generic argument `UdpHdr`
     // can be omitted because it can be infered by the Rust compiler.
@@ -125,14 +141,18 @@ fn main() {
     assert_eq!(size3, 8); // The size of the UDP header is 8.
 
     // Check if the content of variable `bytes3` is as expected.
-    assert_eq!(bytes3[0..8], BYTES1[0..8]); // The UDP header is stored.
-    assert_eq!(bytes3[8..16], [0_u8; 8]);   // Zero because not changed.
+    // Note: The first 8 bytes of const `BYTES1` contains the expected
+    // byte representation of the UDP header.
+    assert_eq!(bytes3[0..8], BYTES1[0..8]); // The expected UDP header.
+    assert_eq!(bytes3[8..16], [0_u8; 8]);   // Zeros because not changed.
 
     //
-    // Step 4: Encast a byte representation of the UDP header in
-    // big-endian (`BE`) at the head of variable `slice2` as four
-    // 16-bit unsigned integers in native-endian and save them in
-    // variable `sport4`, `dport4`, `len4` and `sum4`.
+    // Step 4: Encast byte representations of `u16` in big-endian
+    // (`BE`) read from variable `slice2` as values of `u16` in
+    // native-endian, and saves the resulting values in variable
+    // `sport4`, `dport4`, `len4` and `sum4`.
+    //
+    // The source bytes are a byte representation of the UDP header.
     //
     // In the following method call, generic argument `u16`
     // can be omitted because it can be infered by the Rust compiler.
@@ -149,16 +169,19 @@ fn main() {
 
     // Check if the contents of variable `sport4`, `dport4`, `len4` and `sum4`
     // are as expected.
+    // Note: const `UDP_HDR1` contains the expected value of struct `UdpHdr`.
     assert_eq!(sport4, UDP_HDR1.sport); // = 50121 (Ephemeral Port)
     assert_eq!(dport4, UDP_HDR1.dport); // = 53 (DNS Port)
     assert_eq!(len4,   UDP_HDR1.len);   // = 50 (Length in Bytes)
     assert_eq!(sum4,   UDP_HDR1.sum);   // = 0x823f (Checksum)
 
     //
-    // Step 5: Decast four 16-bit unsigned integers in native-endian
-    // in variables `sport4`, `dport4`, `len4` and `sum4` as a byte
-    // representation of the UDP header in big-endian (`BE`) and
-    // write it to variable `slice5`.
+    // Step 5: Decast values of `u16` in native-endian as byte
+    // representations of the type in big-endian (`BE`) in
+    // variables `sport4`, `dport4`, `len4` and `sum4`, and
+    // write the resulting bytes to variable `slice5`.
+    //
+    // The resulting bytes are a byte representation of the UDP header.
     //
     // In the following method call, generic argument `u16`
     // can be omitted because it can be infered by the Rust compiler.
@@ -182,8 +205,10 @@ fn main() {
     assert_eq!(sum_size5,   2); // The size of u16 is 2.
 
     // Check if the content of variable `bytes5` is as expected.
-    assert_eq!(bytes5[0..8], BYTES1[0..8]); // The UDP header is stored.
-    assert_eq!(bytes5[8..16], [0_u8; 8]);   // Zero because not changed.
+    // Note: The first 8 bytes of const `BYTES1` contains the expected
+    // byte representation of the UDP header.
+    assert_eq!(bytes5[0..8], BYTES1[0..8]); // The expected UDP header.
+    assert_eq!(bytes5[8..16], [0_u8; 8]);   // Zeros because not changed.
 }
 ```
 

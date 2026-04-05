@@ -42,9 +42,9 @@ if cfg!(target_endian = "little") {
 # Relative Endianness vs. Absolute Endianness
 
 The main purpose of enum [`Endian`] is to specify the endianness of a
-byte representation of a format.
+byte representation of a fixed binary format.
 
-In most cases, the endianness of a byte representation is specified
+In most cases, the endianness of a byte representation is specified by
 using an absolute endianness.  For example, most protocols of the
 [Internet protocol suite] adopt big-endianness, while some of them
 adopt little-endianness.  In such cases, it is simple to specify the

@@ -1,10 +1,10 @@
-Marks types whose values' endiannesses can be flipped by the methods
-of this crate.
+Marks types whose values' endiannesses can be flipped by using the
+methods of this crate.
 
 # Description
 
-The endiannesses of the values of types that implement trait [`Flip`]
-can be flipped by the methods of this crate.
+The endiannesses of the values of types implementing trait [`Flip`]
+can be flipped by using the methods of this crate.
 
 Trait [`Flip`] is implemented for
 
@@ -26,9 +26,9 @@ marker trait [`NopFlip`].
 
 The methods of trait [`Flip`] are designed mainly for internal use.
 They are called by the methods of this crate to flip the endiannesses
-of their resulting values or byte representations.  However, if they
+of the resulting values or byte representations.  However, if they
 satisfy your requirements, you may call them manually to flip the
-endiannesses of your values.
+endiannesses of your values or byte representations.
 
 # Safety
 
@@ -39,23 +39,23 @@ The recommended way to implement trait [`Flip`] for a struct type is
 to apply attribute `#[`[`derive(Flip)`]`]` to the type.
 
 Note that the internal specification of attribute
-`#[`[`derive(Flip)`]`]` may be revised in a future release.
+`#[`[`derive(Flip)`]`]` may be revised in future releases.
 
 # Method Naming Convention
 
 Each method name consits of two parts.
 
-The first part determines the result handling.  The methods whose
-names start with
+The first part determines how to manipulate the value.  The methods
+whose names start with
 
-1. "`flip_val`" return the value in `self`, and
+1. "`flip_val`" return the value of `self`, and
 
 2. "`flip_var`" manipulate the value in `self`.
 
-The second part determines the endianness handling.  The methods whose
-names end with
+The second part determines how to handle the endianness.  The methods
+whose names end with
 
-1. "" (no suffix) flip the endianness of the value if parameter
+1. "" (i.e., no suffix) flip the endianness of the value if parameter
    `endian` is not equivalent to the endianness of the target system,
    and
 
@@ -66,7 +66,7 @@ names end with
 # Comparison With Trait `Copy`
 
 As you may have noticed by reading [the Description
-section](#description) above, all types that implement trait [`Flip`]
+section](#description) above, all types implementing trait [`Flip`]
 can be duplicated simply by copying bits.  However, trait [`Flip`] is
 not a subtrait of trait [`Copy`].  The reasons why trait [`Flip`] is
 defined independently from trait [`Copy`] are (1) to exclude pointers,
@@ -75,21 +75,22 @@ and (2) to avoid unexpected copy operation.  Therefore, when a
 and trait [`Copy`], you must implement both traits explicitly.
 
 When the methods of this crate flip the endiannesses of one or more
-values of a type that implement trait [`Flip`], the methods read and
-write the bits of the values by the functions provided by module
-[`core::ptr`] instead of by the Rust assignment expressions because
-the type may not implement trait [`Copy`].
+values of a type implementing trait [`Flip`], the methods read and
+write the bits of the values by calling the functions provided by
+module [`core::ptr`] instead of by using the Rust assignment
+expressions since the type may not implement trait [`Copy`].
 
 # Comparison With Trait `Cast`
 
 The set of types that can implement trait [`Flip`] is equal to
 the set of types that can implement trait [`Cast`].
 
-But there is a difference between derive macros that support them;
+But there is a difference between derive macros that implement them;
 attribute `#[`[`derive(Flip)`]`]` does not support a `union` type
 because there is no common way to flip the endianness of a `union`
 type, while attribute `#[`[`derive(Cast)`]`]` supports a `union` type
-because the value of a `union` type can be duplicated by copying bits.
+because the value of a `union` type can be duplicated simply by
+copying bits.
 
 In order to distinguish the difference properly, trait [`Flip`] is
 defined independently from trait [`Cast`].
@@ -106,18 +107,17 @@ order to simplify such manual work, attribute
 Attribute `#[`[`derive(NopFlip)`]`]` can be applied to a `struct` type
 or a `union` type if its all fields implement [`Flip`] or it has no
 field.  By applying the attribute to such type, it implements trait
-[`Flip`] whose methods do nothing (NOP = No OPeration).  What you
-should do manually is to flip the endiannesses of its values or its
-byte representations where necessary.  In addition, it also implements
-trait [`NopFlip`].
+[`Flip`] whose methods do nothing (NOP = No OPeration).  In addition,
+it also implements trait [`NopFlip`].  What you should manually do is
+only to flip the endiannesses of its values or its byte
+representations where necessary.
 
 For more information, see the description of trait [`NopFlip`].
 
 # Example 1
 
 The example below encasts a byte representation of the UDP[^UDP]
-header in big-endian ([`BE`]) as a value of struct `UdpHdr` in
-native-endian.
+header in big-endian as a value of struct `UdpHdr` in native-endian.
 
 [^UDP]: The User Datagram Protocol ([UDP]) is one of the fundamental
 protocols of the Internet protocol suite.  It is defined in [RFC768].
@@ -130,15 +130,16 @@ It is exhcanged in big-endian on the Internet.
       `#[`[`derive(Flip)`]`]` to it.
 
 - Step 2: Method [`EncastMem::encastf`] encasts a byte
-  representation of the UDP header in big-endian as a value of struct
-  `UdpHdr` in native-endian.
+  representation of the UDP header in big-endian ([`BE`]) at the head
+  of parameter `self` as a value of struct `UdpHdr` in native-endian,
+  and returns the value in [`Ok`]`(UdpHdr)`.
 
 ```rust
 # fn main() {
 use castflip::{BE, Cast, EncastMem, Flip};
 
 //
-// Step 1: Define struct `UdpHdr`.
+// Step 1: Define struct `UdpHdr` (The UDP header) and test data.
 //
 #[repr(C)]            // to make it possible to apply #[derive(Cast)]
 #[derive(Cast, Flip)] // to implement trait Cast and trait Flip
@@ -149,16 +150,14 @@ struct UdpHdr {  // UDP: See https://www.rfc-editor.org/rfc/rfc768.txt
     sum:   u16,  // UDP Checksum
 }
 
-//
-// Step 2: Encast a byte representation of the UDP header in big-endian
-// (`BE`) stored in variable `in_bytes` as a value of struct `UdpHdr` in
-// native-endian and save it to variable `out_hdr`.
-//
-
 // Input: A sample byte representation of the UDP header (8 bytes)
 let in_bytes: [u8; 8] = [0xc3, 0xc9, 0x00, 0x35, 0x00, 0x32, 0x82, 0x3f];
 
-// Encast a byte representation in big-endian (`BE`) as a value.
+//
+// Step 2: Encast a byte representation of the UDP header in big-endian
+// (`BE`) at the head of variable `in_bytes` as a value of struct
+// `UdpHdr` in native-endian and save it to variable `out_hdr`.
+//
 let out_hdr: UdpHdr = in_bytes.encastf(BE).unwrap();
 
 // Check if all fields in variable `out_hdr` are as expected.
@@ -202,7 +201,7 @@ assert_eq!(int2, 0x5678);
 // from the little-endianness (`LE`) to the native-endianness.
 //
 let mut int3 = 0xabcd_u16.to_le(); // `int3` is in little-endian.
-int3.flip_var(LE); // `int3` is in native-endian now.
+int3.flip_var(LE); // `int3` is now in native-endian.
 
 // Check if the value in variable `int3` is as expected.
 assert_eq!(int3, 0xabcd);
